@@ -18,7 +18,7 @@ CREATE TABLE Category
 CREATE TABLE Product
 (product_id SERIAL NOT NULL PRIMARY KEY, -- Serial
  owner_id INTEGER NOT NULL REFERENCES Seller(seller_id),
- Description VARCHAR(512) NOT NULL,
+ description VARCHAR(512) NOT NULL,
  name VARCHAR(256) NOT NULL UNIQUE,
  image VARCHAR(512) NOT NULL, -- Image URL
  category VARCHAR(32) NOT NULL REFERENCES Category (name)
@@ -55,6 +55,7 @@ CREATE TABLE ProductReview
  product_id INTEGER NOT NULL REFERENCES Product(product_id),
  num_stars REAL NOT NULL,
  date TIMESTAMP NOT NULL,
+ description VARCHAR(512),
  PRIMARY KEY(account_id, product_id)
 );
  

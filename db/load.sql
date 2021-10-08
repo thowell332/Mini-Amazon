@@ -1,7 +1,7 @@
-\COPY Account FROM 'data/Account.csv' WITH DELIMITER ',' NULL '' CSV;
+\COPY Account (email, name, balance, address, password) FROM 'data/Account.csv' WITH DELIMITER ',' NULL '' CSV;
 \COPY Seller FROM 'data/Seller.csv' WITH DELIMITER ',' NULL '' CSV;
 \COPY Category FROM 'data/Category.csv' WITH DELIMITER ',' NULL '' CSV;
-\COPY Product FROM 'data/Product.csv' WITH DELIMITER ',' NULL '' CSV;
+\COPY Product (owner_id, description, name, image, category) FROM 'data/Product.csv' WITH DELIMITER ',' NULL '' CSV;
 \COPY SellerReview FROM 'data/SellerReview.csv' WITH DELIMITER ',' NULL '' CSV;
 \COPY SellsProduct FROM 'data/SellsProduct.csv' WITH DELIMITER ',' NULL '' CSV;
 \COPY SellsItem FROM 'data/SellsItem.csv' WITH DELIMITER ',' NULL '' CSV;
