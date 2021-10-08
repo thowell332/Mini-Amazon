@@ -11,7 +11,7 @@ CREATE TABLE Seller
 (seller_id INTEGER NOT NULL PRIMARY KEY REFERENCES Account(account_id)
 );
  
-CREATE TABLE Categories
+CREATE TABLE Category
 (name VARCHAR(32) NOT NULL PRIMARY KEY 
 );
  
