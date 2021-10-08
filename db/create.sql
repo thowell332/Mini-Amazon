@@ -55,6 +55,7 @@ CREATE TABLE ProductReview
  product_id INTEGER NOT NULL REFERENCES Product(product_id),
  num_stars REAL NOT NULL,
  date TIMESTAMP NOT NULL,
+ description VARCHAR(512),
  PRIMARY KEY(account_id, product_id)
 );
  
