@@ -21,7 +21,7 @@ CREATE TABLE Product
  Description VARCHAR(512) NOT NULL,
  name VARCHAR(256) NOT NULL UNIQUE,
  image VARCHAR(512) NOT NULL, -- Image URL
- category VARCHAR(32) NOT NULL REFERENCES Categories(name)
+ category VARCHAR(32) NOT NULL REFERENCES Category (name)
 );
  
 CREATE TABLE SellerReview
