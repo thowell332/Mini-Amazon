@@ -70,14 +70,13 @@ PRIMARY KEY (buyer_id, seller_id, product_id)
 CREATE TABLE Purchase
 (
 buyer_id INTEGER NOT NULL REFERENCES Account(account_id),
-seller_id INTEGER NOT NULL,
 product_id INTEGER NOT NULL,
 item_id INTEGER NOT NULL,
 purchase_id INTEGER NOT NULL,
 status VARCHAR(32) NOT NULL,
 date TIMESTAMP WITH TIME ZONE NOT NULL,
-PRIMARY KEY (buyer_id, seller_id, product_id, item_id),
-FOREIGN KEY(seller_id, product_id, item_id) REFERENCES SellsItem(seller_id, product_id, item_id)
+PRIMARY KEY (buyer_id, product_id, item_id),
+FOREIGN KEY(product_id, item_id) REFERENCES SellsItem(product_id, item_id)
 );
  
 CREATE FUNCTION Product_Reviewer() RETURNS TRIGGER AS $$
