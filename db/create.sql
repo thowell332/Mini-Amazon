@@ -82,7 +82,7 @@ FOREIGN KEY(product_id, item_id) REFERENCES SellsItem(product_id, item_id)
  
 CREATE FUNCTION Product_Reviewer() RETURNS TRIGGER AS $$
 BEGIN 
-	IF NOT (NEW.buyer_id IN (SELECT Purchase.buyer_id FROM Purchase WHERE Purchase.product_id = NEW.product_id)) THEN
+	IF NOT (NEW.account_id IN (SELECT Purchase.buyer_id FROM Purchase WHERE Purchase.product_id = NEW.product_id)) THEN
        RAISE EXCEPTION 'Buyers cannot write reviews for products they have not  
        purchased';
        END IF;
@@ -97,7 +97,7 @@ CREATE TRIGGER Product_Reviewer
  
 CREATE FUNCTION TF_Seller_Reviewer() RETURNS TRIGGER AS $seller_review$
 BEGIN
-	IF NOT (NEW.buyer_id IN (SELECT Purchase.buyer_id FROM Purchase WHERE Purchase.seller_id = NEW.seller_id)) THEN
+	IF NOT (NEW.buyer_id IN (SELECT Purchase.buyer_id FROM Purchase, SellsItem WHERE SellsItem.seller_id = NEW.seller_id AND Purchase.product_id = SellsItem.product_id AND Purchase.item_id = SellsItem.item_id)) THEN
 	RAISE EXCEPTION 'Buyers cannot review sellers they have not bought from before';
 	END IF;
 	RETURN NEW;
@@ -111,7 +111,7 @@ CREATE TRIGGER TG_Seller_Reviewer
  
 CREATE FUNCTION TF_Cart_Product_Exists() RETURNS TRIGGER AS $cart_product_exists$
 BEGIN
-	IF NOT(NEW.seller_id, NEW.product_id IN (SELECT seller_id, product_id FROM SellsProduct)) THEN
+	IF NOT((NEW.seller_id, NEW.product_id) IN (SELECT seller_id, product_id FROM SellsProduct)) THEN
 	RAISE EXCEPTION 'The product you placed in the cart is not listed by any seller';
 	END IF;
 	RETURN NEW;
