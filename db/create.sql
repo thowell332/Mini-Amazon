@@ -2,7 +2,7 @@ CREATE TABLE Account
 (account_id SERIAL NOT NULL PRIMARY KEY, -- System assigned
 email VARCHAR(256) NOT NULL UNIQUE,
 name VARCHAR(32) NOT NULL,
-balance REAL NOT NULL, -- 4 byte floating point number
+balance DECIMAL NOT NULL, -- 4 byte floating point number
 address VARCHAR(256) NOT NULL,
 password VARCHAR(256) NOT NULL
 );
@@ -27,7 +27,7 @@ CREATE TABLE Product
 CREATE TABLE SellerReview
 (buyer_id INTEGER NOT NULL REFERENCES Account(account_id),
  seller_id INTEGER NOT NULL REFERENCES Seller(seller_id),
- num_stars REAL NOT NULL, -- # stars is float
+ num_stars DECIMAL NOT NULL, -- # stars is float
  date TIMESTAMP NOT NULL,
  description VARCHAR(512), -- Can have stars with no description
  PRIMARY KEY(buyer_id, seller_id)
@@ -37,7 +37,7 @@ CREATE TABLE SellsProduct
 (
 seller_id INTEGER NOT NULL REFERENCES Seller(seller_id),
 product_id INTEGER NOT NULL REFERENCES Product(product_id),
-price REAL NOT NULL,
+price DECIMAL NOT NULL,
 PRIMARY KEY (seller_id, product_id)
 );
  
@@ -51,12 +51,12 @@ FOREIGN KEY(seller_id, product_id) REFERENCES SellsProduct(seller_id, product_id
 );
  
 CREATE TABLE ProductReview
-(account_id INTEGER NOT NULL REFERENCES Account(account_id),
+(buyer_id INTEGER NOT NULL REFERENCES Account(account_id),
  product_id INTEGER NOT NULL REFERENCES Product(product_id),
  num_stars REAL NOT NULL,
  date TIMESTAMP NOT NULL,
  description VARCHAR(512),
- PRIMARY KEY(account_id, product_id)
+ PRIMARY KEY(buyer_id, product_id)
 );
  
 CREATE TABLE Cart
@@ -79,10 +79,10 @@ date TIMESTAMP WITH TIME ZONE NOT NULL,
 PRIMARY KEY (buyer_id, product_id, item_id),
 FOREIGN KEY(product_id, item_id) REFERENCES SellsItem(product_id, item_id)
 );
- 
+
 CREATE FUNCTION Product_Reviewer() RETURNS TRIGGER AS $$
 BEGIN 
-	IF NOT (NEW.account_id IN (SELECT Purchase.buyer_id FROM Purchase WHERE Purchase.product_id = NEW.product_id)) THEN
+	IF NOT (NEW.buyer_id IN (SELECT Purchase.buyer_id FROM Purchase WHERE Purchase.product_id = NEW.product_id)) THEN
        RAISE EXCEPTION 'Buyers cannot write reviews for products they have not  
        purchased';
        END IF;
