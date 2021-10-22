@@ -2,9 +2,9 @@
 \COPY Seller FROM 'data/Seller.csv' WITH DELIMITER ',' NULL '' CSV;
 \COPY Category FROM 'data/Category.csv' WITH DELIMITER ',' NULL '' CSV;
 \COPY Product (owner_id, description, name, image, category) FROM 'data/Product.csv' WITH DELIMITER ',' NULL '' CSV;
-\COPY SellerReview FROM 'data/SellerReview.csv' WITH DELIMITER ',' NULL '' CSV;
 \COPY SellsProduct FROM 'data/SellsProduct.csv' WITH DELIMITER ',' NULL '' CSV;
 \COPY SellsItem FROM 'data/SellsItem.csv' WITH DELIMITER ',' NULL '' CSV;
+\COPY Purchase FROM 'data/Purchase.csv' WITH DELIMITER ',' NULL '' CSV;
+\COPY SellerReview FROM 'data/SellerReview.csv' WITH DELIMITER ',' NULL '' CSV;
 \COPY ProductReview FROM 'data/ProductReview.csv' WITH DELIMITER ',' NULL '' CSV;
 \COPY Cart FROM 'data/Cart.csv' WITH DELIMITER ',' NULL '' CSV;
-\COPY Purchase FROM 'data/Purchase.csv' WITH DELIMITER ',' NULL '' CSV;

@@ -24,15 +24,6 @@ CREATE TABLE Product
  category VARCHAR(32) NOT NULL REFERENCES Category (name)
 );
  
-CREATE TABLE SellerReview
-(buyer_id INTEGER NOT NULL REFERENCES Account(account_id),
- seller_id INTEGER NOT NULL REFERENCES Seller(seller_id),
- num_stars DECIMAL NOT NULL, -- # stars is float
- date TIMESTAMP NOT NULL,
- description VARCHAR(512), -- Can have stars with no description
- PRIMARY KEY(buyer_id, seller_id)
-);
- 
 CREATE TABLE SellsProduct
 (
 seller_id INTEGER NOT NULL REFERENCES Seller(seller_id),
@@ -40,7 +31,7 @@ product_id INTEGER NOT NULL REFERENCES Product(product_id),
 price DECIMAL NOT NULL,
 PRIMARY KEY (seller_id, product_id)
 );
- 
+
 CREATE TABLE SellsItem
 (
 seller_id INTEGER NOT NULL,
@@ -48,6 +39,27 @@ product_id INTEGER NOT NULL,
 item_id INTEGER NOT NULL,
 PRIMARY KEY (product_id, item_id),
 FOREIGN KEY(seller_id, product_id) REFERENCES SellsProduct(seller_id, product_id)
+);
+
+CREATE TABLE Purchase
+(
+buyer_id INTEGER NOT NULL REFERENCES Account(account_id),
+product_id INTEGER NOT NULL,
+item_id INTEGER NOT NULL,
+purchase_id INTEGER NOT NULL,
+status VARCHAR(32) NOT NULL,
+date TIMESTAMP WITH TIME ZONE NOT NULL,
+PRIMARY KEY (buyer_id, product_id, item_id),
+FOREIGN KEY(product_id, item_id) REFERENCES SellsItem(product_id, item_id)
+);
+ 
+CREATE TABLE SellerReview
+(buyer_id INTEGER NOT NULL REFERENCES Account(account_id),
+ seller_id INTEGER NOT NULL REFERENCES Seller(seller_id),
+ num_stars DECIMAL NOT NULL, -- # stars is float
+ date TIMESTAMP NOT NULL,
+ description VARCHAR(512), -- Can have stars with no description
+ PRIMARY KEY(buyer_id, seller_id)
 );
  
 CREATE TABLE ProductReview
@@ -68,17 +80,6 @@ quantity INTEGER NOT NULL,
 PRIMARY KEY (buyer_id, seller_id, product_id)
 );
  
-CREATE TABLE Purchase
-(
-buyer_id INTEGER NOT NULL REFERENCES Account(account_id),
-product_id INTEGER NOT NULL,
-item_id INTEGER NOT NULL,
-purchase_id INTEGER NOT NULL,
-status VARCHAR(32) NOT NULL,
-date TIMESTAMP WITH TIME ZONE NOT NULL,
-PRIMARY KEY (buyer_id, product_id, item_id),
-FOREIGN KEY(product_id, item_id) REFERENCES SellsItem(product_id, item_id)
-);
 
 CREATE FUNCTION Product_Reviewer() RETURNS TRIGGER AS $$
 BEGIN 
