@@ -1,6 +1,11 @@
 import React from 'react';
 import LogoImage from '../images/logo.png'
 
+/**
+ * Logo image wrapped into a component.
+ *
+ * @author Eric Doppelt
+ */
 function Logo() {
 
   return (
