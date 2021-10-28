@@ -40,7 +40,7 @@ WHERE search_criteria = :search_criteria
 AND name LIKE search_criteria OR description LIKE search_criteria
         
         ''', search_criteria=search_criteria)
-        return [Product(*row) for row in rows]
+        return [Product(*row) for row in rows] if rows is not None else None
 
     @staticmethod
     ##method to return all products in a certain category
@@ -50,7 +50,7 @@ SELECT product_id, owner_id, description, name, image, category
 FROM Products
 WHERE category = :category
         ''', category=category)
-        return [Product(*row) for row in rows]
+        return [Product(*row) for row in rows] if rows is not None else None
 
     @staticmethod
     ##A detailed product page will show all details for the product,
@@ -65,7 +65,7 @@ AND p.owner_id = sp.seller_id
 AND p.product_id = si.product_id
 AND p.owner_id = si.seller_id
 ''', product_id=product_id)
-        return [ProductDisplayPage(*row) for row in rows]
+        return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
 
     @staticmethod
     ##Method to insert a new product into the database
@@ -75,5 +75,19 @@ INSERT INTO Product (product_id, owner_id, description, name, image, category)
 VALUES (%s, %s, %s, %s, %s, %s)
         '''
         values = (product_id, owner_id, description, name, image, category)
-        app.db.execute(insert_statement, values)
+        try:
+            app.db.execute(insert_statement, values)
+        except Exception as e:
+            print(e)
+
+    @staticmethod
+    ##Method to delete a product from the database
+    def delete_product(product_id):
+        try:
+            app.db.execute('''
+DELETE FROM Product WHERE product_id = :product_id
+        ''', product_id=product_id)
+        except Exception as e:
+            print(e)
+
 
