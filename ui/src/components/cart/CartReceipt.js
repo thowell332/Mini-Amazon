@@ -10,16 +10,8 @@ import { Button } from '@mui/material';
  * @author Eric Doppelt
  */
 
-/**
- * Need to show:
- *   - Product Name
- *   - Seller Name
- *   - Quantity
- *   - Unit Price
- *   - Total Item Price
- *   - Total Price at Bottom
- */
 
+/* MOCK DATA */
  var mock_data = [
     {
       id: 1,
@@ -37,6 +29,9 @@ import { Button } from '@mui/material';
       price: '6.90'
     },
   ]
+
+  var mock_user_email = 'edopp4182@gmail.com'
+/* END OF MOCK DATA */
 
   const columns = [
     { field: 'product_name', headerName: 'Product', width: 250 },
