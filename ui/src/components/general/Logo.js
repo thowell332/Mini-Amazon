@@ -1,5 +1,5 @@
 import React from 'react';
-import LogoImage from '../images/logo.png'
+import LogoImage from '../../images/logo.png'
 
 /**
  * Logo image wrapped into a component.
@@ -10,7 +10,7 @@ function Logo() {
 
   return (
     <div className='logo'>
-        <img height='30' width='auto' src={LogoImage}/>
+        <img alt='logo' height='30' width='auto' src={LogoImage}/>
     </div>
   );
 }

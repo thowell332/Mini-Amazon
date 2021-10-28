@@ -1,23 +1,31 @@
-import IconHeader from '../components/IconHeader';
-import SearchBar from '../components/SearchBar';
+import IconHeader from '../components/general/IconHeader';
+import SearchBar from '../components/general/SearchBar';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import theme from '../util/Theme';
-import '../util/stylings/FullDiv.css'
+import '../stylings/FullDiv.css'
+import '../stylings/Cart.css'
+import CartReceipt from '../components/cart/CartReceipt';
+
 /**
  * Cart page. 
  *
  * @author Eric Doppelt
  */
+
 function Cart() {
+
     return (
       <div className="fullDiv">
         <SearchBar/>
-        <IconHeader
-          /* TODO: refactor this into a LargeIcon */
-          icon={<ShoppingCartIcon sx={{width: 200, height: 200, color: theme.palette.secondary.light}}/>}
-          title='Your Shopping Cart'
-        />
-      </div>
+        <div className='iconHeader'>
+          <IconHeader
+            icon={<ShoppingCartIcon color='secondary' style={{fontSize: 150}}/>}
+            title='Your Shopping Cart'
+          />
+        </div>
+        <div className='receipt'>
+          <CartReceipt/>
+        </div>
+        </div>
     );
 }
 

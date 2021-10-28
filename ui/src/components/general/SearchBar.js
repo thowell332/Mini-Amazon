@@ -1,5 +1,4 @@
 import {React, useState} from 'react';
-import theme from '../util/Theme';
 
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -35,10 +34,7 @@ function SearchBar() {
     
     <div className="app-bar">
       {/* AppBar with Search, Login Button, etc. incoming.*/}
-      <AppBar
-        sx={{
-          backgroundColor: theme.palette.primary.main
-        }}
+      <AppBar color='primary'
         >
           <Toolbar>
             <IconButton
@@ -49,7 +45,7 @@ function SearchBar() {
             {/* FIXME: Style this with CSS or altenrative. */}
             <div style={{marginLeft:20, marginTop:10}}>
               <Link to={'/'}>
-                <Logo/>
+                {/* <Logo/> */}
               </Link>
             </div>
           </Toolbar>
@@ -62,13 +58,12 @@ function SearchBar() {
           open={openDrawer}
           onClose={() => setOpenDrawer(false)}
           >
-          <div style={{backgroundColor: theme.palette.primary.main, paddingLeft: 50, paddingTop: 20}}>
+          <div style={{paddingLeft: 50, paddingTop: 20}}>
             <Logo/>
           </div>
           <Divider/>
           <List
             sx = {{
-              backgroundColor: theme.palette.primary.main,
               height: '100vh',
               width: 200,
               textDecoration: 'none',
@@ -76,9 +71,9 @@ function SearchBar() {
             >
             {/*----HOME----*/}
             {links.map((link, index) => (
-              <Link to={link} style={{ color: theme.palette.secondary.light, textDecoration: 'none'}}>
+              <Link to={link} style={{textDecoration: 'none'}}>
               <ListItem key={pageNames[index]} sx={{paddingLeft: 2.5}}>
-                <ListItemIcon style={{color: theme.palette.secondary.light}}>
+                <ListItemIcon>
                   {icons[index]}
                 </ListItemIcon>
                 <ListItemText primary={pageNames[index]} primaryTypographyProps={{variant: 'body1'}}/>
