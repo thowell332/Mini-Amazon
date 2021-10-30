@@ -1,6 +1,6 @@
 from flask import current_app as app
 
-from productdisplaypage import ProductDisplayPage
+import productdisplaypage;
 
 class Product:
     def __init__(self, product_id, owner_id, description, name, image, category):
@@ -65,7 +65,7 @@ AND p.owner_id = sp.seller_id
 AND p.product_id = si.product_id
 AND p.owner_id = si.seller_id
 ''', product_id=product_id)
-        return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
+        return [productdisplaypage(*row) for row in rows] if rows is not None else None
 
     @staticmethod
     ##Method to insert a new product into the database
