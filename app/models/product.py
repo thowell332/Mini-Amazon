@@ -1,7 +1,5 @@
 from flask import current_app as app
 
-import productdisplaypage;
-
 class Product:
     def __init__(self, product_id, owner_id, description, name, image, category):
         self.product_id = product_id
@@ -65,7 +63,7 @@ AND p.owner_id = sp.seller_id
 AND p.product_id = si.product_id
 AND p.owner_id = si.seller_id
 ''', product_id=product_id)
-        return [productdisplaypage(*row) for row in rows] if rows is not None else None
+        return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
 
     @staticmethod
     ##Method to insert a new product into the database
@@ -90,4 +88,15 @@ DELETE FROM Product WHERE product_id = :product_id
         except Exception as e:
             print(e)
 
+
+class ProductDisplayPage:
+    def __init__(self, product_id, owner_id, description, name, image, category, price, quantity):
+        self.product_id = product_id
+        self.owner_id = owner_id
+        self.description = description
+        self.name = name
+        self.image = image
+        self.category = category
+        self.price = price
+        self.quantity = quantity
 
