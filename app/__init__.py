@@ -1,6 +1,9 @@
 from flask import Flask
 from flask_login import LoginManager
 from flask_babel import Babel
+from flask import Flask
+from flask_login import LoginManager
+from flask_babel import Babel
 from .config import Config
 from .db import DB
 
