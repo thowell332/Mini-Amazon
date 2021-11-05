@@ -7,7 +7,7 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from flask_babel import _, lazy_gettext as _l
 
 from .models.user import User
-
+from .models.userReviews import userProductReview, userSellerReview
 
 from flask import Blueprint
 bp = Blueprint('users', __name__)
@@ -73,3 +73,21 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('index.index'))
+
+"""
+class UserReviewForm(FlaskForm):
+    review = StringField(_l('Review'), validators=[DataRequired()])
+"""
+
+
+@bp.route('/userReviews')
+def userReviews():
+     # get all product reviews user has made:
+    productReviews = userProductReview.get('5')
+    print(productReviews[0].product_id)
+    # render the page by adding information to the index.html file
+    return render_template('userReviews.html',
+                           userProductReviews=productReviews)
+  
+   
+

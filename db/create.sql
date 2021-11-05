@@ -166,7 +166,7 @@ CREATE TRIGGER One_Seller_Review
 	FOR EACH ROW
 	EXECUTE PROCEDURE One_Seller_Review();
 
---All ratings/reviews authored by the user in reverse chronological order
+--Allratings/reviews authored by the user in reverse chronological order
 --SELECT * FROM ProductReview, SellerReview
 --WHERE NEW.account_id = ProductReview.account_id
 --ORDER BY date DESC
