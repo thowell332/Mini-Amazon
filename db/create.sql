@@ -148,7 +148,7 @@ END;
 $one_product_review$ LANGUAGE plpgsql;
 
 CREATE TRIGGER One_Product_Review
-	BEFORE INSERT OR UPDATE ON ProductReview
+	BEFORE INSERT ON ProductReview 
 	FOR EACH ROW
 	EXECUTE PROCEDURE One_Product_Review();
 
@@ -162,7 +162,7 @@ END;
 $one_seller_review$ LANGUAGE plpgsql;
 
 CREATE TRIGGER One_Seller_Review
-	BEFORE INSERT OR UPDATE ON SellerReview
+	BEFORE INSERT ON SellerReview
 	FOR EACH ROW
 	EXECUTE PROCEDURE One_Seller_Review();
 

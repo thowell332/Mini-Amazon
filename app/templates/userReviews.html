@@ -4,7 +4,7 @@
 
 <br><br>
 
-<h2>Summary of User Reviews for Products:</h2>
+<h2>User Reviews for Products:</h2>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
@@ -22,6 +22,31 @@
         <td>{{product_review.num_stars}}</td>
         <td>{{product_review.date}}</td>
         <td>{{product_review.description}}</td>
+        <th> <a class="btn btn-secondary" href="{{ url_for('users.editReview')}}" role="button">Edit</a></th>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>User Reviews for Sellers:</h2>
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Seller ID</th>
+      <th scope="col">Number of Stars</th>
+      <th scope="col">Date</th>
+      <th scope="col">Review</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    {% for seller_review in userSellerReviews%}
+      <tr>
+        <th scope="row">{{seller_review.seller_id}}</th>
+        <td>{{seller_review.num_stars}}</td>
+        <td>{{seller_review.date}}</td>
+        <td>{{seller_review.description}}</td>
+        <th> <a class="btn btn-secondary" href="{{ url_for('users.editReview')}}" role="button">Edit</a></th>
       </tr>
     {% endfor %}
   </tbody>
