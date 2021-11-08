@@ -13,7 +13,7 @@ class Product:
     def get(product_id):
         rows = app.db.execute('''
 SELECT product_id, owner_id, description, name, image, category
-FROM Products
+FROM Product
 WHERE product_id = :product_id
 ''',
                               product_id=product_id)
@@ -45,7 +45,7 @@ AND name LIKE search_criteria OR description LIKE search_criteria
     def get_products_based_on_category(category):
         rows = app.db.execute('''
 SELECT product_id, owner_id, description, name, image, category
-FROM Products
+FROM Product
 WHERE category = :category
         ''', category=category)
         return [Product(*row) for row in rows] if rows is not None else None
