@@ -7,6 +7,7 @@ from flask_babel import Babel
 from .config import Config
 from .db import DB
 
+from .models.cart import Cart
 
 login = LoginManager()
 login.login_view = 'users.login'
@@ -29,5 +30,8 @@ def create_app():
 
     from .cart import bp as cart_bp
     app.register_blueprint(cart_bp)
+
+    # TODO: Refactor this into a procedure method. Or create.sql.
+    Cart.initialize_get_procedure()
 
     return app

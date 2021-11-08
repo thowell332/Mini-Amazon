@@ -17,13 +17,15 @@ class Cart:
         self.quantity = quantity
 
     @staticmethod
-    def get_by_buyer_id(buyer_id):
-        rows = app.db.execute("""
-WITH
+    def initialize_get_procedure():
+        app.db.execute("""
+CREATE PROCEDURE GetById
+AS
+(WITH
 CartInfo(product_id, seller_id, quantity) AS (
     SELECT product_id, seller_id, quantity
     FROM Cart
-    WHERE buyer_id = :buyer_id
+    WHERE buyer_id = $1
 ),
 
 CartInfoSellsProduct(product_id, seller_id, quantity, unit_price) AS (
@@ -49,13 +51,20 @@ CartInfoSeller(product_name, product_image, seller_name, quantity) AS (
     Account
     ON CartInfoProduct.seller_id = Account.account_id
 )
-Select * FROM CartInfoProduct
-""",
+Select * FROM CartInfoProduct)
+""")
 
-buyer_id = buyer_id)
-
-        print(rows)
+    @staticmethod
+    def get_by_buyer_id(buyer_id):
+        rows = app.db.execute("""CALL GetById(:buyer_id)""", buyer_id = buyer_id)
         if not rows:  # email not found
             return None
         else:
             return [CartItem(*row) for row in rows]
+
+    # TODO: MAKE THIS SERIALIZABLE AND A PROCEDURE.
+    @staticmethod
+    def purchase_by_buyer_id(buyer_id):
+        print('TEST')
+
+        
