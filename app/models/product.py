@@ -56,12 +56,13 @@ WHERE category = :category
     def get_product_display_page(product_id):
         rows = app.db.execute('''
 SELECT p.product_id, p.owner_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id)
-FROM Products p, SellsProduct sp, SellsItem si
-WHERE product_id = :product_id
+FROM Product p, SellsProduct sp, SellsItem si
+WHERE p.product_id = :product_id
 AND p.product_id = sp.product_id
 AND p.owner_id = sp.seller_id
 AND p.product_id = si.product_id
 AND p.owner_id = si.seller_id
+GROUP BY p.product_id, sp.price
 ''', product_id=product_id)
         return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
 
