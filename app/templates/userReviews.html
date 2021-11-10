@@ -19,10 +19,15 @@
     {% for product_review in userProductReviews%}
       <tr>
         <th scope="row">{{product_review.product_id}}</th>
+        <input type="hidden" name="product_id" value="{{product_review.product_id}}" />
         <td>{{product_review.num_stars}}</td>
+        <input type="hidden" name="num_stars" value="{{product_review.num_stars}}" />
         <td>{{product_review.date}}</td>
+        <input type="hidden" name="date" value="{{product_review.date}}" />
         <td>{{product_review.description}}</td>
-        <th> <a class="btn btn-secondary" href="{{ url_for('users.editReview')}}" role="button">Edit</a></th>
+        <input type="hidden" name="description" value="{{product_review.description}}" />
+        <th> <a class="btn btn-secondary" href="{{ url_for('users.editProductReview', id = product_review["product_id"])}}" role="button">Edit</a></th>
+        <th> <a class="btn btn-secondary" href="{{ url_for('users.deleteProductReview', id = product_review["product_id"])}}" role="button">Delete</a></th>
       </tr>
     {% endfor %}
   </tbody>
@@ -43,10 +48,15 @@
     {% for seller_review in userSellerReviews%}
       <tr>
         <th scope="row">{{seller_review.seller_id}}</th>
+        <input type="hidden" name="seller_id" value="{{seller_review.seller_id}}" />
         <td>{{seller_review.num_stars}}</td>
+        <input type="hidden" name="num_stars" value="{{seller_review.num_stars}}" />
         <td>{{seller_review.date}}</td>
+        <input type="hidden" name="date" value="{{seller_review.date}}" />
         <td>{{seller_review.description}}</td>
-        <th> <a class="btn btn-secondary" href="{{ url_for('users.editReview')}}" role="button">Edit</a></th>
+        <input type="hidden" name="description" value="{{seller_review.description}}" />
+        <th> <a class="btn btn-secondary" href="{{ url_for('users.editSellerReview', id = seller_review["seller_id"])}}" role="button">Edit</a></th>
+        <th> <a class="btn btn-secondary" href="{{ url_for('users.deleteProductReview', id = seller_review["seller_id"])}}" role="button">Delete</a></th>
       </tr>
     {% endfor %}
   </tbody>

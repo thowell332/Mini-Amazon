@@ -116,16 +116,35 @@ class EditReviewForm(FlaskForm):
     description = StringField(_l('Review'), validators=[DataRequired()])
     submit = SubmitField(_l('Submit'))
 
-@bp.route('/editReview', methods=['GET', 'POST'])
-def editReview():
+@bp.route('/editSellerReview/<int:id>', methods=['GET', 'POST'])
+def editSellerReview(id):
     form = EditReviewForm()
     if form.validate_on_submit():
-        print("hi")
-        userProductReview.update_product_review('5', '1', form.numStars.data, '10/20/21 0:00', form.description.data)
-        userSellerReview.update_seller_review('5', '2', form.numStars.data, '10/20/21 0:00', form.description.data)
+        userSellerReview.update_seller_review('5', id, form.numStars.data, '10/20/21 0:00', form.description.data) #REMOVE HARD CODE
         flash('Review has been updated')
         return redirect(url_for('users.userReviews'))
     # render the page by adding information to the index.html file
     return render_template('editReview.html', title='Edit Review', form=form)
-   
-   
+
+@bp.route('/editProductReview/<int:id>', methods=['GET', 'POST'])
+def editProductReview(id):
+    form = EditReviewForm()
+    if form.validate_on_submit():
+        userProductReview.update_product_review('5', id, form.numStars.data, '10/20/21 0:00', form.description.data) #REMOVE HARD CODE
+        flash('Review has been updated')
+        return redirect(url_for('users.userReviews'))
+    # render the page by adding information to the index.html file
+    return render_template('editReview.html', title='Edit Review', form=form)
+
+
+@bp.route('/deleteProductReview/<int:id>', methods=['GET', 'POST'])
+def deleteProductReview(id):
+    userProductReview.delete_product_review('5', id) #REMOVE HARD CODE
+    flash('Review has been deleted')
+    return redirect(url_for('users.userReviews'))
+
+@bp.route('/deleteSellerReview/<int:id>', methods=['GET', 'POST'])
+def deleteSellerReview(id):
+    userSellerReview.delete_seller_review('5', id) #REMOVE HARD CODE
+    flash('Review has been deleted')
+    return redirect(url_for('users.userReviews'))
