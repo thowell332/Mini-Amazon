@@ -24,7 +24,7 @@ def inventory():
                            inventory=inventoryList)
 
 class EditInventoryForm(FlaskForm):
-    name = StringField(_l('Name'), validators=[Optional()])
+    name = StringField(_l('Product Name'), validators=[Optional()])
     description = StringField(_l('Description'), validators=[Optional()])
     price = DecimalField(_l('Price'), validators=[DataRequired(), NumberRange(min=0, message='Price cannot be negative.')])
     quantity = IntegerField(_l('Quantity'), validators=[DataRequired(), NumberRange(min=0, message='Quantity cannot be negative.')])
@@ -35,9 +35,25 @@ def editInventory(product_id):
     product = InventoryListing.get_product_listing('2', product_id) #CHANGE '5' TO USER ID
     form = EditInventoryForm()
     if form.validate_on_submit():
-        InventoryListing.update_product_listing('2', product_id, form.price.data, form.quantity.data - product.quantity) #CHANGE '5' TO USER ID
+        InventoryListing.edit_product_listing('2', product_id, form.price.data, form.quantity.data - product.quantity) #CHANGE '5' TO USER ID
         flash('Product listing has been updated')
         return redirect(url_for('inventories.inventory'))
     # render the page by adding information to the index.html file
     return render_template('editInventory.html', title='Edit Product Listing', form=form, product=product)
+
+class AddInventoryForm(FlaskForm):
+    name = StringField(_l('Product Name'), validators=[DataRequired()])
+    price = DecimalField(_l('Price'), validators=[DataRequired(), NumberRange(min=0, message='Price cannot be negative.')])
+    quantity = IntegerField(_l('Quantity'), validators=[DataRequired(), NumberRange(min=0, message='Quantity cannot be negative.')])
+    submit = SubmitField(_l('Submit'))
+
+@bp.route('/addInventory', methods=['GET', 'POST'])
+def addInventory():
+    form = AddInventoryForm()
+    if form.validate_on_submit():
+        InventoryListing.add_product_listing('2', form) #CHANGE '5' TO USER ID
+        flash('Product listing has been updated')
+        return redirect(url_for('inventories.inventory'))
+    # render the page by adding information to the index.html file
+    return render_template('addInventory.html', title='Add Product Listing', form=form)
 

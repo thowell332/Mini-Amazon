@@ -49,8 +49,8 @@ class InventoryListing:
         return InventoryListing(*(row[0])) if row is not None else None
 
     @staticmethod
-    # update product listing
-    def update_product_listing(seller_id, product_id, price, delta_quantity):
+    # update existing product listing
+    def edit_product_listing(seller_id, product_id, price, delta_quantity):
         # update the price of the product for the seller
         try: app.db.execute(
             '''
@@ -63,6 +63,41 @@ class InventoryListing:
         )
         except Exception as e:
             print(e)
+        # update quantity of the product for the seller
+        InventoryListing.update_quantity(seller_id, product_id, delta_quantity)
+
+    @staticmethod
+    # add new product listing
+    def add_product_listing(seller_id, form):
+        # get product id for this listing
+        row = app.db.execute(
+            '''
+            SELECT product_id
+            FROM Product
+            WHERE name = :name;
+            ''',
+            name=form.name.data
+        )
+        product_id = row[0][0] if row is not None else None
+        
+        # update SellsProduct with new listing
+        try: app.db.execute(
+            '''
+            INSERT INTO SellsProduct
+            VALUES (:seller_id, :product_id, :price)
+            ''',
+            seller_id=seller_id,
+            product_id=product_id,
+            price=form.price.data
+        )     
+        except Exception as e:
+            print(e)
+
+        # add new items for sale to match quantity
+        InventoryListing.update_quantity(seller_id, product_id, form.quantity.data)
+    
+    @staticmethod
+    def update_quantity(seller_id, product_id, delta_quantity):
         # if new quantity is lower, remove items
         if delta_quantity < 0:
             # remove items in descending order of item_id
@@ -84,6 +119,7 @@ class InventoryListing:
                 print(e)
         # if new quantity is higher, add items
         elif delta_quantity > 0:
+            # get existing item_id values
             rows = app.db.execute(
                 '''
                 SELECT item_id
