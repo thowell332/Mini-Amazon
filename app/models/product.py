@@ -31,13 +31,10 @@ FROM Product
     @staticmethod
     ##method to return all products based on a certain search criteria
     def get_products_based_on_search_criteria(search_criteria):
-        rows = app.db.execute('''
-SELECT product_id, owner_id, description, name, image, category
-FROM Product
-WHERE search_criteria = :search_criteria
-AND name LIKE search_criteria OR description LIKE search_criteria
-        
-        ''', search_criteria=search_criteria)
+        query = '''SELECT product_id, owner_id, description, name, image, category
+        FROM Product
+        WHERE name LIKE '%s%' OR description LIKE '%s%' OR category LIKE '%s%' '''.format(search_criteria)
+        rows = app.db.execute(query)
         return [Product(*row) for row in rows] if rows is not None else None
 
     @staticmethod

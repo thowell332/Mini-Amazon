@@ -27,5 +27,10 @@ def create_app():
     from .product import bp as product_bp
     app.register_blueprint(product_bp)
 
+    from .productSearchInput import bp as productSearchInput_bp
+    app.register_blueprint(productSearchInput_bp)
+
+    from .productSearchCategory import bp as productSearchCategory_bp
+    app.register_blueprint(productSearchCategory_bp)
 
     return app
