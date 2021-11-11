@@ -72,9 +72,21 @@ VALUES (%s, %s, %s, %s, %s, %s)
         '''
         values = (product_id, owner_id, description, name, image, category)
         try:
-            app.db.execute(insert_statement, values)
+            rows = app.db.execute("""
+INSERT INTO Product(product_id, owner_id, description, name, image, category)
+VALUES(:product_id, :owner_id, :description, :name, :image, :category)
+RETURNING product_id
+""",
+                                  product_id=product_id,
+                                  owner_id=owner_id,
+                                  description=description,
+                                  name=name,
+                                  image=image,
+                                  category=category)
+            return product_id
         except Exception as e:
             print(e)
+            return None
 
     @staticmethod
     ##Method to delete a product from the database
