@@ -1,32 +1,116 @@
 from flask import current_app as app
+import sys
 
 class Inventory:
-    def __init__(self, name, description, image, price, quantity):
+    def __init__(self, product_id, name, description, image, price, quantity):
+        self.product_id = product_id
         self.name = name
         self.description = description
         self.image = image
         self.price = price
         self.quantity = quantity
-
+    
     @staticmethod
-    # Retrieve seller inventory
+    # retrieve seller inventory
     def get(seller_id):
-        rows = app.db.execute('''
-SELECT p.name, p.description, p.image, sp.price, COUNT(si.item_id) as quantity
-FROM Product p, SellsItem si, SellsProduct sp
-WHERE si.seller_id = :seller_id AND p.product_id = si.product_id
-AND sp.seller_id = :seller_id AND p.product_id = sp.product_id
-GROUP BY p.name, p.description, p.image, sp.price;
-''',
-                              seller_id=seller_id)
+        rows = app.db.execute(
+            '''
+            SELECT p.product_id, p.name, p.description, p.image, sp.price, COUNT(si.item_id) as quantity
+            FROM Product p, SellsItem si, SellsProduct sp
+            WHERE si.seller_id = :seller_id AND p.product_id = si.product_id
+            AND sp.seller_id = :seller_id AND p.product_id = sp.product_id
+            GROUP BY p.product_id, p.name, p.description, p.image, sp.price;
+            ''',
+            seller_id=seller_id
+        )
         return [Inventory(*row) for row in rows] if rows is not None else None
 
+
+class InventoryListing:
+    def __init__(self, name, description, price, quantity):
+        self.name = name
+        self.description = description
+        self.price = price
+        self.quantity = quantity
+
     @staticmethod
-    # Update product listing
-    def update_product_listing(seller_id, product_id, price):
-        try: app.db.execute('''
-UPDATE SellsProduct SET price = :price
-WHERE seller_id = :seller_id AND product_id = :product_id
-        ''', seller_id=seller_id, product_id=product_id, price=price)
+    # retrieve product listing information
+    def get_product_listing(seller_id, product_id):
+        row = app.db.execute(
+            '''
+            SELECT p.name, p.description, sp.price, COUNT(si.item_id) as quantity
+            FROM Product p, SellsItem si, SellsProduct sp
+            WHERE si.seller_id = :seller_id AND p.product_id = si.product_id
+            AND sp.seller_id = :seller_id AND p.product_id = sp.product_id
+            GROUP BY p.name, p.description, sp.price;
+            ''',
+            product_id=product_id,
+            seller_id=seller_id)
+        return InventoryListing(*(row[0])) if row is not None else None
+
+    @staticmethod
+    # update product listing
+    def update_product_listing(seller_id, product_id, price, delta_quantity):
+        # update the price of the product for the seller
+        try: app.db.execute(
+            '''
+            UPDATE SellsProduct SET price = :price
+            WHERE seller_id = :seller_id AND product_id = :product_id;
+            ''',
+            seller_id=seller_id,
+            product_id=product_id,
+            price=price
+        )
         except Exception as e:
             print(e)
+        # if new quantity is lower, remove items
+        if delta_quantity < 0:
+            # remove items in descending order of item_id
+            try: app.db.execute(
+                '''
+                DELETE FROM SellsItem s1
+                WHERE s1.item_id IN (
+                    SELECT s2.item_id
+                    FROM SellsItem s2
+                    WHERE s2.seller_id = :seller_id AND s2.product_id = :product_id
+                    ORDER BY s2.item_id DESC LIMIT :delta
+                );
+                ''',
+                seller_id=seller_id,
+                product_id=product_id,
+                delta=abs(delta_quantity)
+            )
+            except Exception as e:
+                print(e)
+        # if new quantity is higher, add items
+        elif delta_quantity > 0:
+            rows = app.db.execute(
+                '''
+                SELECT item_id
+                FROM SellsItem
+                WHERE product_id = :product_id
+                ORDER BY item_id;
+                ''',
+                seller_id=seller_id,
+                product_id=product_id
+            )
+            current_items = [row[0] for row in rows] if rows is not None else None
+            # identify holes in item_id column
+            missing_items = sorted(set(range(1, current_items[-1] + 1)).difference(current_items))
+            # assign minimum item_id values to the new rows
+            if len(missing_items) >= delta_quantity:
+                new_items = missing_items[:delta_quantity - 1]
+            else:
+                new_items = missing_items + [max(current_items) + i + 1 for i in range(delta_quantity - len(missing_items))]
+            # generate row values to be inserted
+            values = ', '.join(['(' + ', '.join((str(seller_id), str(product_id), str(new_items[i]))) + ')' for i in range(delta_quantity)])
+            # execute insert query
+            try: app.db.execute(
+                '''
+                INSERT INTO SellsItem
+                VALUES 
+                ''' + values
+            )
+            except Exception as e:
+                print(e)
+
