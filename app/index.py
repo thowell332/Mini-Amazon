@@ -8,6 +8,7 @@ from .models.purchase import Purchase
 from flask import Blueprint
 bp = Blueprint('index', __name__)
 
+
 @bp.route('/')
 def index():
     # get all available products for sale:
