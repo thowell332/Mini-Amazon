@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Submit Review</h1>
+
+<form action="" method="post">
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.numStars.label }}<br/>
+    {{ form.numStars(size=32) }}<br/>
+    {% for error in form.numStars.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.description.label }}<br/>
+    {{ form.description(size=32) }}<br/>
+    {% for error in form.description.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+
+{% endblock %}

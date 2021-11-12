@@ -5,6 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from flask_babel import _, lazy_gettext as _l
+from datetime import datetime
 
 from .models.user import User
 from .models.userReviews import userProductReview, userSellerReview
@@ -80,13 +81,14 @@ def logout():
 class UserReviewForm(FlaskForm):
     review = StringField(_l('Review'), validators=[DataRequired()])
 """
-
+currentUser = '3'
 
 @bp.route('/userReviews')
 def userReviews():
     # get all product reviews user has made:
-    productReviews = userProductReview.get('5') #CHANGE '5' TO CURRENT USER ID
-    sellerReviews = userSellerReview.get('5') #CHANGE '5' TO CURRENT USER ID
+    productReviews = userProductReview.get(currentUser) #CHANGE '5' TO CURRENT USER ID
+    sellerReviews = userSellerReview.get(currentUser) #CHANGE '5' TO CURRENT USER ID
+    print(current_user.get_id())
     # render the page by adding information to the index.html file
     return render_template('userReviews.html',
                            userProductReviews=productReviews, userSellerReviews=sellerReviews)
@@ -95,8 +97,8 @@ def userReviews():
 @bp.route('/sellerReviews')
 def sellerReviews():
     # get all reviews for given seller:
-    summary = sellerReviewSummary.get('2') #CHANGE '2' TO SELECTED SELLER ID
-    reviews = sellerReview.get('2') #CHANGE '2' TO SELECTED SELLER ID
+    summary = sellerReviewSummary.get('5') #CHANGE '2' TO SELECTED SELLER ID
+    reviews = sellerReview.get('5') #CHANGE '2' TO SELECTED SELLER ID
     # render the page by adding information to the index.html file
     return render_template('sellerSummaryReviews.html',
                            sellerReviewSummary=summary, sellerReviews=reviews)
@@ -111,16 +113,17 @@ def productReviews():
     return render_template('productSummaryReviews.html',
                            productReviewSummary=summary, productReviews=reviews)
 
-class EditReviewForm(FlaskForm):
+class ReviewForm(FlaskForm):
     numStars= StringField(_l('Number of Stars'), validators=[DataRequired()])
     description = StringField(_l('Review'), validators=[DataRequired()])
     submit = SubmitField(_l('Submit'))
 
 @bp.route('/editSellerReview/<int:id>', methods=['GET', 'POST'])
 def editSellerReview(id):
-    form = EditReviewForm()
+    form = ReviewForm()
     if form.validate_on_submit():
-        userSellerReview.update_seller_review('5', id, form.numStars.data, '10/20/21 0:00', form.description.data) #REMOVE HARD CODE
+        date = datetime.now()
+        userSellerReview.update_seller_review(currentUser, id, form.numStars.data, str(date), form.description.data) #REMOVE HARD CODE
         flash('Review has been updated')
         return redirect(url_for('users.userReviews'))
     # render the page by adding information to the index.html file
@@ -128,9 +131,10 @@ def editSellerReview(id):
 
 @bp.route('/editProductReview/<int:id>', methods=['GET', 'POST'])
 def editProductReview(id):
-    form = EditReviewForm()
+    form = ReviewForm()
     if form.validate_on_submit():
-        userProductReview.update_product_review('5', id, form.numStars.data, '10/20/21 0:00', form.description.data) #REMOVE HARD CODE
+        date = datetime.now()
+        userProductReview.update_product_review(currentUser, id, form.numStars.data, str(date), form.description.data) #REMOVE HARD CODE
         flash('Review has been updated')
         return redirect(url_for('users.userReviews'))
     # render the page by adding information to the index.html file
@@ -139,12 +143,33 @@ def editProductReview(id):
 
 @bp.route('/deleteProductReview/<int:id>', methods=['GET', 'POST'])
 def deleteProductReview(id):
-    userProductReview.delete_product_review('5', id) #REMOVE HARD CODE
+    userProductReview.delete_product_review(currentUser, id) #REMOVE HARD CODE
     flash('Review has been deleted')
     return redirect(url_for('users.userReviews'))
 
-@bp.route('/deleteSellerReview/<int:id>', methods=['GET', 'POST'])
-def deleteSellerReview(id):
-    userSellerReview.delete_seller_review('5', id) #REMOVE HARD CODE
-    flash('Review has been deleted')
-    return redirect(url_for('users.userReviews'))
+#Delete product review with specified id
+@bp.route('/submitProductReview<int:id>', methods=['GET', 'POST'])
+#IMPLEMENT GET ID
+def submitProductReview(id):
+    #<input type="hidden" name="product_id" value="{{product_review.num_stars}}" />
+    <th> <a class="btn btn-secondary" href="{{ url_for('users.deleteProductReview', id = product_review["product_id"])}}" role="button">Delete</a></th>
+    form = ReviewForm()
+    if form.validate_on_submit():
+        date = datetime.now()
+        userProductReview.submit_product_review(currentUser, id, form.numStars.data, str(date), form.description.data) #REMOVE HARD CODE
+        flash('Product Review has been submitted')
+        return redirect(url_for('users.login'))
+    return render_template('submitReview.html', title='Submit Review', form=form)
+
+#Delete seller review with specified id
+@bp.route('/submitSellerReview<int:id>', methods=['GET', 'POST'])
+#IMPLEMENT GET ID
+def submitSellerReview(id):
+    #<input type="hidden" name="num_stars" value="{{product_review.num_stars}}" />
+    form = ReviewForm()
+    if form.validate_on_submit():
+        date = datetime.now()
+        userSellerReview.submit_seller_review(currentUser, id, form.numStars.data, str(date), form.description.data) #REMOVE HARD CODE
+        flash('Seller Review has been submitted')
+        return redirect(url_for('users.login'))
+    return render_template('submitReview.html', title='Submit Review', form=form)

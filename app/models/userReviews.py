@@ -19,6 +19,14 @@ ORDER BY date DESC
                               user_id=user_id)
         return [userProductReview(*row) for row in rows] if rows is not None else None
 
+    @staticmethod
+    ##Method to submit a product review authored by user with user_id
+    def submit_product_review(user_id, product_id, num_stars, date, description):
+        try: app.db.execute('''
+INSERT INTO ProductReview VALUES (:user_id, :product_id, :num_stars, :date, :description)
+        ''', user_id=user_id, product_id=product_id, num_stars=num_stars, date=date, description=description)
+        except Exception as e:
+            print(e)
 
     @staticmethod
     ##Method to update a selected product review authored by user with user_id
@@ -58,6 +66,14 @@ ORDER BY date DESC
                               user_id=user_id)
         return [userSellerReview(*row) for row in rows] if rows is not None else None
 
+    @staticmethod
+    ##Method to submit a seller review authored by user with user_id
+    def submit_seller_review(user_id, seller_id, num_stars, date, description):
+        try: app.db.execute('''
+INSERT INTO SellerReview VALUES (:user_id, :seller_id, :num_stars, :date, :description)
+        ''', user_id=user_id, seller_id=seller_id, num_stars=num_stars, date=date, description=description)
+        except Exception as e:
+            print(e)
 
     @staticmethod
     ##Method to update a selected seller review authored by user with user_id 
