@@ -23,12 +23,11 @@ def cart():
     #     cart = Cart.get_by_buyer_id(current_user.id)
 
     # Test data for now.
-    cart = Cart.get_cart_for_buyer_id(1)
+    cart = Cart.get_cart_for_buyer_id(29)
     form = CartForm()
 
     # TODO: Show items that were out of stock.
     if form.validate_on_submit():
-        Cart.purchase_cart_for_buyer_id(1)
+        Cart.purchase_cart_for_buyer_id(29)
         
-
     return render_template('cart.html', items=cart, form=form)
