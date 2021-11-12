@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Product</h1>
+    <table class='table table-hover table-bordered container'>
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Product Name</th>
+            <th scope="col">Image</th>
+            <th scope="col">Seller ID</th>
+            <th scope="col">Product ID</th>
+            <th scope="col">Description</th>
+            <th scope="col">Category</th>
+            <th scope="col">Price</th>
+            <th scope="col">Quantity Available</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in product%}
+            <tr>
+                <th scope="row">{{item.name}}</th>
+                <td>{{item.image}}</td>
+                <td>{{item.owner_id}}</td>
+                <td>{{item.product_id}}</td>
+                <td>{{item.description}}</td>
+                <td>{{item.category}}</td>
+                <td>{{item.price}}</td>
+                <td>{{item.quantity}}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
