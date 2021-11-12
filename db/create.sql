@@ -50,7 +50,6 @@ purchase_id INTEGER NOT NULL,
 status VARCHAR(32) NOT NULL,
 date TIMESTAMP WITH TIME ZONE NOT NULL,
 PRIMARY KEY (buyer_id, product_id, item_id),
-FOREIGN KEY(product_id, item_id) REFERENCES SellsItem(product_id, item_id)
 );
  
 CREATE TABLE SellerReview
