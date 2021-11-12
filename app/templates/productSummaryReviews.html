@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br><br>
+<h2>Summary of Reviews for Product:</h2>
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Number of Reviews</th>
+      <th scope="col">Average Number of Stars</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <th scope="row">{{productReviewSummary.count}}</th>
+        <td>{{productReviewSummary.average}}</td>
+      </tr>
+  </tbody>
+</table>
+
+<h2>Reviews for Product:</h2>
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Buyer ID</th>
+      <th scope="col">Number of Stars</th>
+      <th scope="col">Date</th>
+      <th scope="col">Review</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    {% for product_review in productReviews%}
+      <tr>
+        <th scope="row">{{product_review.buyer_id}}</th>
+        <td>{{product_review.num_stars}}</td>
+        <td>{{product_review.date}}</td>
+        <td>{{product_review.description}}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+{% endblock %}
