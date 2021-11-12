@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Cart</h1>
+<table class='table table-hover table-bordered container'>
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Product Name</th>
+        <th scope="col">Image</th>
+        <th scope="col">Seller Name</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Unit Price</th>
+        <th scope="col">Total Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items%}
+        <tr>
+          <th scope="row">{{item.product_name}}</th>
+          <td>{{item.product_image}}</td>
+          <td>{{item.seller_name}}</td>
+          <td>{{item.quantity}}</td>
+          <td>{{item.unit_price}}</td>
+          <td>{{item.total_price}}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <form method="post" action="">
+    {{ form.hidden_tag() }}
+    <p>{{ form.submit() }}</p>
+  </form>
+  
+{% endblock %}
