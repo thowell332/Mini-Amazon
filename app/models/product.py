@@ -13,7 +13,7 @@ class Product:
     def get(product_id):
         rows = app.db.execute('''
 SELECT product_id, owner_id, description, name, image, category
-FROM Products
+FROM Product
 WHERE product_id = :product_id
 ''',
                               product_id=product_id)
@@ -31,13 +31,10 @@ FROM Product
     @staticmethod
     ##method to return all products based on a certain search criteria
     def get_products_based_on_search_criteria(search_criteria):
-        rows = app.db.execute('''
-SELECT product_id, owner_id, description, name, image, category
-FROM Product
-WHERE search_criteria = :search_criteria
-AND name LIKE search_criteria OR description LIKE search_criteria
-        
-        ''', search_criteria=search_criteria)
+        query = '''SELECT product_id, owner_id, description, name, image, category
+        FROM Product
+        WHERE name LIKE '%s%' OR description LIKE '%s%' OR category LIKE '%s%' '''.format(search_criteria)
+        rows = app.db.execute(query)
         return [Product(*row) for row in rows] if rows is not None else None
 
     @staticmethod
@@ -45,7 +42,7 @@ AND name LIKE search_criteria OR description LIKE search_criteria
     def get_products_based_on_category(category):
         rows = app.db.execute('''
 SELECT product_id, owner_id, description, name, image, category
-FROM Products
+FROM Product
 WHERE category = :category
         ''', category=category)
         return [Product(*row) for row in rows] if rows is not None else None
@@ -56,12 +53,13 @@ WHERE category = :category
     def get_product_display_page(product_id):
         rows = app.db.execute('''
 SELECT p.product_id, p.owner_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id)
-FROM Products p, SellsProduct sp, SellsItem si
-WHERE product_id = :product_id
+FROM Product p, SellsProduct sp, SellsItem si
+WHERE p.product_id = :product_id
 AND p.product_id = sp.product_id
 AND p.owner_id = sp.seller_id
 AND p.product_id = si.product_id
 AND p.owner_id = si.seller_id
+GROUP BY p.product_id, sp.price
 ''', product_id=product_id)
         return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
 
@@ -74,9 +72,21 @@ VALUES (%s, %s, %s, %s, %s, %s)
         '''
         values = (product_id, owner_id, description, name, image, category)
         try:
-            app.db.execute(insert_statement, values)
+            rows = app.db.execute("""
+INSERT INTO Product(product_id, owner_id, description, name, image, category)
+VALUES(:product_id, :owner_id, :description, :name, :image, :category)
+RETURNING product_id
+""",
+                                  product_id=product_id,
+                                  owner_id=owner_id,
+                                  description=description,
+                                  name=name,
+                                  image=image,
+                                  category=category)
+            return product_id
         except Exception as e:
             print(e)
+            return None
 
     @staticmethod
     ##Method to delete a product from the database
