@@ -83,6 +83,7 @@ class UserReviewForm(FlaskForm):
 """
 currentUser = '5'
 currentProduct = '1'
+currentSeller = '2'
 @bp.route('/userReviews')
 def userReviews():
     # get all product reviews user has made:
@@ -97,8 +98,8 @@ def userReviews():
 @bp.route('/sellerReviews')
 def sellerReviews():
     # get all reviews for given seller:
-    summary = sellerReviewSummary.get('2') #CHANGE '2' TO SELECTED SELLER ID
-    reviews = sellerReview.get('2') #CHANGE '2' TO SELECTED SELLER ID
+    summary = sellerReviewSummary.get(currentSeller) #CHANGE '2' TO SELECTED SELLER ID
+    reviews = sellerReview.get(currentSeller) #CHANGE '2' TO SELECTED SELLER ID
     # render the page by adding information to the index.html file
     return render_template('sellerSummaryReviews.html',
                            sellerReviewSummary=summary, sellerReviews=reviews)
@@ -204,9 +205,6 @@ def upvoteProductReview(id, upvotes):
     user_id = id 
     product_id = currentProduct #Change to current product id
     upvotes = upvotes
-    print('User ID:', user_id) 
-    print('Product ID:', product_id) 
-    print('Upvotes:', upvotes) 
     userProductReview.upvote_product_review(user_id, product_id, upvotes)
     summary = productReviewSummary.get(currentProduct) #CHANGE '2' TO SELECTED PRODUCT ID
     reviews = productReview.get(currentProduct) #CHANGE '2' TO SELECTED PRODUCT ID
@@ -217,13 +215,13 @@ def upvoteProductReview(id, upvotes):
 """
 Upvote seller review 
 """
-@bp.route('/upvoteSellerReview', methods=['GET', 'POST'])
-def upvoteSellerReview():
-    user_id = currentUser #Change to current user id
-    args = flask.request.args
-    seller_id = args.get("id")
-    upvotes = args.get("upvotes")
-    
-    userReviews.upvote_seller_review(user_id, seller_id, upvotes)
+@bp.route('/upvoteSellerReview/<int:id>/<int:upvotes>', methods=['GET', 'POST'])
+def upvoteSellerReview(id, upvotes):
+    user_id = id
+    seller_id = currentSeller #Change to current seller id
+    upvotes = upvotes
+    userSellerReview.upvote_seller_review(user_id, seller_id, upvotes)
+    summary = sellerReviewSummary.get(currentSeller) #CHANGE '2' TO SELECTED SELLER ID
+    reviews = sellerReview.get(currentSeller) #CHANGE '2' TO SELECTED SELLER ID
     return render_template('sellerSummaryReviews.html',
                            sellerReviewSummary=summary, sellerReviews=reviews)

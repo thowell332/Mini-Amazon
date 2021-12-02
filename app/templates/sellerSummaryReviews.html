@@ -34,10 +34,13 @@
   <tbody>
     {% for seller_review in sellerReviews%}
       <tr>
-        <td>{{seller_review.upvotes}}</td>
+        <td>{{seller_review.upvotes}}
+          <a class="btn btn-secondary" href="{{ url_for('users.upvoteSellerReview', id = seller_review["buyer_id"], upvotes = seller_review["upvotes"])}}" role="button" onClick='this.disabled=true'>Upvote</a>
+        </td>
         <input type="hidden" name="upvotes" value="{{seller_review.upvotes}}" /> 
-        <a class="btn btn-secondary" href="{{ url_for('users.upvoteSellerReview', id = seller_review["seller_id"], upvotes = seller_review["upvotes"])}}" role="button">Upvote</a>
+    
         <th scope="row">{{seller_review.buyer_id}}</th>
+        <input type="hidden" name="buyer_id" value="{{seller_review.buyer_id}}" /> 
         <td>{{seller_review.num_stars}}</td>
         <td>{{seller_review.date}}</td>
         <td>{{seller_review.description}}</td>

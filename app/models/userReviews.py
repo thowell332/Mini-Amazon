@@ -113,7 +113,7 @@ DELETE FROM SellerReview WHERE buyer_id = :user_id AND seller_id = :seller_id
     ##Method to upvote a seller review
     def upvote_seller_review(user_id, seller_id, upvotes):
         try: app.db.execute('''
-UPDATE SellerReview SET (upvotes) = (:upvotes)
+UPDATE SellerReview SET upvotes = :upvotes
 WHERE buyer_id = :user_id AND seller_id = :seller_id
         ''', user_id=user_id, seller_id=seller_id, upvotes=str(int(upvotes)+1))
         except Exception as e:
