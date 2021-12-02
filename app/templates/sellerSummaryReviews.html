@@ -3,7 +3,7 @@
 {% block content %}
 
 <br><br>
-<h2>Summary of Reviews for Seller with ID 3 (CHANGE)</h2>
+<h2>Summary of Reviews for Seller with ID 3</h2>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
@@ -23,20 +23,26 @@
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
+      <th scope="col">Upvotes</th> 
       <th scope="col">Buyer ID</th>
       <th scope="col">Number of Stars</th>
       <th scope="col">Date</th>
       <th scope="col">Review</th>
-
+      <th scope="col">Images</th>
     </tr>
   </thead>
   <tbody>
     {% for seller_review in sellerReviews%}
       <tr>
+        <td>{{seller_review.upvotes}}</td>
+        <input type="hidden" name="upvotes" value="{{seller_review.upvotes}}" /> 
+        <a class="btn btn-secondary" href="{{ url_for('users.upvoteSellerReview', id = seller_review["seller_id"], upvotes = seller_review["upvotes"])}}" role="button">Upvote</a>
         <th scope="row">{{seller_review.buyer_id}}</th>
         <td>{{seller_review.num_stars}}</td>
         <td>{{seller_review.date}}</td>
         <td>{{seller_review.description}}</td>
+        <td>{{seller_review.images}}</td>
+        
       </tr>
     {% endfor %}
   </tbody>

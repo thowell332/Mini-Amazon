@@ -59,6 +59,8 @@ CREATE TABLE SellerReview
  num_stars DECIMAL NOT NULL, -- # stars is float
  date TIMESTAMP NOT NULL,
  description VARCHAR(512), -- Can have stars with no description
+ upvotes INTEGER NOT NULL,
+ images VARCHAR(512),
  PRIMARY KEY(buyer_id, seller_id)
 );
  
@@ -68,6 +70,8 @@ CREATE TABLE ProductReview
  num_stars REAL NOT NULL,
  date TIMESTAMP NOT NULL,
  description VARCHAR(512),
+ upvotes INTEGER NOT NULL,
+ images VARCHAR(512),
  PRIMARY KEY(buyer_id, product_id)
 );
  

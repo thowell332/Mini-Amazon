@@ -18,17 +18,19 @@ WHERE seller_id = :seller_id
 
         
 class sellerReview:
-    def __init__(self, buyer_id, num_stars, date, description):
+    def __init__(self, buyer_id, num_stars, date, description, upvotes, images):
         self.buyer_id = buyer_id
         self.num_stars = num_stars
         self.date = date
         self.description = description
+        self.upvotes = upvotes
+        self.images = images
 
     @staticmethod
     ##method to get all reviews for a given seller in reverse chronological order
     def get(seller_id):
         rows = app.db.execute('''
-SELECT buyer_id, num_stars, date, description
+SELECT buyer_id, num_stars, date, description, upvotes, images
 FROM SellerReview
 WHERE seller_id = :seller_id
 ORDER BY date DESC
