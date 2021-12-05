@@ -39,7 +39,12 @@ class sellerReview:
 UNION ALL
 (SELECT buyer_id, num_stars, date, description, upvotes, images FROM SellerReview
 WHERE NOT EXISTS (
-    SELECT buyer_id, num_stars, date, description, upvotes, images FROM topThree 
+    SELECT buyer_id, num_stars, date, description, upvotes, images FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
+    FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
+    FROM SellerReview
+    WHERE seller_id = :seller_id
+    ORDER BY upvotes DESC) AS sortedReviews
+    LIMIT 3) AS topThree
     WHERE SellerReview.buyer_id = buyer_id
 )
 ORDER BY date DESC)

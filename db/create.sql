@@ -60,7 +60,7 @@ CREATE TABLE SellerReview
  date TIMESTAMP NOT NULL,
  description VARCHAR(512), -- Can have stars with no description
  upvotes INTEGER NOT NULL,
- images VARCHAR(512),
+ images TEXT[],
  PRIMARY KEY(buyer_id, seller_id)
 );
  
@@ -71,7 +71,7 @@ CREATE TABLE ProductReview
  date TIMESTAMP NOT NULL,
  description VARCHAR(512),
  upvotes INTEGER NOT NULL,
- images VARCHAR(512),
+ images TEXT[],
  PRIMARY KEY(buyer_id, product_id)
 );
  

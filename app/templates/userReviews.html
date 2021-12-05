@@ -13,7 +13,7 @@
       <th scope="col">Number of Stars</th>
       <th scope="col">Date</th>
       <th scope="col">Review</th>
-      <th scope="col">Images</th>
+
 
     </tr>
   </thead>
@@ -30,10 +30,15 @@
         <input type="hidden" name="date" value="{{product_review.date}}" />
         <td>{{product_review.description}}</td>
         <input type="hidden" name="description" value="{{product_review.description}}" />
-        <td>{{product_review.images}}</td>
-        <input type="hidden" name="images" value="{{product_review.images}}" />
         <th> <a class="btn btn-secondary" href="{{ url_for('users.editProductReview', id = product_review["product_id"])}}" role="button">Edit</a></th>
         <th> <a class="btn btn-secondary" href="{{ url_for('users.deleteProductReview', id = product_review["product_id"])}}" role="button">Delete</a></th>
+      </tr>
+      <tr>
+        {% for imageURL in product_review.images%}
+        {% if imageURL != "" %}
+        <td><img src="{{imageURL}}" width="200"></td>
+        {% endif %}
+        {% endfor %}
       </tr>
     {% endfor %}
   </tbody>
@@ -48,7 +53,6 @@
       <th scope="col">Number of Stars</th>
       <th scope="col">Date</th>
       <th scope="col">Review</th>
-      <th scope="col">Images</th>
 
     </tr>
   </thead>
@@ -65,10 +69,15 @@
         <input type="hidden" name="date" value="{{seller_review.date}}" />
         <td>{{seller_review.description}}</td>
         <input type="hidden" name="description" value="{{seller_review.description}}" />
-        <td>{{seller_review.images}}</td>
-        <input type="hidden" name="images" value="{{seller_review.images}}" />
         <th> <a class="btn btn-secondary" href="{{ url_for('users.editSellerReview', id = seller_review["seller_id"])}}" role="button">Edit</a></th>
         <th> <a class="btn btn-secondary" href="{{ url_for('users.deleteSellerReview', id = seller_review["seller_id"])}}" role="button">Delete</a></th>
+      </tr>
+      <tr>
+        {% for imageURL in seller_review.images%}
+        {% if imageURL != "" %}
+        <td><img src="{{imageURL}}" width="200"></td>
+        {% endif %}
+        {% endfor %}
       </tr>
     {% endfor %}
   </tbody>

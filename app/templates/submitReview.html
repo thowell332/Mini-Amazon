@@ -21,12 +21,28 @@
     {% endfor %}
   </p>
   <p>
-    {{ form.images.label }}<br/>
-    {{ form.images(size=32) }}<br/>
-    {% for error in form.images.errors %}
+    {{ form.image1.label }}<br/>
+    {{ form.image1(size=32) }}<br/>
+    {% for error in form.image1.errors %}
     <span style="color: red;">[{{ error }}]</span>
     {% endfor %}
   </p>
+  <p>
+    {{ form.image2.label }}<br/>
+    {{ form.image2(size=32) }}<br/>
+    {% for error in form.image2.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.image3.label }}<br/>
+    {{ form.image3(size=32) }}<br/>
+    {% for error in form.image3.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  
+
   <p>{{ form.submit() }}</p>
 </form>
 

@@ -77,11 +77,7 @@ def logout():
     logout_user()
     return redirect(url_for('index.index'))
 
-"""
-class UserReviewForm(FlaskForm):
-    review = StringField(_l('Review'), validators=[DataRequired()])
-"""
-currentUser = '5'
+currentUser = '3'
 currentProduct = '1'
 currentSeller = '2'
 @bp.route('/userReviews')
@@ -89,7 +85,6 @@ def userReviews():
     # get all product reviews user has made:
     productReviews = userProductReview.get(currentUser) #CHANGE '5' TO CURRENT USER ID
     sellerReviews = userSellerReview.get(currentUser) #CHANGE '5' TO CURRENT USER ID
-    print(current_user.get_id())
     # render the page by adding information to the index.html file
     return render_template('userReviews.html',
                            userProductReviews=productReviews, userSellerReviews=sellerReviews)
@@ -117,7 +112,9 @@ def productReviews():
 class ReviewForm(FlaskForm):
     numStars= StringField(_l('Number of Stars'), validators=[DataRequired()])
     description = StringField(_l('Review'), validators=[DataRequired()])
-    images = StringField(_l('Images'), validators=[DataRequired()])
+    image1 = StringField(_l('Image 1 URL (optional)'))
+    image2 = StringField(_l('Image 2 URL (optional)'))
+    image3 = StringField(_l('Image 3 URL (optional)'))
     submit = SubmitField(_l('Submit'))
 
 """
@@ -129,7 +126,7 @@ def editSellerReview(id):
     form = ReviewForm()
     if form.validate_on_submit():
         date = datetime.now()
-        userSellerReview.update_seller_review(currentUser, id, form.numStars.data, str(date), form.description.data, form.images.data) #REMOVE HARD CODE
+        userSellerReview.update_seller_review(currentUser, id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) #REMOVE HARD CODE
         flash('Review has been updated')
         return redirect(url_for('users.userReviews'))
     # render the page by adding information to the index.html file
@@ -144,7 +141,7 @@ def editProductReview(id):
     form = ReviewForm()
     if form.validate_on_submit():
         date = datetime.now()
-        userProductReview.update_product_review(currentUser, id, form.numStars.data, str(date), form.description.data, form.images.data) #REMOVE HARD CODE
+        userProductReview.update_product_review(currentUser, id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) #REMOVE HARD CODE
         flash('Review has been updated')
         return redirect(url_for('users.userReviews'))
     # render the page by adding information to the index.html file
@@ -178,7 +175,7 @@ def submitProductReview():
     form = ReviewForm()
     if form.validate_on_submit():
         date = datetime.now()
-        userProductReview.submit_product_review(currentUser, '1', form.numStars.data, str(date), form.description.data, '0', form.images.data) #REMOVE HARD CODE FOR PRODUCT_ID
+        userProductReview.submit_product_review(currentUser, currentProduct, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) #REMOVE HARD CODE FOR PRODUCT_ID
         flash('Product Review has been submitted')
         return redirect(url_for('users.login'))
     return render_template('submitReview.html', title='Submit Review', form=form)
@@ -191,7 +188,7 @@ def submitSellerReview():
     form = ReviewForm()
     if form.validate_on_submit():
         date = datetime.now()
-        userSellerReview.submit_seller_review(currentUser, '2', form.numStars.data, str(date), form.description.data, '0', form.images.data) #REMOVE HARD CODE FOR SELLER_ID
+        userSellerReview.submit_seller_review(currentUser, currentSeller, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) #REMOVE HARD CODE FOR SELLER_ID
         flash('Seller Review has been submitted')
         return redirect(url_for('users.login'))
     return render_template('submitReview.html', title='Submit Review', form=form)
@@ -205,6 +202,7 @@ def upvoteProductReview(id, upvotes):
     user_id = id 
     product_id = currentProduct #Change to current product id
     upvotes = upvotes
+    print(id, product_id, upvotes)
     userProductReview.upvote_product_review(user_id, product_id, upvotes)
     summary = productReviewSummary.get(currentProduct) #CHANGE '2' TO SELECTED PRODUCT ID
     reviews = productReview.get(currentProduct) #CHANGE '2' TO SELECTED PRODUCT ID

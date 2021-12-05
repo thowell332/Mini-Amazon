@@ -28,7 +28,6 @@
       <th scope="col">Number of Stars</th>
       <th scope="col">Date</th>
       <th scope="col">Review</th>
-      <th scope="col">Images</th>
 
     </tr>
   </thead>
@@ -37,17 +36,24 @@
       <tr>
         <td>
           {{product_review.upvotes}}
-          <a class="btn btn-secondary" href="{{ url_for('users.upvoteProductReview', id = product_review["buyer_id"], upvotes = product_review["upvotes"])}}" role="button" onClick="this.disabled=true">Upvote</a>
+          <a class="btn btn-secondary" href="{{ url_for('users.upvoteProductReview', id = product_review["buyer_id"], upvotes = product_review["upvotes"])}}" role="button">Upvote</a>
   
         </td>
         <input type="hidden" name="upvotes" value="{{product_review.upvotes}}" /> 
-        <th scope="row">{{product_review.buyer_id}}</th>
+        <td>{{product_review.buyer_id}}</td>
         <input type="hidden" name="buyer_id" value="{{product_review.buyer_id}}" /> 
         <td>{{product_review.num_stars}}</td>
         <td>{{product_review.date}}</td>
         <td>{{product_review.description}}</td>
-        <td>{{product_review.images}}</td>
+      </tr>
+      <tr>
+        {% for imageURL in product_review.images%}
+        {% if imageURL != "" %}
+        <td><img src="{{imageURL}}" width = 200></td>
+        {% endif %}
+        {% endfor %}
         
+         
       </tr>
     {% endfor %}
   </tbody>

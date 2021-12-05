@@ -28,7 +28,6 @@
       <th scope="col">Number of Stars</th>
       <th scope="col">Date</th>
       <th scope="col">Review</th>
-      <th scope="col">Images</th>
     </tr>
   </thead>
   <tbody>
@@ -44,8 +43,13 @@
         <td>{{seller_review.num_stars}}</td>
         <td>{{seller_review.date}}</td>
         <td>{{seller_review.description}}</td>
-        <td>{{seller_review.images}}</td>
-        
+      </tr>
+      <tr>
+        {% for imageURL in seller_review.images%}
+        {% if imageURL != "" %}
+        <td><img src="{{imageURL}}" width="200"></td>
+        {% endif %}
+        {% endfor %}
       </tr>
     {% endfor %}
   </tbody>
