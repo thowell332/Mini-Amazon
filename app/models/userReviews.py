@@ -28,6 +28,7 @@ ORDER BY date DESC
 INSERT INTO ProductReview VALUES (:user_id, :product_id, :num_stars, :date, :description, :upvotes, :images)
         ''', user_id=user_id, product_id=product_id, num_stars=num_stars, date=date, description=description, upvotes=upvotes, images=[image1, image2, image3])
         except Exception as e:
+            print("hihi")
             print(e)
 
     @staticmethod

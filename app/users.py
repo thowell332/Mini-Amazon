@@ -15,7 +15,6 @@ from .models.productReviews import productReviewSummary, productReview
 from flask import Blueprint
 bp = Blueprint('users', __name__)
 
-
 class LoginForm(FlaskForm):
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
     password = PasswordField(_l('Password'), validators=[DataRequired()])
@@ -77,9 +76,7 @@ def logout():
     logout_user()
     return redirect(url_for('index.index'))
 
-currentUser = '3'
-currentProduct = '1'
-currentSeller = '2'
+
 @bp.route('/userReviews')
 def userReviews():
     # get all product reviews user has made:
@@ -117,6 +114,12 @@ class ReviewForm(FlaskForm):
     image3 = StringField(_l('Image 3 URL (optional)'))
     submit = SubmitField(_l('Submit'))
 
+global currentUser 
+currentUser = '3'
+global currentProduct
+currentProduct = '1'
+global currentSeller
+currentSeller = '5'
 """
 Edit seller review 
 parameters: id is seller_id

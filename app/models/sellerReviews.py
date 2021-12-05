@@ -29,16 +29,17 @@ class sellerReview:
     @staticmethod
     ##method to get all reviews for a given seller in reverse chronological order
     def get(seller_id):
-        rows = app.db.execute('''
-(SELECT buyer_id, num_stars, date, description, upvotes, images FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
+        rows = app.db.execute(
+'''
+SELECT buyer_id, num_stars, date, description, upvotes, images FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
     FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
     FROM SellerReview
     WHERE seller_id = :seller_id
     ORDER BY upvotes DESC) AS sortedReviews
-    LIMIT 3) AS topThree) 
+    LIMIT 3) AS topThree
 UNION ALL
 (SELECT buyer_id, num_stars, date, description, upvotes, images FROM SellerReview
-WHERE NOT EXISTS (
+WHERE seller_id = :seller_id AND NOT EXISTS (
     SELECT buyer_id, num_stars, date, description, upvotes, images FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
     FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
     FROM SellerReview
@@ -51,3 +52,4 @@ ORDER BY date DESC)
 ''',
                               seller_id=seller_id)
         return [sellerReview(*row) for row in rows] if rows is not None else None
+
