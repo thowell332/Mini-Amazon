@@ -48,7 +48,5 @@ def create_app():
 
     from .cart import bp as cart_bp
     app.register_blueprint(cart_bp)
-    # TODO: Refactor this into a procedure method. Or create.sql.
-    Cart.initialize_get_procedure()
 
     return app
