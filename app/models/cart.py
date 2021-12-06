@@ -1,4 +1,18 @@
 from flask import current_app as app
+from datetime import datetime
+
+class CartEntry:
+    def __init__(self, buyer_id, seller_id, product_id, quantity):
+        self.buyer_id = buyer_id
+        self.seller_id = seller_id
+        self.product_id = product_id
+        self.quantity = quantity
+
+class SellsItemEntry:
+    def __init__(self, seller_id, product_id, item_id):
+        self.seller_id = seller_id
+        self.product_id = product_id
+        self.item_id = item_id
 
 # TODO: Convert from normal query to procedure.
 class CartItem:
@@ -10,6 +24,7 @@ class CartItem:
         self.unit_price = unit_price
         self.total_price = self.unit_price * self.quantity
 
+# TODO: Refactor SQL queries to remove overlap.
 class Cart:
     def __init__(self, product_id, seller_id, quantity):
         self.product_id = product_id
@@ -17,11 +32,9 @@ class Cart:
         self.quantity = quantity
 
     @staticmethod
-    def initialize_get_procedure():
-        app.db.execute("""
-CREATE PROCEDURE GetById
-AS
-(WITH
+    def get_cart_for_buyer_id(buyer_id):
+        rows = app.db.execute("""
+WITH
 CartInfo(product_id, seller_id, quantity) AS (
     SELECT product_id, seller_id, quantity
     FROM Cart
@@ -45,7 +58,7 @@ CartInfoProduct(product_name, product_image, seller_id, quantity) AS (
 ),
 
 CartInfoSeller(product_name, product_image, seller_name, quantity) AS (
-    SELECT CartInfoProduct.product_name, CartInfoProduct.product_image, Account.name, CartInfoProduct.quantity, CartInfoProduct.unit_price
+    SELECT CartInfoProduct.product_name, CartInfoProduct.product_image, Account.firstname, CartInfoProduct.quantity, CartInfoProduct.unit_price
     FROM CartInfoProduct
     LEFT JOIN
     Account
@@ -54,11 +67,8 @@ CartInfoSeller(product_name, product_image, seller_name, quantity) AS (
 Select * FROM CartInfoProduct)
 """)
 
-    @staticmethod
-    def get_by_buyer_id(buyer_id):
-        rows = app.db.execute("""CALL GetById(:buyer_id)""", buyer_id = buyer_id)
         if not rows:  # email not found
-            return None
+            return []
         else:
             return [CartItem(*row) for row in rows]
 

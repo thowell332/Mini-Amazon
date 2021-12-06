@@ -8,14 +8,14 @@
       <tr>
         <th scope="col">Product Name</th>
         <th scope="col">Image</th>
-        <th scope="col">Seller Name</th>
+        <th scope="col">Seller ID</th>
         <th scope="col">Quantity</th>
         <th scope="col">Unit Price</th>
         <th scope="col">Total Price</th>
       </tr>
     </thead>
     <tbody>
-      {% for item in cart_items%}
+      {% for item in items%}
         <tr>
           <th scope="row">{{item.product_name}}</th>
           <td>{{item.product_image}}</td>
@@ -27,8 +27,10 @@
       {% endfor %}
     </tbody>
   </table>
-  <button>
-    
-  </button>
+
+  <form method="post" action="">
+    {{ form.hidden_tag() }}
+    <p>{{ form.submit() }}</p>
+  </form>
   
 {% endblock %}

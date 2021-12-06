@@ -1,9 +1,10 @@
 CREATE TABLE Account
 (account_id SERIAL NOT NULL PRIMARY KEY, -- System assigned
 email VARCHAR(256) NOT NULL UNIQUE,
-name VARCHAR(32) NOT NULL,
-balance DECIMAL NOT NULL, -- 4 byte floating point number
+firstname VARCHAR(32) NOT NULL,
+lastname VARCHAR(32) NOT NULL,
 address VARCHAR(256) NOT NULL,
+balance DECIMAL NOT NULL, -- 4 byte floating point number
 password VARCHAR(256) NOT NULL
 );
  
@@ -50,7 +51,6 @@ purchase_id INTEGER NOT NULL,
 status VARCHAR(32) NOT NULL,
 date TIMESTAMP WITH TIME ZONE NOT NULL,
 PRIMARY KEY (buyer_id, product_id, item_id),
-FOREIGN KEY(product_id, item_id) REFERENCES SellsItem(product_id, item_id)
 );
  
 CREATE TABLE SellerReview
@@ -137,3 +137,55 @@ CREATE TRIGGER TG_Cart_Quantity_Available
 	BEFORE INSERT ON Cart
 	FOR EACH ROW
 	EXECUTE PROCEDURE TF_Cart_Quantity_Available();
+
+CREATE FUNCTION One_Product_Review() RETURNS TRIGGER AS $one_product_review$
+BEGIN 
+	IF EXISTS(SELECT * FROM ProductReview WHERE NEW.buyer_id = ProductReview.buyer_id AND NEW.product_id = ProductReview.product_id) THEN
+	RAISE EXCEPTION 'A user cannot submit more than one rating/review for a single product';
+	END IF;
+	RETURN NEW;
+END;
+$one_product_review$ LANGUAGE plpgsql;
+
+CREATE TRIGGER One_Product_Review
+	BEFORE INSERT ON ProductReview 
+	FOR EACH ROW
+	EXECUTE PROCEDURE One_Product_Review();
+
+CREATE FUNCTION One_Seller_Review() RETURNS TRIGGER AS $one_seller_review$
+BEGIN 
+	IF EXISTS(SELECT * FROM SellerReview WHERE NEW.buyer_id = SellerReview.buyer_id AND NEW.seller_id = SellerReview.seller_id) THEN
+	RAISE EXCEPTION 'A user cannot submit more than one rating/review for a single seller';
+	END IF;
+	RETURN NEW;
+END;
+$one_seller_review$ LANGUAGE plpgsql;
+
+CREATE TRIGGER One_Seller_Review
+	BEFORE INSERT ON SellerReview
+	FOR EACH ROW
+	EXECUTE PROCEDURE One_Seller_Review();
+
+--Allratings/reviews authored by the user in reverse chronological order
+--SELECT * FROM ProductReview, SellerReview
+--WHERE NEW.account_id = ProductReview.account_id
+--ORDER BY date DESC
+
+--List of ratings for product
+--SELECT * FROM ProductReview 
+--WHERE NEW.product_id = ProductReview.product_id
+--ORDER BY ProductReview.num_stars DESC
+
+--Average, number of ratings for product
+--SELECT AVG(num_stars), COUNT(*) FROM ProductReview
+--WHERE NEW.product_id = ProductReview.product_id
+
+
+--List of ratings for seller
+--SELECT * FROM SellerReview 
+--WHERE NEW.seller_id = SellerReview.seller_id
+--ORDER BY SellerReview.num_stars DESC
+
+--Average, number of ratings for seller
+--SELECT AVG(num_stars), COUNT(*) FROM SellerReview
+--WHERE NEW.seller_id = SellerReview.seller_id
