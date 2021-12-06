@@ -23,7 +23,7 @@
         <td>{{product.quantity}}</td>
         <th> 
             <a class="btn btn-secondary" href="{{ url_for('inventories.editInventory', product_id=product.product_id) }}" role="button">Edit</a>
-            <a class="btn btn-secondary" onclick="{{ delete_product_listing('2', product.product_id) }}" role="button">Delete</a>
+            <a class="btn btn-secondary" href="{{ url_for('inventories.deleteInventory', product_id=product.product_id) }}" role="button">Delete</a>
         </th>
       </tr>
     {% endfor %}

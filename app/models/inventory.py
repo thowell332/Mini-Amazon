@@ -46,7 +46,8 @@ class InventoryListing:
             ''',
             product_id=product_id,
             seller_id=seller_id)
-        return InventoryListing(*(row[0])) if row is not None else None
+        print(row)
+        return InventoryListing(*(row[0])) if row else None
 
     @staticmethod
     # update existing product listing
@@ -99,6 +100,7 @@ class InventoryListing:
     @staticmethod
     # delete existing product listing
     def delete_product_listing(seller_id, product_id):
+        print('deleting your shit!')
         # remove all items associated with this listing
         try: app.db.execute(
             '''
@@ -158,13 +160,8 @@ class InventoryListing:
                 product_id=product_id
             )
             current_items = [row[0] for row in rows] if rows is not None else None
-            # identify holes in item_id column
-            missing_items = sorted(set(range(1, current_items[-1] + 1)).difference(current_items))
-            # assign minimum item_id values to the new rows
-            if len(missing_items) >= delta_quantity:
-                new_items = missing_items[:delta_quantity - 1]
-            else:
-                new_items = missing_items + [max(current_items) + i + 1 for i in range(delta_quantity - len(missing_items))]
+            # assign item_id values to the new rows
+            new_items = [max(current_items) + i + 1 for i in range(delta_quantity)]
             # generate row values to be inserted
             values = ', '.join(['(' + ', '.join((str(seller_id), str(product_id), str(new_items[i]))) + ')' for i in range(delta_quantity)])
             # execute insert query

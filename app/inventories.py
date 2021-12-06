@@ -20,7 +20,7 @@ def inventory():
     # get product inventory for given seller
     inventoryList = Inventory.get('2') #CHANGE '5' TO USER ID
     # render the page by adding information to the index.html file
-    return render_template('inventory.html', inventory=inventoryList, delete_product_listing=InventoryListing.delete_product_listing)
+    return render_template('inventory.html', inventory=inventoryList)
 
 class EditInventoryForm(FlaskForm):
     name = StringField(_l('Product Name'), validators=[Optional()])
@@ -55,4 +55,11 @@ def addInventory():
         return redirect(url_for('inventories.inventory'))
     # render the page by adding information to the index.html file
     return render_template('addInventory.html', title='Add Product Listing', form=form)
+
+@bp.route('/deleteInventory/<int:product_id>', methods=['GET', 'POST'])
+def deleteInventory(product_id):
+    # execute deletion of inventory
+    InventoryListing.delete_product_listing('2', product_id) #CHANGE '5' TO USER ID
+    # render inventory page
+    return inventory()
 
