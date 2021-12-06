@@ -1,9 +1,10 @@
 CREATE TABLE Account
 (account_id SERIAL NOT NULL PRIMARY KEY, -- System assigned
 email VARCHAR(256) NOT NULL UNIQUE,
-name VARCHAR(32) NOT NULL,
-balance DECIMAL NOT NULL, -- 4 byte floating point number
+firstname VARCHAR(32) NOT NULL,
+lastname VARCHAR(32) NOT NULL,
 address VARCHAR(256) NOT NULL,
+balance DECIMAL NOT NULL, -- 4 byte floating point number
 password VARCHAR(256) NOT NULL
 );
  

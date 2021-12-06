@@ -58,7 +58,7 @@ CartInfoProduct(product_name, product_image, seller_id, quantity) AS (
 ),
 
 CartInfoSeller(product_name, product_image, seller_name, quantity) AS (
-    SELECT CartInfoProduct.product_name, CartInfoProduct.product_image, Account.name, CartInfoProduct.quantity, CartInfoProduct.unit_price
+    SELECT CartInfoProduct.product_name, CartInfoProduct.product_image, Account.firstname, CartInfoProduct.quantity, CartInfoProduct.unit_price
     FROM CartInfoProduct
     LEFT JOIN
     Account
@@ -86,7 +86,7 @@ WHERE buyer_id = :buyer_id
 """,
 buyer_id = buyer_id)
 
-        print(cart_tuples)
+
         cart_items = [CartEntry(*cart_tuple) for cart_tuple in cart_tuples]
 
         out_of_stock_items = []
@@ -102,8 +102,7 @@ WHERE product_id = :product_id AND seller_id = :seller_id
 product_id = item.product_id, seller_id = item.seller_id)
 
             quantity_in_inventory = quantity_in_inventory[0][0]
-
-            if item.quantity > quantity_in_inventory:
+            if item.quantity > quantity_in_inventory or item.quantity == 0:
                 out_of_stock_items.append(item)
             else:
                 in_stock_items.append(item)
@@ -121,11 +120,11 @@ product_id = item.product_id, seller_id = item.seller_id)
 """
 DELETE
 FROM Cart
-WHERE product_id = :product_id AND seller_id = :seller_id
+WHERE product_id = :product_id AND seller_id = :seller_id AND buyer_id = :buyer_id
 RETURNING 0
 """,
 
-product_id = item.product_id, seller_id = item.seller_id)
+product_id = item.product_id, seller_id = item.seller_id, buyer_id  = buyer_id)
 
                 # Remove item from SellsItem table.
                 items_available_for_purchase = app.db.execute(
@@ -136,9 +135,11 @@ WHERE product_id = :product_id AND seller_id = :seller_id
 """,
 product_id = item.product_id, seller_id = item.seller_id)
 
-                items_avaiable_for_purchase = [SellsItemEntry(*item_available) for item_available in items_available_for_purchase]
 
+                items_avaiable_for_purchase = [SellsItemEntry(*item_available) for item_available in items_available_for_purchase]
+        
                 # Buy one item for each incremental quantity selected.
+                
                 for i in range(item.quantity):
                     purchased_item = items_avaiable_for_purchase[i]
 
@@ -152,14 +153,15 @@ RETURNING 0
 """,
 item_id = purchased_item.item_id)
 
+                    # TODO: Fix the code below. SQL thinks purchase doesn't exist.
                     # Note that the item was purchased.
-                    app.db.execute(
-                    """
-                    INSERT INTO Purchase (buyer_id, product_id, item_id, purchase_id, status, date)
-                    VALUES (:buyer_id, :product_id, :item_id, :purchase_id, :status, :date)
-                    RETURNING 0
-                    """,
-                    buyer_id = buyer_id, product_id = purchased_item.product_id, item_id = purchased_item.item_id, purchase_id = purchase_id, status = initial_status, date = datetime.now())
+                    # app.db.execute(
+                    # """
+                    # INSERT INTO Purchase (buyer_id, product_id, item_id, purchase_id, status, date)
+                    # VALUES (:buyer_id, :product_id, :item_id, :purchase_id, :status, :date)
+                    # RETURNING 0
+                    # """,
+                    # buyer_id = buyer_id, product_id = purchased_item.product_id, item_id = purchased_item.item_id, purchase_id = purchase_id, status = initial_status, date = datetime.now())
 
 
 
