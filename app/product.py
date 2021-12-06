@@ -1,5 +1,8 @@
 from flask import render_template, Blueprint, request
 from flask_paginate import Pagination, get_page_parameter
+from flask_wtf import FlaskForm
+from wtforms import StringField
+from flask_babel import _, lazy_gettext as _l
 
 from .models.product import Product
 
