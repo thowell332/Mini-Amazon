@@ -200,7 +200,8 @@ def gen_cart(num_carts, num_accounts, items_sold):
                 if seller_id == i[0] and product_id == i[1]:
                     available_items += 1
             quantity = fake.random_int(max=available_items)
-            writer.writerow([buyer_id, seller_id, product_id, quantity])
+            saved_for_later = fake.boolean()
+            writer.writerow([buyer_id, seller_id, product_id, quantity, saved_for_later])
         print(f'{num_carts} carts generated')
     return
 
