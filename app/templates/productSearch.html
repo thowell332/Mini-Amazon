@@ -13,6 +13,7 @@
             <th scope="col">Product ID</th>
             <th scope="col">Description</th>
             <th scope="col">Category</th>
+            <th scope="col">View Product</th>
         </tr>
         </thead>
         <tbody>
@@ -23,6 +24,12 @@
                 <td>{{item.product_id}}</td>
                 <td>{{item.description}}</td>
                 <td>{{item.category}}</td>
+                <td class="td-actions text-right">
+                    <a href="{{ url_for("product.product", input=item.product_id) }}"><input type="submit" name="go_to_product_button" value="Go To Product"rel="tooltip" class="btn btn-info">
+                        <i class="material-icons"></i>
+                        </input>
+                    </a>
+                </td>
             </tr>
         {% endfor %}
         </tbody>
