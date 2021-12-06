@@ -15,11 +15,13 @@ class SellsItemEntry:
         self.item_id = item_id
 
 # TODO: Convert from normal query to procedure.
+
 class CartItem:
-    def __init__(self, product_name, product_image, seller_name, quantity, unit_price):
+    def __init__(self, product_name, product_image, seller_first_name, seller_last_name, saved_for_later, quantity, unit_price):
         self.product_name = product_name
         self.product_image = product_image
-        self.seller_name = seller_name
+        self.seller_name = seller_first_name + ' ' + seller_last_name
+        self.saved_for_later = saved_for_later
         self.quantity = quantity
         self.unit_price = unit_price
         self.total_price = self.unit_price * self.quantity
@@ -33,41 +35,45 @@ class Cart:
 
     @staticmethod
     def get_cart_for_buyer_id(buyer_id):
+
         rows = app.db.execute("""
 WITH
-CartInfo(product_id, seller_id, quantity) AS (
-    SELECT product_id, seller_id, quantity
+BasicCart(product_id, seller_id, saved_for_later, quantity) AS (
+    SELECT product_id, seller_id, saved_for_later, quantity
     FROM Cart
     WHERE buyer_id = :buyer_id
 ),
 
-CartInfoSellsProduct(product_id, seller_id, quantity, unit_price) AS (
-    SELECT CartInfo.product_id, CartInfo.seller_id, CartInfo.quantity, SellsProduct.price
-    FROM CartInfo
+CartAddPrice(product_id, seller_id, saved_for_later, quantity, unit_price) AS (
+    SELECT BasicCart.product_id, BasicCart.seller_id, BasicCart.saved_for_later, BasicCart.quantity, SellsProduct.price
+    FROM BasicCart
     LEFT JOIN
     SellsProduct
-    ON CartInfo.seller_id = SellsProduct.seller_id AND CartInfo.product_id = SellsProduct.product_id
+    ON BasicCart.seller_id = SellsProduct.seller_id AND BasicCart.product_id = SellsProduct.product_id
 ),
 
-CartInfoProduct(product_name, product_image, seller_id, quantity) AS (
-    SELECT Product.name, Product.image, CartInfoSellsProduct.seller_id, CartInfoSellsProduct.quantity, CartInfoSellsProduct.unit_price
-    FROM CartInfoSellsProduct
+CartAddProduct(product_name, product_image, seller_id, saved_for_later, quantity, unit_price) AS (
+    SELECT Product.name, Product.image, CartAddPrice.seller_id, CartAddPrice.saved_for_later, CartAddPrice.quantity, CartAddPrice.unit_price
+    FROM CartAddPrice
     LEFT JOIN
     Product
-    ON CartInfoSellsProduct.product_id = Product.product_id
+    ON CartAddPrice.product_id = Product.product_id
 ),
 
-CartInfoSeller(product_name, product_image, seller_name, quantity) AS (
-    SELECT CartInfoProduct.product_name, CartInfoProduct.product_image, Account.firstname, CartInfoProduct.quantity, CartInfoProduct.unit_price
-    FROM CartInfoProduct
+FullCart(product_name, product_image, seller_first_name, seller_last_name, saved_for_later, quantity, unit_price) AS (
+    SELECT CartAddProduct.product_name, CartAddProduct.product_image, Account.firstname, Account.lastname, CartAddProduct.saved_for_later, CartAddProduct.quantity, CartAddProduct.unit_price
+    FROM CartAddProduct
     LEFT JOIN
     Account
-    ON CartInfoProduct.seller_id = Account.account_id
+    ON CartAddProduct.seller_id = Account.account_id
 )
-Select * FROM CartInfoProduct
+Select * FROM FullCart
 """,
 
-buyer_id = buyer_id)
+                              buyer_id = buyer_id)
+
+        print('rows')
+        print(rows)
 
         if not rows:  # email not found
             return []
@@ -75,93 +81,7 @@ buyer_id = buyer_id)
             return [CartItem(*row) for row in rows]
 
 
-    # TODO: Make this serializable.
+    # TODO: MAKE THIS SERIALIZABLE AND A PROCEDURE.
     @staticmethod
-    def purchase_cart_for_buyer_id(buyer_id):
-        cart_tuples = app.db.execute(
-"""
-SELECT *
-FROM Cart
-WHERE buyer_id = :buyer_id
-""",
-buyer_id = buyer_id)
-
-
-        cart_items = [CartEntry(*cart_tuple) for cart_tuple in cart_tuples]
-
-        out_of_stock_items = []
-        in_stock_items = []
-
-        for item in cart_items:
-            quantity_in_inventory = app.db.execute(
-"""
-SELECT COUNT(*)
-FROM SellsItem
-WHERE product_id = :product_id AND seller_id = :seller_id
-""",
-product_id = item.product_id, seller_id = item.seller_id)
-
-            quantity_in_inventory = quantity_in_inventory[0][0]
-            if item.quantity > quantity_in_inventory or item.quantity == 0:
-                out_of_stock_items.append(item)
-            else:
-                in_stock_items.append(item)
-            
-            # Purchase all the in stock items and remove them form cart.
-
-            # TODO: Make purchase ID unique.
-            purchase_id = 123
-            initial_status = 'Unfulfilled'
-
-            for item in in_stock_items:
-
-                # Remove product from Cart table.
-                app.db.execute(
-"""
-DELETE
-FROM Cart
-WHERE product_id = :product_id AND seller_id = :seller_id AND buyer_id = :buyer_id
-RETURNING 0
-""",
-
-product_id = item.product_id, seller_id = item.seller_id, buyer_id  = buyer_id)
-
-                # Remove item from SellsItem table.
-                items_available_for_purchase = app.db.execute(
-"""
-SELECT *
-FROM SellsItem
-WHERE product_id = :product_id AND seller_id = :seller_id
-""",
-product_id = item.product_id, seller_id = item.seller_id)
-
-
-                items_avaiable_for_purchase = [SellsItemEntry(*item_available) for item_available in items_available_for_purchase]
-        
-                # Buy one item for each incremental quantity selected.
-                
-                for i in range(item.quantity):
-                    purchased_item = items_avaiable_for_purchase[i]
-
-                    # Remove the item as being for sale.
-                    app.db.execute(
-"""
-DELETE
-FROM SellsItem
-WHERE item_id = :item_id
-RETURNING 0
-""",
-item_id = purchased_item.item_id)
-
-                    # TODO: Fix the code below. SQL thinks purchase doesn't exist.
-                    # Note that the item was purchased.
-                    # app.db.execute(
-                    # """
-                    # INSERT INTO Purchase (buyer_id, product_id, item_id, purchase_id, status, date)
-                    # VALUES (:buyer_id, :product_id, :item_id, :purchase_id, :status, :date)
-                    # RETURNING 0
-                    # """,
-                    # buyer_id = buyer_id, product_id = purchased_item.product_id, item_id = purchased_item.item_id, purchase_id = purchase_id, status = initial_status, date = datetime.now())
-
-
-
+    def purchase_by_buyer_id(buyer_id):
+        print('TEST')
