@@ -15,7 +15,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for item in items%}
+      {% for item in immediate_cart%}
         <tr>
           <th scope="row">{{item.product_name}}</th>
           <td>{{item.product_image}}</td>
@@ -29,8 +29,34 @@
   </table>
 
   <form method="post" action="">
-    {{ form.hidden_tag() }}
-    <p>{{ form.submit() }}</p>
+    {{ purchase_form.hidden_tag() }}
+    <p>{{ purchase_form.submit() }}</p>
   </form>
+
+  <h1>Saved For Later</h1>
+  <table class='table table-hover table-bordered container'>
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Product Name</th>
+        <th scope="col">Image</th>
+        <th scope="col">Seller ID</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Unit Price</th>
+        <th scope="col">Total Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in saved_for_later_cart%}
+        <tr>
+          <th scope="row">{{item.product_name}}</th>
+          <td>{{item.product_image}}</td>
+          <td>{{item.seller_name}}</td>
+          <td>{{item.quantity}}</td>
+          <td>{{item.unit_price}}</td>
+          <td>{{item.total_price}}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
   
 {% endblock %}

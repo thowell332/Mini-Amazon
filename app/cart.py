@@ -24,6 +24,20 @@ def cart():
 
     # Test data for now.
     cart = Cart.get_cart_for_buyer_id(98)
+
+    immediate_cart = []
+    saved_for_later_cart = []
+
+    for cart_entry in cart:
+        if cart_entry.saved_for_later:
+            saved_for_later_cart.append(cart_entry)
+        else:
+            immediate_cart.append(cart_entry)
+
+    print('here')
+    print(immediate_cart)
+    print(saved_for_later_cart)
+
     form = CartForm()
 
     # TODO: Show items that were out of stock.
@@ -31,4 +45,4 @@ def cart():
         print('called')
         # Cart.purchase_cart_for_buyer_id(38)
         
-    return render_template('cart.html', items=cart, form=form)
+    return render_template('cart.html', immediate_cart=immediate_cart, saved_for_later_cart=saved_for_later_cart, purchase_form=form)

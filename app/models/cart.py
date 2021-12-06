@@ -15,11 +15,13 @@ class SellsItemEntry:
         self.item_id = item_id
 
 # TODO: Convert from normal query to procedure.
+
 class CartItem:
-    def __init__(self, product_name, product_image, seller_name, quantity, unit_price):
+    def __init__(self, product_name, product_image, seller_first_name, seller_last_name, saved_for_later, quantity, unit_price):
         self.product_name = product_name
         self.product_image = product_image
-        self.seller_name = seller_name
+        self.seller_name = seller_first_name + ' ' + seller_last_name
+        self.saved_for_later = saved_for_later
         self.quantity = quantity
         self.unit_price = unit_price
         self.total_price = self.unit_price * self.quantity
@@ -36,36 +38,36 @@ class Cart:
       
         rows = app.db.execute("""
 WITH
-CartInfo(product_id, seller_id, quantity) AS (
-    SELECT product_id, seller_id, quantity
+BasicCart(product_id, seller_id, saved_for_later, quantity) AS (
+    SELECT product_id, seller_id, saved_for_later, quantity
     FROM Cart
     WHERE buyer_id = :buyer_id
 ),
 
-CartInfoSellsProduct(product_id, seller_id, quantity, unit_price) AS (
-    SELECT CartInfo.product_id, CartInfo.seller_id, CartInfo.quantity, SellsProduct.price
-    FROM CartInfo
+CartAddPrice(product_id, seller_id, saved_for_later, quantity, unit_price) AS (
+    SELECT BasicCart.product_id, BasicCart.seller_id, BasicCart.saved_for_later, BasicCart.quantity, SellsProduct.price
+    FROM BasicCart
     LEFT JOIN
     SellsProduct
-    ON CartInfo.seller_id = SellsProduct.seller_id AND CartInfo.product_id = SellsProduct.product_id
+    ON BasicCart.seller_id = SellsProduct.seller_id AND BasicCart.product_id = SellsProduct.product_id
 ),
 
-CartInfoProduct(product_name, product_image, seller_id, quantity) AS (
-    SELECT Product.name, Product.image, CartInfoSellsProduct.seller_id, CartInfoSellsProduct.quantity, CartInfoSellsProduct.unit_price
-    FROM CartInfoSellsProduct
+CartAddProduct(product_name, product_image, seller_id, saved_for_later, quantity, unit_price) AS (
+    SELECT Product.name, Product.image, CartAddPrice.seller_id, CartAddPrice.saved_for_later, CartAddPrice.quantity, CartAddPrice.unit_price
+    FROM CartAddPrice
     LEFT JOIN
     Product
-    ON CartInfoSellsProduct.product_id = Product.product_id
+    ON CartAddPrice.product_id = Product.product_id
 ),
 
-CartInfoSeller(product_name, product_image, seller_name, quantity) AS (
-    SELECT CartInfoProduct.product_name, CartInfoProduct.product_image, Account.firstname, CartInfoProduct.quantity, CartInfoProduct.unit_price
-    FROM CartInfoProduct
+FullCart(product_name, product_image, seller_first_name, seller_last_name, saved_for_later, quantity, unit_price) AS (
+    SELECT CartAddProduct.product_name, CartAddProduct.product_image, Account.firstname, Account.lastname, CartAddProduct.saved_for_later, CartAddProduct.quantity, CartAddProduct.unit_price
+    FROM CartAddProduct
     LEFT JOIN
     Account
-    ON CartInfoProduct.seller_id = Account.account_id
+    ON CartAddProduct.seller_id = Account.account_id
 )
-Select * FROM CartInfo
+Select * FROM FullCart
 """,
 
 buyer_id = buyer_id)
@@ -77,6 +79,7 @@ buyer_id = buyer_id)
             return []
         else:
             return [CartItem(*row) for row in rows]
+
 
     # TODO: MAKE THIS SERIALIZABLE AND A PROCEDURE.
     @staticmethod
