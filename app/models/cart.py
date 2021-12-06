@@ -33,12 +33,13 @@ class Cart:
 
     @staticmethod
     def get_cart_for_buyer_id(buyer_id):
+      
         rows = app.db.execute("""
 WITH
 CartInfo(product_id, seller_id, quantity) AS (
     SELECT product_id, seller_id, quantity
     FROM Cart
-    WHERE buyer_id = $1
+    WHERE buyer_id = :buyer_id
 ),
 
 CartInfoSellsProduct(product_id, seller_id, quantity, unit_price) AS (
@@ -64,8 +65,13 @@ CartInfoSeller(product_name, product_image, seller_name, quantity) AS (
     Account
     ON CartInfoProduct.seller_id = Account.account_id
 )
-Select * FROM CartInfoProduct)
-""")
+Select * FROM CartInfo
+""",
+
+buyer_id = buyer_id)
+
+        print('rows')
+        print(rows)
 
         if not rows:  # email not found
             return []
