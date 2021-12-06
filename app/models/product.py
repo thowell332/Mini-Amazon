@@ -33,7 +33,7 @@ FROM Product
     def get_products_based_on_search_criteria(search_criteria):
         query = '''SELECT product_id, owner_id, description, name, image, category
         FROM Product
-        WHERE name LIKE '%s%' OR description LIKE '%s%' OR category LIKE '%s%' '''.format(search_criteria)
+        WHERE name LIKE '%{0}%' OR description LIKE '%{0}%' OR category LIKE '%{0}%' '''.format(search_criteria)
         rows = app.db.execute(query)
         return [Product(*row) for row in rows] if rows is not None else None
 
