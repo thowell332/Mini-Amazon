@@ -50,11 +50,7 @@ item_id INTEGER NOT NULL,
 purchase_id INTEGER NOT NULL,
 status VARCHAR(32) NOT NULL,
 date TIMESTAMP WITH TIME ZONE NOT NULL,
-<<<<<<< HEAD
 PRIMARY KEY (buyer_id, product_id, item_id)
-=======
-PRIMARY KEY (buyer_id, product_id, item_id),
->>>>>>> 4290eb458319eaa2ca5c5ecc10df49bfcd91e886
 );
  
 CREATE TABLE SellerReview
