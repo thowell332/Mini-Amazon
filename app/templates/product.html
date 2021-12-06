@@ -3,6 +3,24 @@
 {% block content %}
 
     <h1>Product</h1>
+    <td class="td-actions text-right">
+        <a href="{{ url_for("product.product_price_sort", input=product[0].product_id) }}"><input type="submit" name="Sort by Price" value="Sort By Price"rel="tooltip" class="btn btn-info">
+            <i class="material-icons"></i>
+            </input>
+        </a>
+    </td>
+    <td class="td-actions text-right">
+        <a href="{{ url_for("product.product_quantity_sort", input=product[0].product_id) }}"><input type="submit" name="Sort by Quantity" value="Sort By Quantity"rel="tooltip" class="btn btn-info">
+            <i class="material-icons"></i>
+            </input>
+        </a>
+    </td>
+    <td class="td-actions text-right">
+        <a href="{{ url_for("product.product", input=product[0].product_id) }}"><input type="submit" name="Standard Sort" value="Undo Sorting"rel="tooltip" class="btn btn-info">
+            <i class="material-icons"></i>
+            </input>
+        </a>
+    </td>
     <table class='table table-hover table-bordered container'>
         <thead class="thead-dark">
         <tr>

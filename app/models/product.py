@@ -64,6 +64,40 @@ GROUP BY p.product_id, sp.price
         return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
 
     @staticmethod
+    ##A detailed product page will show all details for the product,
+    ##together with a list of sellers and their current quantities in stock
+    def get_product_display_page_price_ordered(product_id):
+        rows = app.db.execute('''
+SELECT p.product_id, p.owner_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id)
+FROM Product p, SellsProduct sp, SellsItem si
+WHERE p.product_id = :product_id
+AND p.product_id = sp.product_id
+AND p.owner_id = sp.seller_id
+AND p.product_id = si.product_id
+AND p.owner_id = si.seller_id
+GROUP BY p.product_id, sp.price
+ORDER BY sp.price DESC
+''', product_id=product_id)
+        return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
+
+    @staticmethod
+    ##A detailed product page will show all details for the product,
+    ##together with a list of sellers and their current quantities in stock
+    def get_product_display_page_quantity_ordered(product_id):
+        rows = app.db.execute('''
+SELECT p.product_id, p.owner_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id)
+FROM Product p, SellsProduct sp, SellsItem si
+WHERE p.product_id = :product_id
+AND p.product_id = sp.product_id
+AND p.owner_id = sp.seller_id
+AND p.product_id = si.product_id
+AND p.owner_id = si.seller_id
+GROUP BY p.product_id, sp.price
+ORDER BY COUNT(si.item_id) DESC
+''', product_id=product_id)
+        return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
+
+    @staticmethod
     ##Method to insert a new product into the database
     def insert_new_product(product_id, owner_id, description, name, image, category):
         insert_statement = '''

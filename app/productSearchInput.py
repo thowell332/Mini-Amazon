@@ -7,6 +7,8 @@ bp = Blueprint('productSearchInput', __name__)
 per_page = 10
 
 @bp.route('/productSearchInput')
+##change to @bp.route('/productSearchInput<input>')
+##make the below function take in @param input
 def product():
     search = False
     q = request.args.get('q')
@@ -17,3 +19,4 @@ def product():
     product = Product.get_products_based_on_search_criteria("Laptops") ##change "Laptop" to @param input
     pagination = Pagination(page=page, per_page=per_page, total=len(product), search=search, record_name='products')
     return render_template('productSearch.html', product=product[start: start + per_page], pagination=pagination)
+
