@@ -50,7 +50,7 @@ item_id INTEGER NOT NULL,
 purchase_id INTEGER NOT NULL,
 status VARCHAR(32) NOT NULL,
 date TIMESTAMP WITH TIME ZONE NOT NULL,
-PRIMARY KEY (buyer_id, product_id, item_id),
+PRIMARY KEY (buyer_id, product_id, item_id)
 );
  
 CREATE TABLE SellerReview
@@ -127,7 +127,7 @@ CREATE TRIGGER TG_Cart_Product_Exists
  
 CREATE FUNCTION TF_Cart_Quantity_Available() RETURNS TRIGGER AS $cart_quantity_available$
 BEGIN
-	IF ((SELECT COUNT(*) FROM SellsItem WHERE NEW.product_id = SellsItem.item_id AND NEW.seller_id = SellsItem.seller_id) > NEW.quantity) THEN
+	IF ((SELECT COUNT(*) FROM SellsItem WHERE NEW.product_id = SellsItem.product_id AND NEW.seller_id = SellsItem.seller_id) < NEW.quantity) THEN
 	RAISE EXCEPTION 'The quantity you selected is not available';
 	END IF;
 	RETURN NEW;

@@ -185,6 +185,8 @@ def gen_Reviews(num_reviews, purchases, items_sold):
     return
 
 def gen_cart(num_carts, num_accounts, items_sold):
+    print('items sold')
+    print(items_sold)
     with open('Cart.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Cart...', end=' ', flush=True)
