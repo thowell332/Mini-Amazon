@@ -1,11 +1,9 @@
-from flask import render_template, request
+from flask import render_template, request, Blueprint
 from flask_paginate import Pagination, get_page_parameter
 
 from .models.product import Product
 
-from flask import Blueprint
 bp = Blueprint('productSearchCategory', __name__)
-
 per_page = 10
 
 @bp.route('/productSearchCategory')
