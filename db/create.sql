@@ -1,9 +1,10 @@
 CREATE TABLE Account
 (account_id SERIAL NOT NULL PRIMARY KEY, -- System assigned
 email VARCHAR(256) NOT NULL UNIQUE,
-name VARCHAR(32) NOT NULL,
-balance DECIMAL NOT NULL, -- 4 byte floating point number
+firstname VARCHAR(32) NOT NULL,
+lastname VARCHAR(32) NOT NULL,
 address VARCHAR(256) NOT NULL,
+balance DECIMAL NOT NULL, -- 4 byte floating point number
 password VARCHAR(256) NOT NULL
 );
  
@@ -49,7 +50,11 @@ item_id INTEGER NOT NULL,
 purchase_id INTEGER NOT NULL,
 status VARCHAR(32) NOT NULL,
 date TIMESTAMP WITH TIME ZONE NOT NULL,
+<<<<<<< HEAD
 PRIMARY KEY (buyer_id, product_id, item_id)
+=======
+PRIMARY KEY (buyer_id, product_id, item_id),
+>>>>>>> 4290eb458319eaa2ca5c5ecc10df49bfcd91e886
 );
  
 CREATE TABLE SellerReview
