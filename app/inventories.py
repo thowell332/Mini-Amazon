@@ -20,8 +20,7 @@ def inventory():
     # get product inventory for given seller
     inventoryList = Inventory.get('2') #CHANGE '5' TO USER ID
     # render the page by adding information to the index.html file
-    return render_template('inventory.html',
-                           inventory=inventoryList)
+    return render_template('inventory.html', inventory=inventoryList, delete_product_listing=InventoryListing.delete_product_listing)
 
 class EditInventoryForm(FlaskForm):
     name = StringField(_l('Product Name'), validators=[Optional()])

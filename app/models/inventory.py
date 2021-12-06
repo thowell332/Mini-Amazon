@@ -97,6 +97,33 @@ class InventoryListing:
         InventoryListing.update_quantity(seller_id, product_id, form.quantity.data)
     
     @staticmethod
+    # delete existing product listing
+    def delete_product_listing(seller_id, product_id):
+        # remove all items associated with this listing
+        try: app.db.execute(
+            '''
+            DELETE FROM SellsItem
+            WHERE seller_id = :seller_id AND product_id = :product_id
+            ''',
+            seller_id=seller_id,
+            product_id=product_id
+        )
+        except Exception as e:
+            print(e)
+        
+        # remove product listing from SellsProduct
+        try: app.db.execute(
+            '''
+            DELETE FROM SellsProduct
+            WHERE seller_id = :seller_id AND product_id = :product_id
+            ''',
+            seller_id=seller_id,
+            product_id=product_id
+        )
+        except Exception as e:
+            print(e)
+    
+    @staticmethod
     def update_quantity(seller_id, product_id, delta_quantity):
         # if new quantity is lower, remove items
         if delta_quantity < 0:
