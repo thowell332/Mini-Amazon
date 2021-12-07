@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import SubmitField
@@ -8,10 +8,6 @@ from .models.cart import Cart
 
 from flask import Blueprint
 bp = Blueprint('cart', __name__)
-
-class CartForm(FlaskForm):
-    submit = SubmitField(_l('Purchase Cart'))
-
 
 @bp.route('/cart', methods=['GET', 'POST'])
 def cart():
@@ -23,26 +19,87 @@ def cart():
     #     cart = Cart.get_by_buyer_id(current_user.id)
 
     # Test data for now.
-    cart = Cart.get_cart_for_buyer_id(98)
+    cart = Cart.get_cart_for_buyer_id(80)
+    if 'type' in request.form:
+        if request.form['type'] == 'Delete Items':
+            print('Called Delete')
+            items_to_delete = request.form.getlist('delete_from_cart')
+            formatted_items = []
+            for item in items_to_delete:
+                item_info = item.split(',')
+                formatted_items.append([item_info[0], item_info[1]])
 
-    immediate_cart = []
-    saved_for_later_cart = []
+            Cart.delete_from_cart(80, formatted_items)            
 
-    for cart_entry in cart:
-        if cart_entry.saved_for_later:
-            saved_for_later_cart.append(cart_entry)
-        else:
-            immediate_cart.append(cart_entry)
+        elif request.form['type'] == 'Move Items to Saved':
+            items_to_move = request.form.getlist('move_to_saved')
+            formatted_items = []
+            for item in items_to_move:
+                quantity_to_move = request.form.get(item)
+                item_info = item.split(',')
+                formatted_items.append([item_info[0], item_info[1], item_info[2], quantity_to_move])
 
-    print('here')
-    print(immediate_cart)
-    print(saved_for_later_cart)
+            Cart.move_to_saved(80, formatted_items)
 
-    form = CartForm()
+        elif request.form['type'] == 'Update Quantities':
+            items_to_update = request.form.getlist('update_quantity')
+            formatted_items = []
+            for item in items_to_update:
+                new_quantity = request.form.get(item)
+                item_info = item.split(',')
+                formatted_items.append([item_info[0], item_info[1], new_quantity])
 
-    # TODO: Show items that were out of stock.
-    if form.validate_on_submit():
-        print('called')
-        # Cart.purchase_cart_for_buyer_id(38)
+            Cart.update_cart_quantity(80, formatted_items)
+
+        # Reload page to show updated data.
+        return redirect(url_for('cart.cart'))
+
         
-    return render_template('cart.html', immediate_cart=immediate_cart, saved_for_later_cart=saved_for_later_cart, purchase_form=form)
+    return render_template('cart.html', cart=cart)
+
+@bp.route('/saved-for-later', methods=['GET', 'POST'])
+def saved_for_later():
+
+    # TODO: Uncomment once functionality is there for logged in users.
+    # if current_user.is_authenticated:
+    #     return redirect(url_for('index.index'))
+    # else:
+    #     cart = Cart.get_by_buyer_id(current_user.id)
+
+    # Test data for now.
+    saved_for_later = Cart.get_saved_for_buyer_id(80)
+
+    if 'type' in request.form:
+        if request.form['type'] == 'Delete Items':
+            items_to_delete = request.form.getlist('delete_from_saved')
+            formatted_items = []
+            for item in items_to_delete:
+                item_info = item.split(',')
+                formatted_items.append([item_info[0], item_info[1]])
+
+            Cart.delete_from_saved(80, formatted_items)            
+
+        elif request.form['type'] == 'Move Items to Cart':
+            items_to_move = request.form.getlist('move_to_cart')
+            formatted_items = []
+            for item in items_to_move:
+                quantity_to_move = request.form.get(item)
+                item_info = item.split(',')
+                formatted_items.append([item_info[0], item_info[1], item_info[2], quantity_to_move])
+
+            Cart.move_to_cart(80, formatted_items)
+
+        elif request.form['type'] == 'Update Quantities':
+            items_to_update = request.form.getlist('update_quantity')
+            formatted_items = []
+            for item in items_to_update:
+                new_quantity = request.form.get(item)
+                item_info = item.split(',')
+                formatted_items.append([item_info[0], item_info[1], new_quantity])
+
+            Cart.update_saved_quantity(formatted_items, 80)
+
+        # Reload page to show updated data.
+        return redirect(url_for('cart.saved_for_later')) 
+        
+    return render_template('savedForLater.html', saved_for_later=saved_for_later)

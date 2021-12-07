@@ -76,9 +76,9 @@ CREATE TABLE Cart
 buyer_id INTEGER NOT NULL REFERENCES Account(account_id),
 seller_id INTEGER NOT NULL REFERENCES Seller(seller_id),
 product_id INTEGER NOT NULL REFERENCES Product(product_id),
-quantity INTEGER NOT NULL,
+quantity INTEGER NOT NULL CHECK (quantity > 0),
 saved_for_later BOOLEAN NOT NULL,
-PRIMARY KEY (buyer_id, seller_id, product_id)
+PRIMARY KEY (buyer_id, seller_id, product_id, saved_for_later)
 );
  
 
