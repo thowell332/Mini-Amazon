@@ -42,6 +42,7 @@ class InventoryListing:
             FROM Product p, SellsItem si, SellsProduct sp
             WHERE si.seller_id = :seller_id AND p.product_id = si.product_id
             AND sp.seller_id = :seller_id AND p.product_id = sp.product_id
+            AND p.product_id = :product_id
             GROUP BY p.name, p.description, sp.price;
             ''',
             product_id=product_id,

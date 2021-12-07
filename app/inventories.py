@@ -61,5 +61,5 @@ def deleteInventory(product_id):
     # execute deletion of inventory
     InventoryListing.delete_product_listing('2', product_id) #CHANGE '5' TO USER ID
     # render inventory page
-    return inventory()
+    return redirect(url_for('inventories.inventory'))
 
