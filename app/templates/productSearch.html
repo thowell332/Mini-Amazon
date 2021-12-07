@@ -3,6 +3,9 @@
 {% block content %}
 
     <h1>Product Search</h1>
+    {{pagination.info}}
+    {{pagination.links}}
+{#    A table containing all of the necessary information to display all products based on the search.#}
     <table class='table table-hover table-bordered container'>
         <thead class="thead-dark">
         <tr>
@@ -11,19 +14,28 @@
             <th scope="col">Product ID</th>
             <th scope="col">Description</th>
             <th scope="col">Category</th>
+            <th scope="col">View Product</th>
         </tr>
         </thead>
         <tbody>
         {% for item in product%}
             <tr>
                 <th scope="row">{{item.name}}</th>
-                <td>{{item.image}}</td>
+                <td><img src="{{item.image}}" alt="User Image Not Found" width="120" height="90"></td>
                 <td>{{item.product_id}}</td>
                 <td>{{item.description}}</td>
                 <td>{{item.category}}</td>
+                <td class="td-actions text-right">
+                    <a href="{{ url_for("product.product", input=item.product_id, sort="standard") }}"><input type="submit" name="go_to_product_button" value="Go To Product"rel="tooltip" class="btn btn-info">
+                        <i class="material-icons"></i>
+                        </input>
+                    </a>
+                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+    {{pagination.links}}
+
 
 {% endblock %}

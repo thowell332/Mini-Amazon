@@ -55,10 +55,12 @@ def gen_sellers(num_sellers):
     return sellers
 
 def gen_categories(num_categories):
-    categories = []
+    categories = ["toys", "appliances", "tech", "outdoors", "kitchen", "clothes", "books"]
     with open('Category.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Categories...', end=' ', flush=True)
+        for cat in categories:
+            writer.writerow([cat])
         for cat in range(num_categories):
             if cat % 10 == 0:
                 print(f'{cat}', end=' ', flush=True)
