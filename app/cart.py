@@ -21,7 +21,10 @@ def cart():
     # Test data for now.
     cart = Cart.get_cart(80)
     total_cart_cost = Cart.get_total_cart_cost(80)
-
+    purchase_success, out_of_stock_error, balance_error = False
+    out_of_stock_items = []
+    current_balance = 0
+    
     if 'type' in request.form:
 
         if request.form['type'] == 'Delete Items':
@@ -54,7 +57,10 @@ def cart():
             Cart.update_cart_quantity(80, formatted_items)
         
         elif request.form['type'] == 'Purchase Cart':
-            out_of_stock = Cart.purchase_cart(80)
+            purchase_information = Cart.purchase_cart(80)
+            result = purchase_information[0]
+            if result == 'Success':
+
 
         # Reload page to show updated data.
         return redirect(url_for('cart.cart'))
