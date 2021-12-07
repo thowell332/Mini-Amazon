@@ -15,6 +15,8 @@ def handle_search():
 ##change to @bp.route('/productSearchInput<input>')
 ##make the below function take in @param input
 def product(input):
+    if input == None:
+        return render_template('index.html')
     search = False
     q = request.args.get('q')
     if q:
