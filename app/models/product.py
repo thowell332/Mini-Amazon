@@ -48,11 +48,10 @@ FROM Product
     # @return- all products related to the category being searched for.
     @staticmethod
     def get_products_based_on_category(category):
-        query = '''SELECT product_id, owner_id, description, name, image, category
+        rows = app.db.execute('''SELECT product_id, owner_id, description, name, image, category
 FROM Product
-WHERE category LIKE '%{0}%'
-        '''.format(category)
-        rows = app.db.execute(query)
+WHERE category LIKE :category
+        ''', category=str('%' + category + '%'))
         return [Product(*row) for row in rows] if rows is not None else None
 
     # Method to get a product display page based on a product id.
@@ -62,7 +61,6 @@ WHERE category LIKE '%{0}%'
     # @return- a list of products with all of the necessary details to display on the product page.
     @staticmethod
     def get_product_display_page(product_id, sort):
-        injection_safe = True
         rows = app.db.execute('''
     SELECT p.product_id, sp.seller_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id)
     FROM Product p, SellsProduct sp, SellsItem si
@@ -85,11 +83,6 @@ WHERE category LIKE '%{0}%'
     # @return- the product id that has been inserted.
     @staticmethod
     def insert_new_product(product_id, owner_id, description, name, image, category):
-        insert_statement = '''
-INSERT INTO Product (product_id, owner_id, description, name, image, category)
-VALUES (%s, %s, %s, %s, %s, %s)
-        '''
-        values = (product_id, owner_id, description, name, image, category)
         try:
             rows = app.db.execute("""
 INSERT INTO Product(product_id, owner_id, description, name, image, category)
@@ -121,9 +114,9 @@ DELETE FROM Product WHERE product_id = :product_id
 
 # A class to containing all of the information to display a specific product.
 class ProductDisplayPage:
-    def __init__(self, product_id, owner_id, description, name, image, category, price, quantity):
+    def __init__(self, product_id, seller_id, description, name, image, category, price, quantity):
         self.product_id = product_id
-        self.owner_id = owner_id
+        self.seller_id = seller_id
         self.description = description
         self.name = name
         self.image = image
