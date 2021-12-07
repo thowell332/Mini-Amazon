@@ -5,19 +5,19 @@
     <h1>Product</h1>
 {#    Buttons to sort the products#}
     <td class="td-actions text-right">
-        <a href="{{ url_for("product.product_price_sort", input=product.product_id) }}"><input type="submit" name="Sort by Price" value="Sort By Price"rel="tooltip" class="btn btn-info">
+        <a href="{{ url_for("product.product", input=productid, sort="price-ordered") }}"><input type="submit" name="Sort by Price" value="Sort By Price"rel="tooltip" class="btn btn-info">
             <i class="material-icons"></i>
             </input>
         </a>
     </td>
     <td class="td-actions text-right">
-        <a href="{{ url_for("product.product_quantity_sort", input=product.product_id) }}"><input type="submit" name="Sort by Quantity" value="Sort By Quantity"rel="tooltip" class="btn btn-info">
+        <a href="{{ url_for("product.product", input=productid, sort="quantity-ordered") }}"><input type="submit" name="Sort by Quantity" value="Sort By Quantity"rel="tooltip" class="btn btn-info">
             <i class="material-icons"></i>
             </input>
         </a>
     </td>
     <td class="td-actions text-right">
-        <a href="{{ url_for("product.product", input=product.product_id) }}"><input type="submit" name="Standard Sort" value="Undo Sorting"rel="tooltip" class="btn btn-info">
+        <a href="{{ url_for("product.product", input=productid, sort="standard") }}"><input type="submit" name="Standard Sort" value="Undo Sorting"rel="tooltip" class="btn btn-info">
             <i class="material-icons"></i>
             </input>
         </a>

@@ -37,10 +37,10 @@ FROM Product
     # @return- all products related to the search criteria.
     @staticmethod
     def get_products_based_on_search_criteria(search_criteria):
-        query = '''SELECT product_id, owner_id, description, name, image, category
+        rows = app.db.execute('''SELECT product_id, owner_id, description, name, image, category
         FROM Product
-        WHERE name LIKE '%{0}%' OR description LIKE '%{0}%' OR category LIKE '%{0}%' '''.format(search_criteria)
-        rows = app.db.execute(query)
+        WHERE name LIKE :search_criteria OR description LIKE :search_criteria OR category LIKE :search_criteria ''', search_criteria=str('%' + search_criteria + '%'))
+
         return [Product(*row) for row in rows] if rows is not None else None
 
     # Method to get all products based on a category.
@@ -61,54 +61,18 @@ WHERE category LIKE '%{0}%'
     # @param product_id- the product id being searched for.
     # @return- a list of products with all of the necessary details to display on the product page.
     @staticmethod
-    def get_product_display_page(product_id):
+    def get_product_display_page(product_id, sort):
+        injection_safe = True
         rows = app.db.execute('''
-SELECT p.product_id, p.owner_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id)
-FROM Product p, SellsProduct sp, SellsItem si
-WHERE p.product_id = :product_id
-AND sp.product_id = :product_id
-AND si.product_id = :product_id
-AND sp.seller_id = si.seller_id
-GROUP BY p.product_id, si.seller_id, sp.price
-''', product_id=product_id)
-        return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
-
-    # Method to get a product display page based on a product id, but sorted by price.
-    # This detailed product page show all details for the product,
-    # together with a list of sellers and their current quantities in stock
-    # @param product_id- the product id being searched for.
-    # @return- a price ordered list of products with all of the necessary details to display on the product page.
-    @staticmethod
-    def get_product_display_page_price_ordered(product_id):
-        rows = app.db.execute('''
-SELECT p.product_id, p.owner_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id)
-FROM Product p, SellsProduct sp, SellsItem si
-WHERE p.product_id = :product_id
-AND sp.product_id = :product_id
-AND si.product_id = :product_id
-AND sp.seller_id = si.seller_id
-GROUP BY p.product_id, si.seller_id, sp.price
-ORDER BY sp.price DESC
-''', product_id=product_id)
-        return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
-
-    # Method to get a product display page based on a product id, but sorted by quantity.
-    # This detailed product page show all details for the product,
-    # together with a list of sellers and their current quantities in stock
-    # @param product_id- the product id being searched for.
-    # @return- a quantity ordered list of products with all of the necessary details to display on the product page.
-    @staticmethod
-    def get_product_display_page_quantity_ordered(product_id):
-        rows = app.db.execute('''
-SELECT p.product_id, p.owner_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id)
-FROM Product p, SellsProduct sp, SellsItem si
-WHERE p.product_id = :product_id
-AND sp.product_id = :product_id
-AND si.product_id = :product_id
-AND sp.seller_id = si.seller_id
-GROUP BY p.product_id, si.seller_id, sp.price
-ORDER BY COUNT(si.item_id) DESC
-''', product_id=product_id)
+    SELECT p.product_id, sp.seller_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id)
+    FROM Product p, SellsProduct sp, SellsItem si
+    WHERE p.product_id = :product_id
+    AND sp.product_id = :product_id
+    AND si.product_id = :product_id
+    AND sp.seller_id = si.seller_id
+    GROUP BY p.product_id, sp.seller_id, sp.price
+    ORDER BY {0} DESC
+    '''.format(sort), product_id=product_id)
         return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
 
     # Method to insert a new product into the database.
