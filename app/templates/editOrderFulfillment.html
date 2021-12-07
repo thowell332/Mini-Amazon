@@ -2,39 +2,77 @@
 
 {% block content %}
 
-<h1>Order Fulfillment Details</h1>
+<a class="btn btn-secondary mt-3 mb-3"
+href="{{ url_for('orderFulfillments.orderFulfillmentDetails', purchase_id=purchase.purchase_id) }}" 
+role="button">Go Back</a>
 
-<form action="" method="post">
-  {{ form.hidden_tag() }}
-  <p>
-    {{ form.orderID.label }}<br/>
-    {{ form.orderID(size=32, disabled=true, value=purchase.purchase_id) }}
-  </p>
-  <p>
-    {{ form.buyerName.label }}<br/>
-    {{ form.buyerName(size=32, disabled=true, value=purchase.buyer_name) }}
-  </p>
-  <p>
-    {{ form.buyerAddress.label }}<br/>
-    {{ form.buyerAddress(size=32, disabled=true, value=purchase.buyer_address) }}
-  </p>
-  <p>
-    {{ form.quantity.label }}<br/>
-    {{ form.quantity(size=32, disabled=true, value=purchase.quantity) }}
-  </p>
-  <p>
-    {{ form.date.label }}<br/>
-    {{ form.date(size=32, disabled=true, value=purchase.date) }}
-  </p>
-  <p>
-    {% set statuses = ['ORDERED', 'SHIPPED', 'DELIVERED'] %}
-    {{ form.status.label }}<br/>
-    {{ form.status(size=32, value=statuses[purchase.status]) }}<br/>
-    {% for error in form.status.errors %}
-    <span style="color: red;">{{ error }}</span>
+<br/>
+<div class="row">
+  <div class="col">
+    <h2>Order Information</h2>
+    <table class='table table-borderless'>
+        <tbody>
+            <tr>
+              <th scope="row">Order ID</th>
+              <td>{{purchase.purchase_id}}</td>
+            </tr>
+            <tr>
+              <th scope="row">Buyer Name</th>
+              <td>{{purchase.buyer_name}}</td>
+            </tr>
+            <tr>
+              <th scope="row">Buyer Address</th>
+              <td>{{purchase.buyer_address}}</td>
+            </tr>
+            <tr>
+              <th scope="row">Product Name</th>
+              <td>{{product.name}}</td>
+            </tr>
+            <tr>
+              <th scope="row">Product Description</th>
+              <td>{{product.description}}</td>
+            </tr>
+        </tbody>
+      </table>
+  </div>
+  <div class="col">
+    <h2>Edit Order Fulfillment</h2>
+    <form action="" method="post">
+      {{ form.hidden_tag() }}
+      <p>
+        {{ form.item.label }}<br/>
+        {{ form.item() }}
+      </p>
+      <p>
+        {{ form.status.label }}<br/>
+        {{ form.status() }}<br/>
+        {% for error in form.status.errors %}
+        <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+      </p>
+      <p>{{ form.submit() }}</p>
+    </form>
+  </div>
+</div>
+
+<br/>
+<h2>Item Fulfillment Details</h2>
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Item ID</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% set statuses = ['ORDERED', 'SHIPPED', 'DELIVERED'] %}  
+    {% for item in itemFulfillment %}
+      <tr>
+        <th scope="row">{{item.item_id}}</th>
+        <td>{{statuses[item.status]}}</td>
+      </tr>
     {% endfor %}
-  </p>
-  <p>{{ form.submit() }}</p>
-</form>
+  </tbody>
+</table>
 
 {% endblock %}
