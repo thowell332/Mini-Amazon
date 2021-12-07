@@ -3,6 +3,11 @@
 {% block content %}
 
 <h1>Saved For Later</h1>
+
+{% for message in get_flashed_messages() %}
+        <p>{{ message }}</p>
+{% endfor %}
+
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>

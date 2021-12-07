@@ -269,7 +269,7 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
     def purchase_cart(buyer_id):
 
         # Get information for entries in the users cart.
-        cart_entries = Cart._get_info_for_buyer_id(buyer_id, "FALSE")
+        cart_entries = Cart._get_info(buyer_id, "FALSE")
 
         # Determine which items are in stock and out of stock.
         out_of_stock = []
@@ -284,13 +284,19 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
                 in_stock.append(entry)
 
         # Check to see if the user is puruchasing out of stock items.
-        # If they are, block the transaction from occurring.
+        # If they are, block the purchase.
         if len(out_of_stock) > 0:
-            return ['Out of Stock', out_of_stock]
+            return ['Inventory Error', out_of_stock]
         
         # Check to see if the user has enough money to purchase the items.
+        # If they don't, block the purchase.
         total_cart_cost = Cart.get_total_cart_cost(buyer_id)
+        current_balance = Cart.get_balance(buyer_id)
+
+        if total_cart_cost > current_balance:
+            return ['Balance Error', current_balance]
         
+        # At this point, the purchase can be successful! So, execute it.
 
         # Create a unique purchase ID.
         purchase_id = Cart._create_purchase_id()
@@ -299,25 +305,31 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
         # TODO: CHANGE TO 0
         initial_status = "ordered"
 
-        # Purchase all the in stock items and remove them from the cart.
+        # Purchase all the in stock items.
+
+        # First, charge the user's balance.
+        new_balance = current_balance - total_cart_cost
+        Cart.update_balance(buyer_id, new_balance)
+        
+        # Next, iterate over each type of product/seller combo being purchased.
         for entry in in_stock:
 
             # Remove the product/seller combo from the Cart table.
             Cart._delete_from_db(buyer_id, entry.product_id, entry.seller_id, "FALSE")
 
-            # Purchase items for the quantity specified.
-
-            # Get the inventory of items being sold.
+            # Get the inventory being sold.
             inventory = Cart._get_full_inventory(entry.product_id, entry.seller_id)
 
-            # Buy one item for each incremental quantity selected.
-                
+            # Buy one item from inventory for each incremental quantity selected.
             for i in range(entry.quantity):
                 purchased_item = inventory[i]
                 Cart._delete_from_sells_item(purchased_item.item_id)
                 Cart._add_to_purchase(buyer_id, entry.product_id, purchased_item.item_id, purchase_id, initial_status)
 
-        return out_of_stock
+            # Pay the seller for the items purchased.
+            Cart.update_balance(entry.seller_id, entry.total_price)
+
+        
 
     # Helper method used to count how many items are in a seller's inventory.
     # This is used to determine which items are in stock vs. out of stock.
@@ -409,12 +421,27 @@ RETURNING 1
 
         return total_cart_cost
 
+    # TODO: Move this into user.
+    @staticmethod
+    def update_balance(account_id, new_balance):
+        app.db.execute(
+"""
+UPDATE Account
+SET balance = :new_balance
+WHERE account_id = :account_id
+RETURNING 1
+""",
+        account_id = account_id, new_balance = new_balance)
 
+    # TODO: Move this into user.
+    @staticmethod
+    def get_balance(account_id):
+        rows = app.db.execute(
+"""
+SELECT balance
+FROM Account
+WHERE account_id = :account_id
+""",
+        account_id = account_id)
 
-
-         
-
-
-
-
-
+        return rows[0][0]
