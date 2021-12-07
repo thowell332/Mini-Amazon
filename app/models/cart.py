@@ -3,7 +3,8 @@ from datetime import datetime
 
 from .user import User
 from .sellsItem import SellsItem
- 
+from .purchase import Purchase
+
 class Cart:
     def __init__(self, product_id, product_name, product_image, seller_id, seller_first_name, seller_last_name, quantity, unit_price):
         self.product_id = product_id
@@ -142,19 +143,10 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, saved_for_l
             total_quantity = entry[2]
             quantity_to_move = entry[3]
 
-            # Check to see whether this entry is already in its destination status.
-            quantity_in_cart = Cart._check_quantity_in_cart(buyer_id, product_id, seller_id, destination_status)
-
-            # If the item is not in its destination, add it.
-            if quantity_in_cart == 0:
-                Cart._insert_into_cart(buyer_id, product_id, seller_id, quantity_to_move, destination_status)
-                
-            # If the item is in its destination, update it.
-            else:
-                new_quantity = quantity_in_cart + int(quantity_to_move)
-                Cart._update_cart_quantity(buyer_id, product_id, seller_id, new_quantity, destination_status)
-                
-            # Now, remove the item from cart, since it is now in saved.
+            # Now, add the values into the destination.
+            Cart.add_values_into_cart(buyer_id, product_id, seller_id, quantity_to_move, destination_status)
+            
+            # Then, remove the item from cart, since it is now in saved.
 
             # If all of the item was moved, delete the entry from cart.
             if quantity_to_move == total_quantity:
@@ -164,6 +156,23 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, saved_for_l
             else:
                 new_quantity = int(total_quantity) - int(quantity_to_move)
                 Cart._update_cart_quantity(buyer_id, product_id, seller_id, new_quantity, current_status)
+
+    # Checks to see whether an entry is in saved for later or cart, as specifiied.
+    # Either inserts into cart or updates the existing entry.
+    # Parameter definitions are the same as above.
+    @staticmethod
+    def add_values_into_cart(buyer_id, product_id, seller_id, quantity_to_add, destination_status):
+        # Check to see whether this entry is already in its destination status.
+        quantity_in_cart = Cart._check_quantity_in_cart(buyer_id, product_id, seller_id, destination_status)
+
+        # If the item is not in its destination, add it.
+        if quantity_in_cart == 0:
+            Cart._insert_into_cart(buyer_id, product_id, seller_id, quantity_to_add, destination_status)
+                
+        # If the item is in its destination, update it.
+        else:
+            new_quantity = quantity_in_cart + int(quantity_to_add)
+            Cart._update_cart_quantity(buyer_id, product_id, seller_id, new_quantity, destination_status)
 
     # Checks the quantity of an entry in the cart specified by:
     # @buyer_id is the ID of the owner of the the cart
@@ -296,7 +305,8 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
         # At this point, the purchase can be successful! So, execute it.
 
         # Create a unique purchase ID.
-        purchase_id = Cart._create_purchase_id()
+        purchase_id = Purchase._create_purchase_id()
+        date_of_purchase = datetime.now()
 
         # Set the status for purchases 0, meaning the items have been ordered.
         # TODO: CHANGE TO 0
@@ -321,43 +331,12 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
             for i in range(entry.quantity):
                 purchased_item = inventory[i]
                 SellsItem._delete_from_sells_item(purchased_item.item_id)
-                Cart._add_to_purchase(buyer_id, entry.product_id, purchased_item.item_id, purchase_id, initial_status)
+                Purchase._add_to_purchase(buyer_id, entry.product_id, purchased_item.item_id, purchase_id, initial_status, date_of_purchase)
 
             # Pay the seller for the items purchased.
             User.update_balance(entry.seller_id, entry.total_price)
         
         return ["Success"]
-
-    # Helper method used to create a unique purchase ID.
-    # This is just the maximum ID already created incremented by one.
-    @staticmethod
-    def _create_purchase_id():
-        rows = app.db.execute(
-"""
-SELECT MAX(purchase_id)
-FROM Purchase
-""")
-        # If there are no purchases, start with an ID of 1.
-        count = rows[0][0]
-        if count is None:
-            return 1
-        else:
-            return count + 1
-
-    # Helper method used to add an entry to Purchase, indicating it has been bought officially.
-    # Same parameter definitions as the methods above, except for:
-    # @purchase_id is the ID of the purchase being exectured
-    # @status is the status of the item being purchased (0, 1, or 2).
-    @staticmethod
-    def _add_to_purchase(buyer_id, product_id, item_id, purchase_id, status):
-        app.db.execute(
-"""
-INSERT INTO Purchase (buyer_id, product_id, item_id, purchase_id, status, date)
-VALUES (:buyer_id, :product_id, :item_id, :purchase_id, :status, :date)
-RETURNING 1
-""",
-        buyer_id = buyer_id, product_id = product_id, item_id = item_id, purchase_id = purchase_id, status = status, date = datetime.now())
-
 
     # Helper method used to get the total cost of a user's cart.
     # Same parameter definitions as the methods above.

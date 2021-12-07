@@ -124,20 +124,6 @@ CREATE TRIGGER TG_Cart_Product_Exists
 	BEFORE INSERT ON Cart
 	FOR EACH ROW
 	EXECUTE PROCEDURE TF_Cart_Product_Exists();
- 
-CREATE FUNCTION TF_Cart_Quantity_Available() RETURNS TRIGGER AS $cart_quantity_available$
-BEGIN
-	IF ((SELECT COUNT(*) FROM SellsItem WHERE NEW.product_id = SellsItem.product_id AND NEW.seller_id = SellsItem.seller_id) < NEW.quantity) THEN
-	RAISE EXCEPTION 'The quantity you selected is not available';
-	END IF;
-	RETURN NEW;
-END;
-$cart_quantity_available$ LANGUAGE plpgsql;
- 
-CREATE TRIGGER TG_Cart_Quantity_Available
-	BEFORE INSERT ON Cart
-	FOR EACH ROW
-	EXECUTE PROCEDURE TF_Cart_Quantity_Available();
 
 CREATE FUNCTION One_Product_Review() RETURNS TRIGGER AS $one_product_review$
 BEGIN 

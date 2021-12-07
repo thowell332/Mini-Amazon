@@ -63,10 +63,8 @@
                         <form method="post" action="">
                             <td><input type="submit" name="add,{{item.product_id}},{{item.seller_id}}" value="Add"></td>
                             <td><input type="submit" name="save,{{item.product_id}},{{item.seller_id}}" value="Save"></td>
+                            <td><input style="width:100px" type="number" min="1" max="{{item.quantity}}" name="quantity,{{item.product_id}},{{item.seller_id}}"></td>
                         </form>
-
-                        <td><input style="width:100px" type="number" min="1" max="{{item.quantity}}" name="quantity,{{item.product_id}},{{item.seller_id}}"></td>
-        
                     </tr>
                 {% endfor %}
         </tbody>

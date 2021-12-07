@@ -42,13 +42,16 @@ def product(input, sort):
                 quantity_key = 'quantity,' + product_id + ',' + seller_id
                 quantity_to_move = request.form.get(quantity_key)
 
+                print('qanon')
+                print(quantity_to_move)
                 # Check to make sure that the new quantitty was specified.
                 if quantity_to_move == '':
                     flash('You did not specify the quantity to move. Please do so!')
                     break
 
                 saved_for_later = "TRUE" if 'save' in key else "FALSE"
-                Cart._insert_into_cart(current_user.id, product_id, seller_id, quantity_to_move, saved_for_later)
+                
+                Cart.add_values_into_cart(current_user.id, product_id, seller_id, quantity_to_move, saved_for_later)
                 if saved_for_later:
                     flash('Successfully added items to saved for later!')
                 else:

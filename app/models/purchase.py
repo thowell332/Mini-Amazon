@@ -1,32 +1,55 @@
 from flask import current_app as app
 
 
+class PurchaseSummary:
+    def __init__(self, purchase_id, date, status):
+        self.purchase_id = purchase_id
+        self.date = date
+        self.status = status
+
 class Purchase:
-    def __init__(self, id, uid, pid, time_purchased):
-        self.id = id
-        self.uid = uid
-        self.pid = pid
-        self.time_purchased = time_purchased
 
+    # Helper method used to create a unique purchase ID.
+    # This is just the maximum ID already created incremented by one.
     @staticmethod
-    def get(id):
-        rows = app.db.execute('''
-SELECT id, uid, pid, time_purchased
-FROM Purchases
-WHERE id = :id
-''',
-                              id=id)
-        return Purchase(*(rows[0])) if rows else None
-
-    @staticmethod
-    def get_all_by_uid_since(uid, since):
-        rows = app.db.execute('''
-SELECT id, uid, pid, time_purchased
+    def _create_purchase_id():
+        rows = app.db.execute(
+"""
+SELECT MAX(purchase_id)
 FROM Purchase
-WHERE uid = :uid
-AND time_purchased >= :since
-ORDER BY time_purchased DESC
-''',
-                              uid=uid,
-                              since=since)
-        return [Purchase(*row) for row in rows]
+""")
+        # If there are no purchases, start with an ID of 1.
+        count = rows[0][0]
+        if count is None:
+            return 1
+        else:
+            return count + 1
+
+    # Helper method used to add an entry to Purchase, indicating it has been bought officially.
+    # Same parameter definitions as the methods above, except for:
+    # @purchase_id is the ID of the purchase being exectured
+    # @status is the status of the item being purchased (0, 1, or 2).
+    @staticmethod
+    def _add_to_purchase(buyer_id, product_id, item_id, purchase_id, status, date):
+        app.db.execute(
+"""
+INSERT INTO Purchase (buyer_id, product_id, item_id, purchase_id, status, date)
+VALUES (:buyer_id, :product_id, :item_id, :purchase_id, :status, :date)
+RETURNING 1
+""",
+        buyer_id = buyer_id, product_id = product_id, item_id = item_id, purchase_id = purchase_id, status = status, date = date)
+
+    # Method used to get all purchase IDs and dates for those purchases.
+    # Same parameter definitions as the methods above.
+    @staticmethod
+    def _get_purchases(buyer_id):
+        rows = app.db.execute(
+"""
+SELECT MIN(status)
+FROM Purchase
+WHERE buyer_id = :buyer_id
+GROUP BY purchase_id, date
+""",
+        buyer_id = buyer_id)
+
+        return [PurchaseSummary(*row) for row in rows]

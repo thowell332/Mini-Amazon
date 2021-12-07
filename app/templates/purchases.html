@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Cart</h1>
+
+<!-- Table to show purchases. -->
+<table class='table table-hover table-bordered container'>
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Purchase ID</th>
+        <th scope="col">Date</th>
+        <th scope="col">Status</th>
+        <th scope="col">See More</th>
+      </tr>
+    </thead>
+    <form method="post" action="">
+      <tbody>
+        {% for item in purchases%}
+          <tr>
+            <th scope="row">{{item.purchase_id}}</th>
+            <th scope="row">{{item.date}}</th>
+            <th scope="row">{{item.status}}</th>
+            <td><input type="number" min="1" max={{item.quantity}} style="width:100px"  name="{{item.product_id}},{{item.seller_id}},{{item.quantity}},move"></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </form>  
+{% endblock %}
