@@ -10,15 +10,15 @@
     <tr>
       <th scope="col">Product ID</th>
       <th scope="col">Product Name</th>
-      <th scope="col">Price</th>
+      <th scope="col">Category</th>
     </tr>
   </thead>
   <tbody>
     {% for product in avail_products%}
       <tr>
-        <th scope="row">{{product.id}}</th>
+        <th scope="row">{{product.product_id}}</th>
         <td>{{product.name}}</td>
-        <td>{{product.price}}</td>
+        <td>{{product.category}}</td>
       </tr>
     {% endfor %}
   </tbody>
@@ -35,15 +35,7 @@
       <th scope="col">Price</th>
     </tr>
   </thead>
-  <tbody>
-    {% for purchase in purchase_history%}
-      <tr>
-        <th scope="row">{{purchase.id}}</th>
-        <td>{{purchase.pid}}</td>
-        <td>{{purchase.time_purchased}}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
+
 </table>
 {% else %}
 <p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
