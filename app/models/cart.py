@@ -2,12 +2,7 @@ from flask import current_app as app
 from datetime import datetime
 
 from .user import User
-
-class SellsItem:
-    def __init__(self, seller_id, product_id, item_id):
-        self.seller_id = seller_id
-        self.product_id = product_id
-        self.item_id = item_id
+from .sellsItem import SellsItem
  
 class Cart:
     def __init__(self, product_id, product_name, product_image, seller_id, seller_first_name, seller_last_name, quantity, unit_price):
@@ -278,7 +273,7 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
         in_stock = []
 
         for entry in cart_entries:
-            inventory_count = Cart._get_inventory_count(entry.product_id, entry.seller_id)
+            inventory_count = SellsItem._get_inventory_count(entry.product_id, entry.seller_id)
 
             if entry.quantity > inventory_count:
                 out_of_stock.append([entry, inventory_count])
@@ -293,7 +288,7 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
         # Check to see if the user has enough money to purchase the items.
         # If they don't, block the purchase.
         total_cart_cost = Cart.get_total_cart_cost(buyer_id)
-        current_balance = User.get_balance(buyer_id)
+        current_balance = float(User.get_balance(buyer_id))
 
         if total_cart_cost > current_balance:
             return ['Balance Error', current_balance]
@@ -320,33 +315,18 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
             Cart._delete_from_db(buyer_id, entry.product_id, entry.seller_id, "FALSE")
 
             # Get the inventory being sold.
-            inventory = Cart._get_full_inventory(entry.product_id, entry.seller_id)
+            inventory = SellsItem._get_full_inventory(entry.product_id, entry.seller_id)
 
             # Buy one item from inventory for each incremental quantity selected.
             for i in range(entry.quantity):
                 purchased_item = inventory[i]
-                Cart._delete_from_sells_item(purchased_item.item_id)
+                SellsItem._delete_from_sells_item(purchased_item.item_id)
                 Cart._add_to_purchase(buyer_id, entry.product_id, purchased_item.item_id, purchase_id, initial_status)
 
             # Pay the seller for the items purchased.
             User.update_balance(entry.seller_id, entry.total_price)
-
         
-
-    # Helper method used to count how many items are in a seller's inventory.
-    # This is used to determine which items are in stock vs. out of stock.
-    # Parameter definitions are the same as methods above.
-    @staticmethod
-    def _get_inventory_count(product_id, seller_id):
-        rows = app.db.execute(
-"""
-SELECT COUNT(*)
-FROM SellsItem
-WHERE product_id = :product_id AND seller_id = :seller_id
-""",
-    product_id = product_id, seller_id = seller_id)
-
-        return rows[0][0]
+        return ["Success"]
 
     # Helper method used to create a unique purchase ID.
     # This is just the maximum ID already created incremented by one.
@@ -363,38 +343,6 @@ FROM Purchase
             return 1
         else:
             return count + 1
-
-    # Helper method used to get all items sold for a product and seller.
-    # Parameter definitions are the same as methods above.
-    @staticmethod
-    def _get_full_inventory(product_id, seller_id):
-        rows = app.db.execute(
-"""
-SELECT *
-FROM SellsItem
-WHERE product_id = :product_id AND seller_id = :seller_id
-""",
-product_id = product_id, seller_id = seller_id)
-
-        # If no items are being sold, return None.
-        if rows is None:
-            return []
-        # Otherwise, return the information via SellsItem objects.
-        else:
-            return [SellsItem(*row) for row in rows]
-
-    # Helper method used to delete an item from SellsItem, indicating it has been purchased.
-    # @item_id is the ID of the item being purchased.
-    @staticmethod
-    def _delete_from_sells_item(item_id):
-        app.db.execute(
-"""
-DELETE
-FROM SellsItem
-WHERE item_id = :item_id
-RETURNING 1
-""",
-        item_id = item_id)
 
     # Helper method used to add an entry to Purchase, indicating it has been bought officially.
     # Same parameter definitions as the methods above, except for:
