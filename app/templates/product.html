@@ -49,7 +49,6 @@
         </tr>
         </thead>
         <tbody>
-            <form method="post" action="">
                 {% for item in product%}
                     <tr>
                         <th scope="row">{{item.name}}</th>
@@ -61,13 +60,15 @@
                         <td>{{item.price}}</td>
                         <td>{{item.quantity}}</td>
 
-                        <td><input type="submit" name="add,{{item.product_id}},{{item.owner_id}}" value="Add"></td>
-                        <td><input type="submit" name="save,{{item.product_id}},{{item.owner_id}}" value="Save"></td>
+                        <form method="post" action="">
+                            <td><input type="submit" name="add,{{item.product_id}},{{item.owner_id}}" value="Add"></td>
+                            <td><input type="submit" name="save,{{item.product_id}},{{item.owner_id}}" value="Save"></td>
+                        </form>
+
                         <td><input style="width:100px" type="number" min="1" max="{{item.quantity}}" name="quantity,{{item.product_id}},{{item.owner_id}}"></td>
         
                     </tr>
                 {% endfor %}
-            </form>
         </tbody>
     </table>
     {{pagination.links}}

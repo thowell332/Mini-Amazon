@@ -24,7 +24,6 @@
         <th scope="col">Delete</th>
       </tr>
     </thead>
-    <form method="post" action="">
     <tbody>
       {% for item in saved_for_later%}
         <tr>
@@ -47,6 +46,8 @@
       {% endfor %}
     </tbody>
   </table>
+
+  <form method="post" action="">
 
     <input type="submit" name="type" value="Move Items to Cart">
     <input type="submit" name="type" value="Update Quantities">

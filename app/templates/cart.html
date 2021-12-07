@@ -25,7 +25,6 @@
         <th scope="col">Delete</th>
       </tr>
     </thead>
-    <form method="post" action="">
       <tbody>
         {% for item in cart%}
           <tr>
@@ -50,11 +49,10 @@
     </table>
 
       <h3>Total Cost: {{total_cost}}</h3>
-
+    <form method="post" action="">
       <input type="submit" name="type" value="Purchase Cart">
       <input type="submit" name="type" value="Move Items to Saved">
       <input type="submit" name="type" value="Update Quantities">
       <input type="submit" name="type" value="Delete Items">
-  
     </form>  
 {% endblock %}

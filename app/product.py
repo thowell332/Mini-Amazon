@@ -29,10 +29,12 @@ def product(input):
     print('here')
     print(request)
     print(request.form)
+    print(request.form.keys())
     for key in request.form.keys():
         # The user wants to add to his cart.
         if 'add' in key or 'save' in key:
-
+            print('key')
+            print(key)
             if not current_user.is_authenticated:
                 flash('')
                 flash('You must login before purchasing any items.')
