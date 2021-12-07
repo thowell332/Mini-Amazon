@@ -1,6 +1,12 @@
 from flask import current_app as app
 from datetime import datetime
 
+class SellsItem:
+    def __init__(self, seller_id, product_id, item_id):
+        self.seller_id = seller_id
+        self.product_id = product_id
+        self.item_id = item_id
+ 
 class Cart:
     def __init__(self, product_id, product_name, product_image, seller_id, seller_first_name, seller_last_name, quantity, unit_price):
         self.product_id = product_id
@@ -17,19 +23,19 @@ class Cart:
     # Gets all the items in the cart that are NOT saved for later.
     # @buyer_id is the owner of the cart.
     @staticmethod
-    def get_cart_for_buyer_id(buyer_id):
-        return Cart._get_info_for_buyer_id(buyer_id, "FALSE")
+    def get_cart(buyer_id):
+        return Cart._get_info(buyer_id, "FALSE")
         
     # Gets all the items in the cart that ARE saved for later.
     # @buyer_id is the owner of the cart.
     @staticmethod
-    def get_saved_for_buyer_id(buyer_id):
-        return Cart._get_info_for_buyer_id(buyer_id, "TRUE")
+    def get_saved(buyer_id):
+        return Cart._get_info(buyer_id, "TRUE")
 
     # Gets all the items in the cart that are either saved for later or not, depending on the parameter.
     # @saved_for_later is either "TRUE" or "FALSE", depending on whether we are interested in saved for later items or not, respectively.
     @staticmethod
-    def _get_info_for_buyer_id(buyer_id, saved_for_later):
+    def _get_info(buyer_id, saved_for_later):
         
         # Execute a complex query to get all information needed to visualize the cart in the UI.
         # This requires joining sevaral relations.
@@ -105,11 +111,6 @@ buyer_id = buyer_id, saved_for_later = saved_for_later)
     # @saved_for_later details whether or not the item is in the cart or saved table.
     @staticmethod
     def _delete_from_db(buyer_id, product_id, seller_id, saved_for_later):
-        print('delete call')
-        print(buyer_id)
-        print(product_id)
-        print(seller_id)
-        print(saved_for_later)
         app.db.execute(
 """
 DELETE FROM Cart
@@ -260,79 +261,160 @@ RETURNING 1
 buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantity = new_quantity, saved_for_later = saved_for_later)
 
 
+# METHODS TO PURCHASE THE CART
+
+    # Purchase the entire cart for the user.
+    # @buyer_id is the ID of the owner of the cart.
+    @staticmethod
+    def purchase_cart(buyer_id):
+
+        # Get information for entries in the users cart.
+        cart_entries = Cart._get_info_for_buyer_id(buyer_id, "FALSE")
+
+        # Determine which items are in stock and out of stock.
+        out_of_stock = []
+        in_stock = []
+
+        for entry in cart_entries:
+            inventory_count = Cart._get_inventory_count(entry.product_id, entry.seller_id)
+
+            if entry.quantity > inventory_count:
+                out_of_stock.append([entry, inventory_count])
+            else:
+                in_stock.append(entry)
+
+        # Check to see if the user is puruchasing out of stock items.
+        # If they are, block the transaction from occurring.
+        if len(out_of_stock) > 0:
+            return ['Out of Stock', out_of_stock]
+        
+        # Check to see if the user has enough money to purchase the items.
+        total_cart_cost = Cart.get_total_cart_cost(buyer_id)
+        
+
+        # Create a unique purchase ID.
+        purchase_id = Cart._create_purchase_id()
+
+        # Set the status for purchases 0, meaning the items have been ordered.
+        # TODO: CHANGE TO 0
+        initial_status = "ordered"
+
+        # Purchase all the in stock items and remove them from the cart.
+        for entry in in_stock:
+
+            # Remove the product/seller combo from the Cart table.
+            Cart._delete_from_db(buyer_id, entry.product_id, entry.seller_id, "FALSE")
+
+            # Purchase items for the quantity specified.
+
+            # Get the inventory of items being sold.
+            inventory = Cart._get_full_inventory(entry.product_id, entry.seller_id)
+
+            # Buy one item for each incremental quantity selected.
+                
+            for i in range(entry.quantity):
+                purchased_item = inventory[i]
+                Cart._delete_from_sells_item(purchased_item.item_id)
+                Cart._add_to_purchase(buyer_id, entry.product_id, purchased_item.item_id, purchase_id, initial_status)
+
+        return out_of_stock
+
+    # Helper method used to count how many items are in a seller's inventory.
+    # This is used to determine which items are in stock vs. out of stock.
+    # Parameter definitions are the same as methods above.
+    @staticmethod
+    def _get_inventory_count(product_id, seller_id):
+        rows = app.db.execute(
+"""
+SELECT COUNT(*)
+FROM SellsItem
+WHERE product_id = :product_id AND seller_id = :seller_id
+""",
+    product_id = product_id, seller_id = seller_id)
+
+        return rows[0][0]
+
+    # Helper method used to create a unique purchase ID.
+    # This is just the maximum ID already created incremented by one.
+    @staticmethod
+    def _create_purchase_id():
+        rows = app.db.execute(
+"""
+SELECT MAX(purchase_id)
+FROM Purchase
+""")
+        # If there are no purchases, start with an ID of 1.
+        count = rows[0][0]
+        if count is None:
+            return 1
+        else:
+            return count + 1
+
+    # Helper method used to get all items sold for a product and seller.
+    # Parameter definitions are the same as methods above.
+    @staticmethod
+    def _get_full_inventory(product_id, seller_id):
+        rows = app.db.execute(
+"""
+SELECT *
+FROM SellsItem
+WHERE product_id = :product_id AND seller_id = :seller_id
+""",
+product_id = product_id, seller_id = seller_id)
+
+        # If no items are being sold, return None.
+        if rows is None:
+            return []
+        # Otherwise, return the information via SellsItem objects.
+        else:
+            return [SellsItem(*row) for row in rows]
+
+    # Helper method used to delete an item from SellsItem, indicating it has been purchased.
+    # @item_id is the ID of the item being purchased.
+    @staticmethod
+    def _delete_from_sells_item(item_id):
+        app.db.execute(
+"""
+DELETE
+FROM SellsItem
+WHERE item_id = :item_id
+RETURNING 1
+""",
+        item_id = item_id)
+
+    # Helper method used to add an entry to Purchase, indicating it has been bought officially.
+    # Same parameter definitions as the methods above, except for:
+    # @purchase_id is the ID of the purchase being exectured
+    # @status is the status of the item being purchased (0, 1, or 2).
+    @staticmethod
+    def _add_to_purchase(buyer_id, product_id, item_id, purchase_id, status):
+        app.db.execute(
+"""
+INSERT INTO Purchase (buyer_id, product_id, item_id, purchase_id, status, date)
+VALUES (:buyer_id, :product_id, :item_id, :purchase_id, :status, :date)
+RETURNING 1
+""",
+        buyer_id = buyer_id, product_id = product_id, item_id = item_id, purchase_id = purchase_id, status = status, date = datetime.now())
+
+
+    # Helper method used to get the total cost of a user's cart.
+    # Same parameter definitions as the methods above.
+    @staticmethod
+    def get_total_cart_cost(buyer_id):
+        cart_entries = Cart.get_cart(buyer_id)
+        total_cart_cost = 0.0
+
+        for entry in cart_entries:
+            total_cart_cost += float(entry.total_price)
+
+        return total_cart_cost
+
+
+
+
+         
 
 
 
 
 
-
-
-
-
-
-# GRAVEYARD
-
-#     @staticmethod
-#     def move_to_cart(buyer_id, entries_to_move):
-#         for cart_entry in entries_to_move:
-#             product_id = cart_entry[0]
-#             seller_id = cart_entry[1]
-#             total_quantity_in_saved = cart_entry[2]
-#             quantity_to_move = cart_entry[3]
-
-#             # Check to see whether this entry is already in the cart.
-#             rows = app.db.execute("""
-# SELECT quantity
-# FROM Cart
-# WHERE buyer_id = :buyer_id AND product_id = :product_id AND seller_id = :seller_id AND saved_for_later = FALSE
-# """,
-# buyer_id = buyer_id, product_id = product_id, seller_id = seller_id)
-
-#             # The item is not in the immediate cart, so add it.
-#             if rows == []:
-#                 print('Entry is not in cart.')
-#                 app.db.execute(
-# """
-# INSERT INTO Cart
-# VALUES (:buyer_id, :seller_id, :product_id, :quantity, FALSE)
-# RETURNING 1
-# """,
-# buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, quantity = quantity_to_move)
-
-#             # The item is in the immediate cart, so update it.
-#             else:
-#                 print('Entry is in cart.')
-#                 current_quantity = rows[0][0]
-#                 app.db.execute(
-# """
-# UPDATE Cart
-# SET quantity = :new_quantity
-# WHERE buyer_id = :buyer_id AND seller_id = :seller_id AND product_id = :product_id AND saved_for_later = FALSE
-# RETURNING 1
-# """,
-# buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantity= current_quantity + int(quantity_to_move))
-
-#             # Remove the item from saved for later, since it is now in the cart.
-
-#             # If all of the item was removed, delete the entry from saved for later.
-#             if quantity_to_move == total_quantity_in_saved:
-#                 print('All of item was moved.')
-#                 app.db.execute(
-# """
-# DELETE FROM Cart
-# WHERE buyer_id = :buyer_id AND seller_id = :seller_id AND product_id = :product_id AND saved_for_later = TRUE
-# RETURNING 1
-# """,
-# buyer_id = buyer_id, product_id = product_id, seller_id = seller_id)
-
-#             # If only some of the saved for later was moved, keep the rest.
-#             else:
-#                 print('Some of the item was moved.')
-#                 app.db.execute(
-# """
-# UPDATE Cart
-# SET quantity = :new_quantity
-# WHERE buyer_id = :buyer_id AND seller_id = :seller_id AND product_id = :product_id AND saved_for_later = TRUE
-# RETURNING 1
-# """,
-# buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantity= int(total_quantity_in_saved) - int(quantity_to_move))

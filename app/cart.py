@@ -19,10 +19,12 @@ def cart():
     #     cart = Cart.get_by_buyer_id(current_user.id)
 
     # Test data for now.
-    cart = Cart.get_cart_for_buyer_id(80)
+    cart = Cart.get_cart(80)
+    total_cart_cost = Cart.get_total_cart_cost(80)
+
     if 'type' in request.form:
+
         if request.form['type'] == 'Delete Items':
-            print('Called Delete')
             items_to_delete = request.form.getlist('delete_from_cart')
             formatted_items = []
             for item in items_to_delete:
@@ -50,12 +52,15 @@ def cart():
                 formatted_items.append([item_info[0], item_info[1], new_quantity])
 
             Cart.update_cart_quantity(80, formatted_items)
+        
+        elif request.form['type'] == 'Purchase Cart':
+            out_of_stock = Cart.purchase_cart(80)
 
         # Reload page to show updated data.
         return redirect(url_for('cart.cart'))
 
         
-    return render_template('cart.html', cart=cart)
+    return render_template('cart.html', cart=cart, total_cost=total_cart_cost)
 
 @bp.route('/saved-for-later', methods=['GET', 'POST'])
 def saved_for_later():
@@ -67,7 +72,7 @@ def saved_for_later():
     #     cart = Cart.get_by_buyer_id(current_user.id)
 
     # Test data for now.
-    saved_for_later = Cart.get_saved_for_buyer_id(80)
+    saved_for_later = Cart.get_saved(80)
 
     if 'type' in request.form:
         if request.form['type'] == 'Delete Items':
