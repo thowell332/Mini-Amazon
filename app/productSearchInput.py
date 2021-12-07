@@ -6,24 +6,25 @@ from .models.product import Product
 bp = Blueprint('productSearchInput', __name__)
 per_page = 10
 
+# Method to gather the user's search input and redirect the user to the results page.
+# @return- the resulting product search page based on the search criteria.
 @bp.route('/productSearchInputSearchCriteria', methods=['POST'])
 def handle_search():
     search_criteria = request.form['search_criteria']
     return redirect(url_for('productSearchInput.product', input=search_criteria))
 
+# Method to get and display all products based on a given search criteria.
+# @param input- the search criteria.
+# @return- the product search page containing all products based on that search criteria.
 @bp.route('/productSearchInput<input>')
-##change to @bp.route('/productSearchInput<input>')
-##make the below function take in @param input
 def product(input):
-    if input == None:
-        return render_template('index.html')
     search = False
     q = request.args.get('q')
     if q:
         search = True
     page = request.args.get(get_page_parameter(), type=int, default=1)
     start = (page - 1) * per_page
-    product = Product.get_products_based_on_search_criteria(input) ##change "Laptop" to @param input
+    product = Product.get_products_based_on_search_criteria(input)
     pagination = Pagination(page=page, per_page=per_page, total=len(product), search=search, record_name='products')
     return render_template('productSearch.html', product=product[start: start + per_page], pagination=pagination)
 #
