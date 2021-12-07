@@ -114,9 +114,9 @@ DELETE FROM Product WHERE product_id = :product_id
 
 # A class to containing all of the information to display a specific product.
 class ProductDisplayPage:
-    def __init__(self, product_id, owner_id, description, name, image, category, price, quantity):
+    def __init__(self, product_id, seller_id, description, name, image, category, price, quantity):
         self.product_id = product_id
-        self.owner_id = owner_id
+        self.seller_id = seller_id
         self.description = description
         self.name = name
         self.image = image
