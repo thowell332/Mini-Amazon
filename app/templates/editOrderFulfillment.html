@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Order Fulfillment Details</h1>
+
+<form action="" method="post">
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.orderID.label }}<br/>
+    {{ form.orderID(size=32, disabled=true, value=purchase.purchase_id) }}
+  </p>
+  <p>
+    {{ form.buyerName.label }}<br/>
+    {{ form.buyerName(size=32, disabled=true, value=purchase.buyer_name) }}
+  </p>
+  <p>
+    {{ form.buyerAddress.label }}<br/>
+    {{ form.buyerAddress(size=32, disabled=true, value=purchase.buyer_address) }}
+  </p>
+  <p>
+    {{ form.quantity.label }}<br/>
+    {{ form.quantity(size=32, disabled=true, value=purchase.quantity) }}
+  </p>
+  <p>
+    {{ form.date.label }}<br/>
+    {{ form.date(size=32, disabled=true, value=purchase.date) }}
+  </p>
+  <p>
+    {% set statuses = ['ORDERED', 'SHIPPED', 'DELIVERED'] %}
+    {{ form.status.label }}<br/>
+    {{ form.status(size=32, value=statuses[purchase.status]) }}<br/>
+    {% for error in form.status.errors %}
+    <span style="color: red;">{{ error }}</span>
+    {% endfor %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+
+{% endblock %}

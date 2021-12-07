@@ -46,7 +46,6 @@ class InventoryListing:
             ''',
             product_id=product_id,
             seller_id=seller_id)
-        print(row)
         return InventoryListing(*(row[0])) if row else None
 
     @staticmethod
@@ -100,7 +99,6 @@ class InventoryListing:
     @staticmethod
     # delete existing product listing
     def delete_product_listing(seller_id, product_id):
-        print('deleting your shit!')
         # remove all items associated with this listing
         try: app.db.execute(
             '''

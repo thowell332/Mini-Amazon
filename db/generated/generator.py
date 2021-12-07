@@ -128,7 +128,7 @@ def gen_sellsItem(num_items_per_seller, prods):
         print(f'all items generated')
     return items_sold
 
-def gen_purchases(num_purchases, pids, num_users, itemssold):
+def gen_purchases(num_purchases, pids, sellers, num_users, itemssold):
     purchases = []
     with open('Purchases.csv', 'w') as f:
         writer = get_csv_writer(f)
@@ -139,17 +139,18 @@ def gen_purchases(num_purchases, pids, num_users, itemssold):
                 print(f'{id}', end=' ', flush=True)
             uid = fake.random_int(min=1, max=num_users)
             pid = fake.random_element(elements=pids)
+            sid = fake.random_element(elements=sellers)
             available_items = 0
             for item in itemssold:
                 if item[1]==pid:
                     available_items += 1
             item_id = fake.random_int(max=available_items)
-            status = 'ordered'
+            status = 1
             purchase_id = fake.random_int(min=1, max=num_purchases)
             time_purchased = fake.date_time()
             if pid not in p and item_id != 0:
-                writer.writerow([uid, pid, item_id, purchase_id, status, time_purchased])
-                purchases.append([uid, pid, item_id])
+                writer.writerow([uid, sid, pid, item_id, purchase_id, status, time_purchased])
+                purchases.append([uid, sid, pid, item_id])
             p.append(pid)
         print(f'{num_purchases} generated')
     return purchases
@@ -166,9 +167,9 @@ def gen_Reviews(num_reviews, purchases, items_sold):
                 buyer_id = purchase[0]
                 if buyer_id in reviews:
                     continue
-                product_id = purchase[1]
-                item_id = purchase[2]
-                seller_id = 0
+                seller_id = purchase[1]
+                product_id = purchase[2]
+                item_id = purchase[3]
                 for items in items_sold:
                     if items[1] == product_id and items[2] == item_id:
                         seller_id = items[0]
@@ -210,6 +211,6 @@ categories = gen_categories(num_categories)
 available_pids = gen_products(num_products, categories)
 products_sold = gen_sellsProduct(num_products_per_seller, sellers, available_pids)
 items_sold = gen_sellsItem(num_items_per_seller, products_sold)
-purchases = gen_purchases(num_purchases, available_pids, num_accounts, items_sold)
+purchases = gen_purchases(num_purchases, available_pids, sellers, num_accounts, items_sold)
 gen_Reviews(num_reviews, purchases, items_sold)
 gen_cart(num_carts, num_accounts, items_sold)
