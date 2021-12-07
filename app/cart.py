@@ -3,6 +3,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import SubmitField
 from flask_babel import _, lazy_gettext as _l
+from flask_login import current_user
 
 from .models.cart import Cart
 
@@ -12,15 +13,11 @@ bp = Blueprint('cart', __name__)
 @bp.route('/cart', methods=['GET', 'POST'])
 def cart():
 
-    # TODO: Uncomment once functionality is there for logged in users.
-    # if current_user.is_authenticated:
-    #     return redirect(url_for('index.index'))
-    # else:
-    #     cart = Cart.get_by_buyer_id(current_user.id)
+    if not current_user.is_authenticated:
+        return redirect(url_for('users.login'))
 
-    # Test data for now.
-    cart = Cart.get_cart(80)
-    total_cart_cost = Cart.get_total_cart_cost(80)
+    cart = Cart.get_cart(current_user.id)
+    total_cart_cost = Cart.get_total_cart_cost(current_user.id)
 
     # Initialize variables used for error handling.
     
@@ -35,7 +32,7 @@ def cart():
                 item_info = item.split(',')
                 formatted_items.append([item_info[0], item_info[1]])
 
-            Cart.delete_from_cart(80, formatted_items)            
+            Cart.delete_from_cart(current_user.id, formatted_items)            
 
         elif request.form['type'] == 'Move Items to Saved':
             items_to_move = request.form.getlist('move_to_saved')
@@ -52,7 +49,7 @@ def cart():
                 item_info = item.split(',')
                 formatted_items.append([item_info[0], item_info[1], item_info[2], quantity_to_move])
 
-            Cart.move_to_saved(80, formatted_items)
+            Cart.move_to_saved(current_user.id, formatted_items)
 
         elif request.form['type'] == 'Update Quantities':
             update_quantities = True
@@ -73,10 +70,10 @@ def cart():
                     formatted_items.append([item_info[0], item_info[1], new_quantity])
 
             if update_quantities:
-                Cart.update_cart_quantity(80, formatted_items)
+                Cart.update_cart_quantity(current_user.id, formatted_items)
         
         elif request.form['type'] == 'Purchase Cart':
-            purchase_information = Cart.purchase_cart(80)
+            purchase_information = Cart.purchase_cart(current_user.id)
             result = purchase_information[0]
 
             # If the purchase failed because of an insufficient balance, show that.
@@ -105,14 +102,10 @@ def cart():
 @bp.route('/saved-for-later', methods=['GET', 'POST'])
 def saved_for_later():
 
-    # TODO: Uncomment once functionality is there for logged in users.
-    # if current_user.is_authenticated:
-    #     return redirect(url_for('index.index'))
-    # else:
-    #     cart = Cart.get_by_buyer_id(current_user.id)
+    if not current_user.is_authenticated:
+        return redirect(url_for('users.login'))
 
-    # Test data for now.
-    saved_for_later = Cart.get_saved(80)
+    saved_for_later = Cart.get_saved(current_user.id)
 
     if 'type' in request.form:
 
@@ -125,7 +118,7 @@ def saved_for_later():
                 item_info = item.split(',')
                 formatted_items.append([item_info[0], item_info[1]])
 
-            Cart.delete_from_saved(80, formatted_items)            
+            Cart.delete_from_saved(current_user.id, formatted_items)            
 
         elif request.form['type'] == 'Move Items to Cart':
             items_to_move = request.form.getlist('move_to_cart')
@@ -142,7 +135,7 @@ def saved_for_later():
                 item_info = item.split(',')
                 formatted_items.append([item_info[0], item_info[1], item_info[2], quantity_to_move])
 
-            Cart.move_to_cart(80, formatted_items)
+            Cart.move_to_cart(current_user.id, formatted_items)
 
         elif request.form['type'] == 'Update Quantities':
             items_to_update = request.form.getlist('update_quantity')
@@ -159,7 +152,7 @@ def saved_for_later():
                 item_info = item.split(',')
                 formatted_items.append([item_info[0], item_info[1], new_quantity])
 
-            Cart.update_saved_quantity(80, formatted_items)
+            Cart.update_saved_quantity(current_user.id, formatted_items)
 
         # Reload page to show updated data.
         if redirect_page:

@@ -66,3 +66,26 @@ WHERE account_id = :id
 """,
                               id=id)
         return User(*(rows[0])) if rows else None
+
+    @staticmethod
+    def update_balance(account_id, new_balance):
+        app.db.execute(
+"""
+UPDATE Account
+SET balance = :new_balance
+WHERE account_id = :account_id
+RETURNING 1
+""",
+        account_id = account_id, new_balance = new_balance)
+
+    @staticmethod
+    def get_balance(account_id):
+        rows = app.db.execute(
+"""
+SELECT balance
+FROM Account
+WHERE account_id = :account_id
+""",
+        account_id = account_id)
+
+        return rows[0][0]

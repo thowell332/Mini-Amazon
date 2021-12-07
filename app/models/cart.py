@@ -1,6 +1,8 @@
 from flask import current_app as app
 from datetime import datetime
 
+from .user import User
+
 class SellsItem:
     def __init__(self, seller_id, product_id, item_id):
         self.seller_id = seller_id
@@ -291,7 +293,7 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
         # Check to see if the user has enough money to purchase the items.
         # If they don't, block the purchase.
         total_cart_cost = Cart.get_total_cart_cost(buyer_id)
-        current_balance = Cart.get_balance(buyer_id)
+        current_balance = User.get_balance(buyer_id)
 
         if total_cart_cost > current_balance:
             return ['Balance Error', current_balance]
@@ -309,7 +311,7 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
 
         # First, charge the user's balance.
         new_balance = current_balance - total_cart_cost
-        Cart.update_balance(buyer_id, new_balance)
+        User.update_balance(buyer_id, new_balance)
         
         # Next, iterate over each type of product/seller combo being purchased.
         for entry in in_stock:
@@ -327,7 +329,7 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
                 Cart._add_to_purchase(buyer_id, entry.product_id, purchased_item.item_id, purchase_id, initial_status)
 
             # Pay the seller for the items purchased.
-            Cart.update_balance(entry.seller_id, entry.total_price)
+            User.update_balance(entry.seller_id, entry.total_price)
 
         
 
@@ -421,27 +423,4 @@ RETURNING 1
 
         return total_cart_cost
 
-    # TODO: Move this into user.
-    @staticmethod
-    def update_balance(account_id, new_balance):
-        app.db.execute(
-"""
-UPDATE Account
-SET balance = :new_balance
-WHERE account_id = :account_id
-RETURNING 1
-""",
-        account_id = account_id, new_balance = new_balance)
-
-    # TODO: Move this into user.
-    @staticmethod
-    def get_balance(account_id):
-        rows = app.db.execute(
-"""
-SELECT balance
-FROM Account
-WHERE account_id = :account_id
-""",
-        account_id = account_id)
-
-        return rows[0][0]
+ 

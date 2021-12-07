@@ -7,8 +7,6 @@ from flask_babel import Babel
 from .config import Config
 from .db import DB
 
-from .models.cart import Cart
-
 login = LoginManager()
 login.login_view = 'users.login'
 babel = Babel()
