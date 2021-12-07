@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Add New Product</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.product_id.label }}<br/>
+            {{ form.product_id(size=32) }}<br/>
+            {% for error in form.product_id.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.owner_id.label }}<br/>
+            {{ form.owner_id(size=32) }}<br/>
+            {% for error in form.owner_id.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.product_name.label }}<br/>
+            {{ form.product_name(size=32) }}<br/>
+            {% for error in form.product_name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.product_description.label }}<br/>
+            {{ form.product_description(size=64) }}<br/>
+            {% for error in form.product_description.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.product_image.label }}<br/>
+            {{ form.product_image(size=64) }}<br/>
+            {% for error in form.product_image.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.product_category.label }}<br/>
+            {{ form.product_category(size=32) }}<br/>
+            {% for error in form.product_category.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+
+{% endblock %}

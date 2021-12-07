@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br><br>
+<h2>Product Inventory</h2>
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Description</th>
+      <th scope="col">Price</th>
+      <th scope="col">Quantity</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    {% for product in inventory %}
+      <tr>
+        <th scope="row">{{product.name}}</th>
+        <td>{{product.description}}</td>
+        <td>${{product.price}}</td>
+        <td>{{product.quantity}}</td>
+        <th> 
+            <a class="btn btn-secondary" href="{{ url_for('inventories.editInventory', product_id=product.product_id) }}" role="button">Edit</a>
+        </th>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a class="btn btn-secondary" href="{{ url_for('inventories.addInventory') }}" role="button">Add New Product Listing</a>
+
+
+{% endblock %}
