@@ -3,8 +3,10 @@
 {% block content %}
 
 <br><br>
-<h2>My Product Inventory</h2>
-<table class='table table-hover table-bordered container'>
+<h2>My Inventory</h2>
+{{pagination.info}}
+{{pagination.links}}
+<table id="inventory-table" class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
       <th scope="col">Name</th>
@@ -29,8 +31,34 @@
     {% endfor %}
   </tbody>
 </table>
+{{pagination.links}}
+<br/>
+<a class="btn btn-secondary mb-5" href="{{ url_for('inventories.addInventory') }}" role="button">Add New Product Listing</a>
 
-<a class="btn btn-secondary" href="{{ url_for('inventories.addInventory') }}" role="button">Add New Product Listing</a>
+<!-- <br><br>
+<h2>My Products</h2>
+<table id="product-table" class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Description</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    {% for product in productList %}
+      <tr>
+        <th scope="row">{{product.name}}</th>
+        <td>{{product.description}}</td>
+        <th> 
+            <a class="btn btn-secondary" href="{{ url_for('inventories.editInventory', product_id=product.product_id) }}" role="button">Edit</a>
+        </th>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<br/>
+<a class="btn btn-secondary" href="{{ url_for('newProduct.addNewProduct') }}" role="button">Add New Product</a> -->
 
 
 {% endblock %}

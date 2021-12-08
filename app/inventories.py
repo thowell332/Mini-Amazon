@@ -7,20 +7,30 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.fields.core import DecimalField, IntegerField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional
 from flask_babel import _, lazy_gettext as _l
+from flask_paginate import Pagination, get_page_parameter
 
-from .models.userReviews import userProductReview, userSellerReview
+from .models.product import Product
 
 from .models.inventory import Inventory, InventoryListing
 
 from flask import Blueprint
 bp = Blueprint('inventories', __name__)
+per_page = 10
 
 @bp.route('/inventory')
 def inventory():
-    # get product inventory for given seller
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    start = (page - 1) * per_page
     inventoryList = Inventory.get('2') #CHANGE '5' TO USER ID
+    pagination = Pagination(page=page, per_page=per_page, total=len(inventoryList), search=search, record_name='inventoryList')
+    # get product inventory for given seller
+    productList = Product.get_seller_products('2')
     # render the page by adding information to the index.html file
-    return render_template('inventory.html', inventory=inventoryList)
+    return render_template('inventory.html', inventory=inventoryList[start: start + per_page], pagination=pagination, productList=productList)
 
 class EditInventoryForm(FlaskForm):
     name = StringField(_l('Product Name'), validators=[Optional()])

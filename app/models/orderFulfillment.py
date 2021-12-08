@@ -18,9 +18,35 @@ class OrderHistory:
             a.address, p.date, COUNT(p.item_id) as quantity, MIN(p.status) as status
             FROM Purchase p, Account a
             WHERE p.seller_id = :seller_id AND a.account_id = p.buyer_id
-            GROUP BY p.purchase_id, a.firstname, a.lastname, a.address, p.date;
+            GROUP BY p.purchase_id, a.firstname, a.lastname, a.address, p.date
+            ORDER BY p.date DESC;
             ''',
             seller_id=seller_id
+        )
+        return [OrderHistory(*row) for row in rows] if rows is not None else None
+    
+    @staticmethod
+    # retrieve search results for seller order fulfillment history
+    def get_search_results(seller_id, search_field, search_criteria):
+        search_criteria = "'%" + search_criteria + "%'"
+        if search_field == 'buyer_name':
+            search = 'a.firstname ILIKE ' + search_criteria + ' OR a.lastname ILIKE ' + search_criteria
+        else:
+            search = search_field + ' ILIKE ' + search_criteria
+        rows = app.db.execute(
+            '''
+            SELECT pu.purchase_id, CONCAT(a.firstname,' ',a.lastname) as buyer_name,
+            a.address, pu.date, COUNT(pu.item_id) as quantity, MIN(pu.status) as status
+            FROM Purchase pu, Account a, Product pr
+            WHERE pu.seller_id = :seller_id AND a.account_id = pu.buyer_id
+            AND pr.product_id = pu.product_id AND 
+            ''' + search +
+            '''
+            GROUP BY pu.purchase_id, a.firstname, a.lastname, a.address, pu.date
+            ORDER BY p.date DESC;
+            ''',
+            seller_id=seller_id,
+            search=search
         )
         return [OrderHistory(*row) for row in rows] if rows is not None else None
     

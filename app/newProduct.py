@@ -30,7 +30,7 @@ def addNewProduct():
                                       form.product_image.data,
                                       form.product_category.data):
             flash('Congratulations, you have added a new product!')
-            return redirect(url_for('index.index'))
+            return redirect(url_for('inventories.inventory'))
     return render_template('newProduct.html', title='Add New Product', form=form)
 
 
