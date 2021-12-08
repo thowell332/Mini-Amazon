@@ -8,9 +8,10 @@ class PurchaseSummary:
         self.status = status
 
 class PurchaseEntry:
-    def __init__(self, product_name, product_image, seller_name, quantity, unit_price):
+    def __init__(self, product_name, product_image, seller_id, seller_name, quantity, unit_price):
         self.product_name = product_name
         self.product_image = product_image
+        self.seller_id = seller_id
         self.seller_name = seller_name
         self.quantity = quantity
         self.unit_price = unit_price

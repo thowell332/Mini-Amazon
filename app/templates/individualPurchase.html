@@ -21,7 +21,9 @@
           <tr>
             <th scope="row">{{entry.product_name}}</th>
             <td><img src="{{entry.product_image}}" alt="Image Not Found" height="100"></td>
-            <td scope="row">{{entry.seller_name}}</th>
+            <td scope="row">{{entry.seller_name}}
+              <a class="btn btn-secondary" href="{{ url_for('users.submitSellerReview', sel_id = item["seller_id"], prod_id = item["product_id"])}}" role="button">Review Seller</a>
+            </th>
             <td scope="row">{{entry.quantity}}</th>
             <td scope="row">${{entry.unit_price}}</th>
             <td scope="row">${{entry.total_price}}</th>

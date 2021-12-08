@@ -81,12 +81,19 @@ def logout():
     logout_user()
     return redirect(url_for('index.index'))
 
+global currentUser 
+currentUser = '90'
+global currentProduct
+currentProduct = '17'
+global currentSeller
+currentSeller = '9'
 
-@bp.route('/userReviews')
-def userReviews():
+@bp.route('/userReviews/<int:user_id>')
+def userReviews(user_id):
     # get all product reviews user has made:
-    productReviews = userProductReview.get(currentUser) #CHANGE '5' TO CURRENT USER ID
-    sellerReviews = userSellerReview.get(currentUser) #CHANGE '5' TO CURRENT USER ID
+    productReviews = userProductReview.get(user_id) 
+    # get all seller reviews user has made:
+    sellerReviews = userSellerReview.get(user_id) 
     # render the page by adding information to the index.html file
     return render_template('userReviews.html',
                            userProductReviews=productReviews, userSellerReviews=sellerReviews)
@@ -102,11 +109,11 @@ def sellerReviews():
                            sellerReviewSummary=summary, sellerReviews=reviews)
   
    
-@bp.route('/productReviews')
-def productReviews():
+@bp.route('/productReviews/<int:sel_id>/<int:prod_id>')
+def productReviews(sel_id, prod_id):
     # get all reviews for given seller:
-    summary = productReviewSummary.get(currentProduct) #CHANGE '2' TO SELECTED PRODUCT ID
-    reviews = productReview.get(currentProduct) #CHANGE '2' TO SELECTED PRODUCT ID
+    summary = productReviewSummary.get(prod_id, sel_id) #CHANGE '2' TO SELECTED PRODUCT ID
+    reviews = productReview.get(prod_id, sel_id) #CHANGE '2' TO SELECTED PRODUCT ID
     # render the page by adding information to the index.html file
     return render_template('productSummaryReviews.html',
                            productReviewSummary=summary, productReviews=reviews)
@@ -119,12 +126,7 @@ class ReviewForm(FlaskForm):
     image3 = StringField(_l('Image 3 URL (optional)'))
     submit = SubmitField(_l('Submit'))
 
-global currentUser 
-currentUser = '3'
-global currentProduct
-currentProduct = '1'
-global currentSeller
-currentSeller = '5'
+
 """
 Edit seller review 
 parameters: id is seller_id
@@ -134,35 +136,30 @@ def editSellerReview(id):
     form = ReviewForm()
     if form.validate_on_submit():
         date = datetime.now()
-        userSellerReview.update_seller_review(currentUser, id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) #REMOVE HARD CODE
-        flash('Review has been updated')
+        userSellerReview.update_seller_review(currentUser, id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
         return redirect(url_for('users.userReviews'))
     # render the page by adding information to the index.html file
     return render_template('editReview.html', title='Edit Review', form=form)
 
 """
 Edit product review 
-parameters: id is product_id
 """
-@bp.route('/editProductReview/<int:id>', methods=['GET', 'POST'])
-def editProductReview(id):
+@bp.route('/editProductReview/<int:prod_id>/<int:sel_id>', methods=['GET', 'POST'])
+def editProductReview(prod_id, sel_id):
     form = ReviewForm()
     if form.validate_on_submit():
         date = datetime.now()
-        userProductReview.update_product_review(currentUser, id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) #REMOVE HARD CODE
-        flash('Review has been updated')
+        userProductReview.update_product_review(currentUser, prod_id, sel_id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
         return redirect(url_for('users.userReviews'))
     # render the page by adding information to the index.html file
     return render_template('editReview.html', title='Edit Review', form=form)
 
 """
 Delete product review 
-parameters: id is product_id
 """
-@bp.route('/deleteProductReview/<int:id>', methods=['GET', 'POST'])
-def deleteProductReview(id):
-    userProductReview.delete_product_review(currentUser, id) #REMOVE HARD CODE
-    flash('Review has been deleted')
+@bp.route('/deleteProductReview/<int:prod_id>/<int:sel_id>', methods=['GET', 'POST'])
+def deleteProductReview(prod_id, sel_id):
+    userProductReview.delete_product_review(currentUser, prod_id, sel_id) #REMOVE HARD CODE
     return redirect(url_for('users.userReviews'))
 
 """
@@ -172,19 +169,15 @@ parameters: id is seller_id
 @bp.route('/deleteSellerReview/<int:id>', methods=['GET', 'POST'])
 def deleteSellerReview(id):
     userSellerReview.delete_seller_review(currentUser, id) #REMOVE HARD CODE
-    flash('Review has been deleted')
     return redirect(url_for('users.userReviews'))
 
 #Delete product review with specified id
-@bp.route('/submitProductReview', methods=['GET', 'POST'])
-#IMPLEMENT GET ID
-def submitProductReview():
-    #<input type="hidden" name="product_id" value="{{product_review.num_stars}}" />
+@bp.route('/submitProductReview/<int:sel_id>/<int:prod_id>', methods=['GET', 'POST'])
+def submitProductReview(sel_id, prod_id):
     form = ReviewForm()
     if form.validate_on_submit():
         date = datetime.now()
-        userProductReview.submit_product_review(currentUser, currentProduct, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) #REMOVE HARD CODE FOR PRODUCT_ID
-        flash('Product Review has been submitted')
+        userProductReview.submit_product_review(currentUser, prod_id, sel_id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
         return redirect(url_for('users.login'))
     return render_template('submitReview.html', title='Submit Review', form=form)
 
@@ -196,8 +189,7 @@ def submitSellerReview():
     form = ReviewForm()
     if form.validate_on_submit():
         date = datetime.now()
-        userSellerReview.submit_seller_review(currentUser, currentSeller, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) #REMOVE HARD CODE FOR SELLER_ID
-        flash('Seller Review has been submitted')
+        userSellerReview.submit_seller_review(currentUser, currentSeller, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
         return redirect(url_for('users.login'))
     return render_template('submitReview.html', title='Submit Review', form=form)
 
@@ -205,15 +197,15 @@ def submitSellerReview():
 """
 Upvote product review 
 """
-@bp.route('/upvoteProductReview/<int:id>/<int:upvotes>', methods=['GET', 'POST'])
-def upvoteProductReview(id, upvotes):
-    user_id = id 
+@bp.route('/upvoteProductReview/<int:buyer_id>/<int:upvotes>', methods=['GET', 'POST'])
+def upvoteProductReview(buyer_id, upvotes):
+    user_id = buyer_id 
     product_id = currentProduct #Change to current product id
+    seller_id = currentSeller
     upvotes = upvotes
-    print(id, product_id, upvotes)
-    userProductReview.upvote_product_review(user_id, product_id, upvotes)
-    summary = productReviewSummary.get(currentProduct) #CHANGE '2' TO SELECTED PRODUCT ID
-    reviews = productReview.get(currentProduct) #CHANGE '2' TO SELECTED PRODUCT ID
+    userProductReview.upvote_product_review(user_id, product_id, seller_id, upvotes)
+    summary = productReviewSummary.get(currentProduct, seller_id) #CHANGE '2' TO SELECTED PRODUCT ID
+    reviews = productReview.get(currentProduct, seller_id) #CHANGE '2' TO SELECTED PRODUCT ID
     return render_template('productSummaryReviews.html',
                            productReviewSummary=summary, productReviews=reviews)
 

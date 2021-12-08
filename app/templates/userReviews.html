@@ -3,13 +3,14 @@
 {% block content %}
 
 <br><br>
-<h1> User reviews for user with ID 5</h1>
+<h1> User Reviews</h1>
 <h2>User Reviews for Products:</h2>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
       <th scope="col">Upvotes</th>
       <th scope="col">Product ID</th>
+      <th scope="col">Seller ID</th>
       <th scope="col">Number of Stars</th>
       <th scope="col">Date</th>
       <th scope="col">Review</th>
@@ -24,14 +25,16 @@
         <input type="hidden" name="upvotes" value="{{product_review.upvotes}}" /> 
         <th scope="row">{{product_review.product_id}}</th>
         <input type="hidden" name="product_id" value="{{product_review.product_id}}" />
+        <th scope="row">{{product_review.seller_id}}</th>
+        <input type="hidden" name="seller_id" value="{{product_review.seller_id}}" />
         <td>{{product_review.num_stars}}</td>
         <input type="hidden" name="num_stars" value="{{product_review.num_stars}}" />
         <td>{{product_review.date}}</td>
         <input type="hidden" name="date" value="{{product_review.date}}" />
         <td>{{product_review.description}}</td>
         <input type="hidden" name="description" value="{{product_review.description}}" />
-        <th> <a class="btn btn-secondary" href="{{ url_for('users.editProductReview', id = product_review["product_id"])}}" role="button">Edit</a></th>
-        <th> <a class="btn btn-secondary" href="{{ url_for('users.deleteProductReview', id = product_review["product_id"])}}" role="button">Delete</a></th>
+        <th> <a class="btn btn-secondary" href="{{ url_for('users.editProductReview', prod_id = product_review["product_id"], sel_id = product_review["seller_id"])}}" role="button">Edit</a></th>
+        <th> <a class="btn btn-secondary" href="{{ url_for('users.deleteProductReview', prod_id = product_review["product_id"], sel_id = product_review["seller_id"])}}" role="button">Delete</a></th>
       </tr>
       <tr>
         {% for imageURL in product_review.images%}

@@ -180,8 +180,13 @@ def gen_Reviews(num_reviews, purchases, items_sold):
                 date2 = fake.date_time()
                 description1 = fake.paragraph(nb_sentences=5)
                 description2 = fake.paragraph(nb_sentences=5)
-                seller_writer.writerow([buyer_id, seller_id, num_stars1, date1, description1])
-                product_writer.writerow([buyer_id, product_id, num_stars2, date2, description2])
+                upvotes1 = fake.random_int(min=0, max=10000)
+                upvotes2 = fake.random_int(min=0, max=10000)
+                images1 = {fake.image_url(), fake.image_url(), fake.image_url()}
+                images2 = {fake.image_url(), fake.image_url(), fake.image_url()}
+                
+                seller_writer.writerow([buyer_id, seller_id, num_stars1, date1, description1, upvotes1, images1])
+                product_writer.writerow([buyer_id, product_id, seller_id, num_stars2, date2, description2, upvotes2, images2])
                 reviews.append(buyer_id)
             print(f'{num_reviews} Reviews generated')
     return

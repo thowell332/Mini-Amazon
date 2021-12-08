@@ -67,12 +67,13 @@ CREATE TABLE SellerReview
 CREATE TABLE ProductReview
 (buyer_id INTEGER NOT NULL REFERENCES Account(account_id),
  product_id INTEGER NOT NULL REFERENCES Product(product_id),
+ seller_id INTEGER NOT NULL REFERENCES Seller(seller_id),
  num_stars REAL NOT NULL,
  date TIMESTAMP NOT NULL,
  description VARCHAR(512),
  upvotes INTEGER NOT NULL,
  images TEXT[],
- PRIMARY KEY(buyer_id, product_id)
+ PRIMARY KEY(buyer_id, product_id, seller_id)
 );
  
 CREATE TABLE Cart

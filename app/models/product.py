@@ -62,12 +62,14 @@ WHERE category LIKE :category
     @staticmethod
     def get_product_display_page(product_id, sort):
         rows = app.db.execute('''
-    SELECT p.product_id, sp.seller_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id)
-    FROM Product p, SellsProduct sp, SellsItem si
+    SELECT p.product_id, sp.seller_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id), AVG(num_stars)
+    FROM Product p, SellsProduct sp, SellsItem si, ProductReview pr
     WHERE p.product_id = :product_id
     AND sp.product_id = :product_id
     AND si.product_id = :product_id
     AND sp.seller_id = si.seller_id
+    AND pr.product_id = :product_id 
+    AND pr.seller_id = si.seller_id
     GROUP BY p.product_id, sp.seller_id, sp.price
     ORDER BY {0} DESC
     '''.format(sort), product_id=product_id)
@@ -114,7 +116,7 @@ DELETE FROM Product WHERE product_id = :product_id
 
 # A class to containing all of the information to display a specific product.
 class ProductDisplayPage:
-    def __init__(self, product_id, seller_id, description, name, image, category, price, quantity):
+    def __init__(self, product_id, seller_id, description, name, image, category, price, quantity, num_stars):
         self.product_id = product_id
         self.seller_id = seller_id
         self.description = description
@@ -123,4 +125,5 @@ class ProductDisplayPage:
         self.category = category
         self.price = price
         self.quantity = quantity
+        self.num_stars = num_stars
 
