@@ -60,23 +60,33 @@ RETURNING account_id
     @login.user_loader
     def get(id):
         rows = app.db.execute("""
-SELECT account_id, email, firstname, lastname, address, balance
-FROM Account
-WHERE account_id = :id
-""",
-                              id=id)
+            SELECT account_id, email, firstname, lastname, address, balance
+            FROM Account
+            WHERE account_id = :id
+            """,
+            id=id)
         return User(*(rows[0])) if rows else None
 
     @staticmethod
-    def updateProfile(id, email, password, firstname, lastname, address):
+    def updateProfile(id, email, firstname, lastname, address):
         rows = app.db.execute("""
             UPDATE Account
-            SET account_id = :id, email = :email, password = :password, firstname = :firstname, lastname = :lastname, address = :address
+            SET account_id = :id, email = :email, firstname = :firstname, lastname = :lastname, address = :address
             WHERE account_id = :id
             RETURNING account_id""", 
-            id=id, email=email, password=password, firstname=firstname, lastname=lastname, address=address)
-        return User(*(rows[0])) if rows else None
+            id=id, email=email, firstname=firstname, lastname=lastname, address=address)
+        return 1 if rows else None
     
+    @staticmethod
+    def updatePassword(id, password):
+        app.db.execute("""
+            UPDATE Account
+            SET password = :password
+            WHERE account_id = :id
+            RETURNING account_id""", 
+            id=id, password=generate_password_hash(password))
+        return 1
+            
     
     def update_balance(account_id, new_balance):
         app.db.execute("""
@@ -97,4 +107,27 @@ WHERE account_id = :id
             account_id = account_id)
         return rows[0][0]
 
+    @staticmethod
+    def sellerStatus(account_id):
+        rows = app.db.execute("""
+        SELECT *
+        FROM Seller
+        WHERE seller_id = :account_id""",
+        account_id = account_id)
+        if rows:
+            return 1
+        else:
+            return 0
 
+    @staticmethod
+    def becomeSeller(account_id):
+        try:
+            rows = app.db.execute("""
+            INSERT INTO Seller(seller_id)
+            VALUES(:account_id)
+            RETURNING :account_id""",
+            account_id=account_id)
+            return account_id
+        except Exception:
+            #already a seller
+            return
