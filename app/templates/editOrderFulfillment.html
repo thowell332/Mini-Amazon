@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<a class="btn btn-secondary mt-3 mb-3"
+href="{{ url_for('orderFulfillments.orderFulfillmentDetails', purchase_id=purchase.purchase_id) }}" 
+role="button">Go Back</a>
+
+<br/>
+<div class="row">
+  <div class="col">
+    <h2>Order Information</h2>
+    <table class='table table-borderless'>
+        <tbody>
+            <tr>
+              <th scope="row">Order ID</th>
+              <td>{{purchase.purchase_id}}</td>
+            </tr>
+            <tr>
+              <th scope="row">Buyer Name</th>
+              <td>{{purchase.buyer_name}}</td>
+            </tr>
+            <tr>
+              <th scope="row">Buyer Address</th>
+              <td>{{purchase.buyer_address}}</td>
+            </tr>
+            <tr>
+              <th scope="row">Product Name</th>
+              <td>{{product.name}}</td>
+            </tr>
+            <tr>
+              <th scope="row">Product Description</th>
+              <td>{{product.description}}</td>
+            </tr>
+        </tbody>
+      </table>
+  </div>
+  <div class="col">
+    <h2>Edit Order Fulfillment</h2>
+    <form action="" method="post">
+      {{ form.hidden_tag() }}
+      <p>
+        {{ form.item.label }}<br/>
+        {{ form.item() }}
+      </p>
+      <p>
+        {{ form.status.label }}<br/>
+        {{ form.status() }}<br/>
+        {% for error in form.status.errors %}
+        <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+      </p>
+      <p>{{ form.submit() }}</p>
+    </form>
+  </div>
+</div>
+
+<br/>
+<h2>Item Fulfillment Details</h2>
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Item ID</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% set statuses = ['ORDERED', 'SHIPPED', 'DELIVERED'] %}  
+    {% for item in itemFulfillment %}
+      <tr>
+        <th scope="row">{{item.item_id}}</th>
+        <td>{{statuses[item.status]}}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

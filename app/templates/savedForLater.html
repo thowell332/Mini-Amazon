@@ -4,10 +4,12 @@
 
 <h1>Saved For Later</h1>
 
+<!-- Flashed error messages. -->
 {% for message in get_flashed_messages() %}
         <p>{{ message }}</p>
 {% endfor %}
 
+<!-- Table to show saved for later entries. -->
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>
@@ -26,14 +28,15 @@
     </thead>
     <form method="post" action="">
     <tbody>
+      
       {% for item in saved_for_later%}
         <tr>
           <th scope="row">{{item.product_name}}</th>
           <td><img src="{{item.product_image}}" alt="Image Not Found" height="100"></td>
           <td>{{item.seller_name}}</td>
           <td>{{item.quantity}}</td>
-          <td>{{item.unit_price}}</td>
-          <td>{{item.total_price}}</td>
+          <td>${{item.unit_price}}</td>
+          <td>${{item.total_price}}</td>
 
           <td><input type="checkbox" name="move_to_cart" value="{{item.product_id}},{{item.seller_id}},{{item.quantity}},move"></td>
           <td><input style="width:100px" type="number" min="1" max={{item.quantity}} name="{{item.product_id}},{{item.seller_id}},{{item.quantity}},move"></td>
@@ -48,6 +51,7 @@
     </tbody>
   </table>
 
+<!-- Buttons to change items in saved for later. -->
     <input type="submit" name="type" value="Move Items to Cart">
     <input type="submit" name="type" value="Update Quantities">
     <input type="submit" name="type" value="Delete Items">

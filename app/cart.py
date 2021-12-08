@@ -10,17 +10,20 @@ from .models.cart import Cart
 from flask import Blueprint
 bp = Blueprint('cart', __name__)
 
+# Route to show a user's cart.
 @bp.route('/cart', methods=['GET', 'POST'])
 def cart():
 
+    # Redirect if not logged in.
     if not current_user.is_authenticated:
         return redirect(url_for('users.login'))
 
+    # Get cart and cost.
     cart = Cart.get_cart(current_user.id)
     total_cart_cost = Cart.get_total_cart_cost(current_user.id)
-
-    # Initialize variables used for error handling.
+    total_cart_cost = ('%.2f'%total_cart_cost)
     
+    # Respond to user input via buttons. 
     if 'type' in request.form:
 
         redirect_page = True
@@ -96,17 +99,21 @@ def cart():
         if redirect_page:
             return redirect(url_for('cart.cart'))
 
-        
     return render_template('cart.html', cart=cart, total_cost=total_cart_cost)
 
+# Route to show a user's saved for later section.
 @bp.route('/saved-for-later', methods=['GET', 'POST'])
 def saved_for_later():
 
+    # Redirect if not logged in.
     if not current_user.is_authenticated:
         return redirect(url_for('users.login'))
 
+    # Get items saved for later.
+
     saved_for_later = Cart.get_saved(current_user.id)
 
+    # Respond to user feedback via buttons.
     if 'type' in request.form:
 
         redirect_page = True

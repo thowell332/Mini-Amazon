@@ -26,7 +26,7 @@
                 <td>{{item.description}}</td>
                 <td>{{item.category}}</td>
                 <td class="td-actions text-right">
-                    <a href="{{ url_for("product.product", input=item.product_id) }}"><input type="submit" name="go_to_product_button" value="Go To Product"rel="tooltip" class="btn btn-info">
+                    <a href="{{ url_for("product.product", input=item.product_id, sort="standard") }}"><input type="submit" name="go_to_product_button" value="Go To Product"rel="tooltip" class="btn btn-info">
                         <i class="material-icons"></i>
                         </input>
                     </a>

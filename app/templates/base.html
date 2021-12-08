@@ -22,13 +22,19 @@
             </input>
         </a>
       <div style="color: aliceblue; text-align: right; margin-bottom: 25px">
+        <a href="{{ url_for('users.userPublicView') }}" type="button" class="btn btn-light">Users</a>
         {% if current_user.is_authenticated %}
-          Hello {{current_user.firstname}}! <a href="{{ url_for('users.logout') }}" type="button" class="btn btn-light">Log out</a>
+          Hello {{current_user.firstname}}!
           <a href="{{ url_for('users.profile') }}" type="button" class="btn btn-light">Your Profile</a>
+          <a href="{{ url_for('users.userPublicView') }}" type="button" class="btn btn-light">Users</a>
+          <a href="{{ url_for('cart.cart') }}" type="button" class="btn btn-dark">Cart</a>
+          <a href="{{ url_for('cart.saved_for_later') }}" type="button" class="btn btn-dark">Saved For Later</a>
+          <a href="{{ url_for('purchases.purchases') }}" type="button" class="btn btn-dark">Purchase History</a>
+          <a href="{{ url_for('users.logout') }}" type="button" class="btn btn-light">Log out</a>
+
         {% else %}
           <a href="{{ url_for('users.login') }}" type="button" class="btn btn-light">Log in</a>
         {% endif %}
-        <a href="{{ url_for('users.userPublicView') }}" type="button" class="btn btn-light">Users</a>
 
       </div>
     {% endblock %}
