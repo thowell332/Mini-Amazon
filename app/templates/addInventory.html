@@ -2,6 +2,11 @@
 
 {% block content %}
 
+<a class="btn btn-secondary mt-3 mb-3"
+href="{{ url_for('inventories.inventory') }}" 
+role="button">Go Back</a>
+
+<br/>
 <h1>New Product Listing</h1>
 
 <form action="" method="post">
@@ -9,7 +14,7 @@
   <p>
     {{ form.name.label }}<br/>
     {{ form.name(size=32) }}<br/>
-    {% for error in form.price.errors %}
+    {% for error in form.name.errors %}
     <span style="color: red;">{{ error }}</span>
     {% endfor %}
   </p>

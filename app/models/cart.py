@@ -335,7 +335,8 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
                 Purchase._add_to_purchase(buyer_id, entry.seller_id, entry.product_id, purchased_item.item_id, purchase_id, initial_status, date_of_purchase, entry.unit_price)
 
             # Pay the seller for the items purchased.
-            User.update_balance(entry.seller_id, entry.total_price)
+            seller_balance = float(User.get_balance(entry.seller_id))
+            User.update_balance(entry.seller_id, seller_balance + float(entry.total_price))
         
         return ["Success"]
 
