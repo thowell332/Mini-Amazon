@@ -31,6 +31,7 @@ class UpdateProfile(FlaskForm):
 @bp.route('/updateprofile', methods=['GET', 'POST'])
 def updateProfile():
     user_info = User.get(current_user.id)
+    seller_status = User.sellerStatus(current_user.id)
     form = UpdateProfile(obj = user_info)
     if form.validate_on_submit():
         if User.updateProfile(user_info.id, 
@@ -40,7 +41,7 @@ def updateProfile():
                                 form.address.data):
             flash('Congratulations, you have updated your account information!')
             return redirect(url_for('users.profile'))
-    return render_template('updateProfile.html', title='Update Profile', form=form)
+    return render_template('updateProfile.html', title='Update Profile', form=form, seller_status=seller_status)
 
 class UpdatePassword(FlaskForm):
     password = PasswordField(_l('New Password'), validators=[DataRequired()])
@@ -49,12 +50,13 @@ class UpdatePassword(FlaskForm):
 
 @bp.route('/updatepassword', methods=['GET', 'POST'])
 def updatePassword():
+    seller_status = User.sellerStatus(current_user.id)
     form = UpdatePassword()
     if form.validate_on_submit():
         if User.updatePassword(current_user.id, form.password.data):
             flash('Congratulations, you have successfully updated your password!')
             return redirect(url_for('users.profile'))
-    return render_template('updatePassword.html', title='Update Password', form=form)
+    return render_template('updatePassword.html', title='Update Password', form=form, seller_status=seller_status)
 
 @bp.route('/becomeseller', methods=['GET','POST'])
 def becomeSeller():
@@ -73,6 +75,7 @@ class BalanceForm(FlaskForm):
 
 @bp.route('/updatebalance', methods=['GET', 'POST'])
 def updateBalance():
+    seller_status = User.sellerStatus(current_user.id)
     curr_balance = User.get_balance(current_user.id)
     form = BalanceForm()
     if form.validate_on_submit():
@@ -84,7 +87,7 @@ def updateBalance():
             new_balance = float(new_balance) + form.deposit.data
             User.update_balance(current_user.id, new_balance)
             return redirect(url_for('users.profile'))
-    return render_template('balance.html', title='Balance', form=form, curr_balance=curr_balance)
+    return render_template('balance.html', title='Balance', form=form, curr_balance=curr_balance, seller_status=seller_status)
         
 class LoginForm(FlaskForm):
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
@@ -155,32 +158,41 @@ class UserReviewForm(FlaskForm):
 
 @bp.route('/userReviews')
 def userReviews():
+    seller_status = 0
+    if current_user.is_authenticated:
+        seller_status = User.sellerStatus(current_user.id)
     # get all product reviews user has made:
     productReviews = userProductReview.get('5') #CHANGE '5' TO CURRENT USER ID
     sellerReviews = userSellerReview.get('5') #CHANGE '5' TO CURRENT USER ID
     # render the page by adding information to the index.html file
     return render_template('userReviews.html',
-                           userProductReviews=productReviews, userSellerReviews=sellerReviews)
+                           userProductReviews=productReviews, userSellerReviews=sellerReviews, seller_status=seller_status)
 
 
 @bp.route('/sellerReviews')
 def sellerReviews():
+    seller_status = 0
+    if current_user.is_authenticated:
+        seller_status = User.sellerStatus(current_user.id)
     # get all reviews for given seller:
     summary = sellerReviewSummary.get('2') #CHANGE '2' TO SELECTED SELLER ID
     reviews = sellerReview.get('2') #CHANGE '2' TO SELECTED SELLER ID
     # render the page by adding information to the index.html file
     return render_template('sellerSummaryReviews.html',
-                           sellerReviewSummary=summary, sellerReviews=reviews)
+                           sellerReviewSummary=summary, sellerReviews=reviews, seller_status=seller_status)
   
    
 @bp.route('/productReviews')
 def productReviews():
+    seller_status = 0
+    if current_user.is_authenticated:
+        seller_status = User.sellerStatus(current_user.id)
     # get all reviews for given seller:
     summary = productReviewSummary.get('2') #CHANGE '2' TO SELECTED PRODUCT ID
     reviews = productReview.get('2') #CHANGE '2' TO SELECTED PRODUCT ID
     # render the page by adding information to the index.html file
     return render_template('productSummaryReviews.html',
-                           productReviewSummary=summary, productReviews=reviews)
+                           productReviewSummary=summary, productReviews=reviews, seller_status=seller_status)
 
 class EditReviewForm(FlaskForm):
     numStars= StringField(_l('Number of Stars'), validators=[DataRequired()])
@@ -189,6 +201,7 @@ class EditReviewForm(FlaskForm):
 
 @bp.route('/editReview', methods=['GET', 'POST'])
 def editReview():
+    seller_status = User.sellerStatus(current_user.id)
     form = EditReviewForm()
     if form.validate_on_submit():
         print("hi")
@@ -197,6 +210,6 @@ def editReview():
         flash('Review has been updated')
         return redirect(url_for('users.userReviews'))
     # render the page by adding information to the index.html file
-    return render_template('editReview.html', title='Edit Review', form=form)
+    return render_template('editReview.html', title='Edit Review', form=form, seller_status=seller_status)
    
    

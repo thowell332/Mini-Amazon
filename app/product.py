@@ -6,6 +6,7 @@ from flask_babel import _, lazy_gettext as _l
 
 from .models.product import Product
 from .models.cart import Cart
+from .models.user import User
 from flask_login import current_user
 
 bp = Blueprint('product', __name__)
@@ -17,6 +18,10 @@ per_page = 10
 # @return- the page displaying the product(s) with product_id = @param input.
 @bp.route('/product<input>/<sort>', methods=['GET', 'POST'])
 def product(input, sort):
+    # get seller status
+    seller_status = 0
+    if current_user.is_authenticated:
+        seller_status = User.sellerStatus(current_user.id)
     
     page = request.args.get(get_page_parameter(), type=int, default=1)
     start = (page - 1) * per_page
@@ -60,15 +65,25 @@ def product(input, sort):
         product = Product.get_product_display_page(input, 'sp.seller_id')
     ## if no products being sold, tell user
     if (len(product) == 0):
-        return render_template('noProductsBeingSold.html')
+        return render_template('noProductsBeingSold.html', seller_status=seller_status)
     ## display products being sold
     else:
         productid = product[0].product_id
         pagination = Pagination(page=page, per_page=per_page, total=len(product), record_name='products')
-        return render_template('product.html', product=product[start: start + per_page], productid=productid, pagination=pagination)
+        return render_template('product.html', product=product[start: start + per_page], productid=productid, pagination=pagination, seller_status=seller_status)
 
 @bp.route('/productOwner')
 def productOwner():
+    # redirect to login if not authenticated
+    if not current_user.is_authenticated:
+        return redirect(url_for('users.login'))
+    
+    # redirect to homepage if not seller
+    seller_status = User.sellerStatus(current_user.id)
+    if seller_status != 1:
+        return redirect(url_for('index.index'))
+    
+    # set up pagination
     search = False
     q = request.args.get('q')
     if q:
@@ -77,6 +92,7 @@ def productOwner():
     start = (page - 1) * per_page
     productList = Product.get_seller_products(current_user.id)
     pagination = Pagination(page=page, per_page=per_page, total=len(productList), search=search, record_name='products')
+    
     # render the page by adding information to the index.html file
-    return render_template('productOwner.html', productList=productList[start: start + per_page], pagination=pagination)
+    return render_template('productOwner.html', productList=productList[start: start + per_page], pagination=pagination, seller_status=1)
 
