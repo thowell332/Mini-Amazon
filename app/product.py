@@ -28,8 +28,6 @@ def product(input, sort):
     for key in request.form.keys():
         # The user wants to add to his cart.
         if 'add' in key or 'save' in key:
-            print('key')
-            print(key)
             if not current_user.is_authenticated:
                 flash('')
                 flash('You must login before purchasing any items.')
@@ -42,8 +40,6 @@ def product(input, sort):
                 quantity_key = 'quantity,' + product_id + ',' + seller_id
                 quantity_to_move = request.form.get(quantity_key)
 
-                print('qanon')
-                print(quantity_to_move)
                 # Check to make sure that the new quantitty was specified.
                 if quantity_to_move == '':
                     flash('You did not specify the quantity to move. Please do so!')

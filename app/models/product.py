@@ -84,7 +84,7 @@ WHERE category LIKE :category
     @staticmethod
     def insert_new_product(product_id, owner_id, description, name, image, category):
         try:
-            rows = app.db.execute("""
+            app.db.execute("""
 INSERT INTO Product(product_id, owner_id, description, name, image, category)
 VALUES(:product_id, :owner_id, :description, :name, :image, :category)
 RETURNING product_id
