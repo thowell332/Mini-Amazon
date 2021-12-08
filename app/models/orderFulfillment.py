@@ -30,9 +30,9 @@ class OrderHistory:
     def get_search_results(seller_id, search_field, search_criteria):
         search_criteria = "'%" + search_criteria + "%'"
         if search_field == 'buyer_name':
-            search = '(a.firstname ILIKE ' + search_criteria.replace(" ", "'%'") + ' OR a.lastname ILIKE ' + search_criteria + ')'
+            search = '(a.firstname ILIKE ' + search_criteria.replace(" ", "%") + ' OR a.lastname ILIKE ' + search_criteria + ')'
         else:
-            search = search_field + ' ILIKE ' + search_criteria
+            search = search_field + ' ILIKE ' + search_criteria.replace(" ", "%")
         rows = app.db.execute(
             '''
             SELECT pu.purchase_id, CONCAT(a.firstname,' ',a.lastname) as buyer_name,
