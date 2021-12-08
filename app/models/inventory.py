@@ -184,15 +184,17 @@ class InventoryListing:
             current_items = [row[0] for row in rows] if rows else [0]
             # assign item_id values to the new rows
             new_items = [max(current_items) + i + 1 for i in range(delta_quantity)]
-            # generate row values to be inserted
-            values = ', '.join(['(' + ', '.join((str(seller_id), str(product_id), str(new_items[i]))) + ')' for i in range(delta_quantity)])
             # execute insert query
-            try: app.db.execute(
-                '''
-                INSERT INTO SellsItem
-                VALUES 
-                ''' + values
-            )
-            except Exception as e:
-                print(e)
+            for item_id in new_items:
+                try: app.db.execute(
+                    '''
+                    INSERT INTO SellsItem
+                    VALUES (:seller_id, :product_id, item_id)
+                    ''',
+                    seller_id=seller_id,
+                    product_id=product_id,
+                    item_id=item_id
+                )
+                except Exception as e:
+                    print(e)
 
