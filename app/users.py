@@ -9,8 +9,8 @@ from datetime import datetime
 
 from .models.user import User, UserView
 from .models.userReviews import userProductReview, userSellerReview
-from .models.sellerReviews import sellerReviewSummary, sellerReview
-from .models.productReviews import productReviewSummary, productReview
+from .models.sellerReviews import sellerReview
+from .models.productReviews import productReview
 from flask_paginate import Pagination, get_page_parameter
 
 from flask import Blueprint
@@ -194,12 +194,20 @@ def sellerReviews(sel_id):
     seller_status = 0
     if current_user.is_authenticated:
         seller_status = User.sellerStatus(current_user.id)
-    # get all reviews for given seller:
-    summary = sellerReviewSummary.get(sel_id) 
+    # get all reviews for given seller: 
     reviews = sellerReview.get(sel_id) 
+    total = len(reviews)
+    if total == 0:
+        average_rating = 0
+    else:
+        print(total)
+        count = 0
+        for review in reviews:
+            count += review.num_stars
+        average_rating = count / total
     # render the page by adding information to the index.html file
     return render_template('sellerSummaryReviews.html',
-                           sellerReviewSummary=summary, sellerReviews=reviews, seller_status=seller_status)
+                           total=total, average_rating=average_rating, sellerReviews=reviews, seller_status=seller_status)
   
     
 @bp.route('/productReviews/<int:sel_id>/<int:prod_id>')
@@ -208,11 +216,19 @@ def productReviews(sel_id, prod_id):
     if current_user.is_authenticated:
         seller_status = User.sellerStatus(current_user.id)
     # get all reviews for given seller:
-    summary = productReviewSummary.get(prod_id, sel_id) 
     reviews = productReview.get(prod_id, sel_id) 
+    total = len(reviews)
+    if total == 0:
+        average_rating = 0
+    else:
+        print(total)
+        count = 0
+        for review in reviews:
+            count += review.num_stars
+        average_rating = count / total
     # render the page by adding information to the index.html file
     return render_template('productSummaryReviews.html',
-                           productReviewSummary=summary, productReviews=reviews, seller_status=seller_status)
+                           total = total, average_rating=average_rating, productReviews=reviews, seller_status=seller_status)
 
 class ReviewForm(FlaskForm):
     numStars= StringField(_l('Number of Stars'), validators=[DataRequired()])
@@ -300,10 +316,18 @@ def upvoteProductReview(buyer_id, prod_id, sel_id, upvotes):
     seller_id = sel_id
     upvotes = upvotes
     userProductReview.upvote_product_review(user_id, product_id, seller_id, upvotes)
-    summary = productReviewSummary.get(product_id, seller_id)
     reviews = productReview.get(product_id, seller_id) 
+    total = len(reviews)
+    if total == 0:
+        average_rating = 0
+    else:
+        print(total)
+        count = 0
+        for review in reviews:
+            count += review.num_stars
+        average_rating = count / total
     return render_template('productSummaryReviews.html',
-                           productReviewSummary=summary, productReviews=reviews)
+                           total=total, average_rating=average_rating, productReviews=reviews)
 
 
 """
@@ -315,7 +339,15 @@ def upvoteSellerReview(buyer_id, sel_id, upvotes):
     seller_id = sel_id
     upvotes = upvotes
     userSellerReview.upvote_seller_review(user_id, seller_id, upvotes)
-    summary = sellerReviewSummary.get(seller_id) 
-    reviews = sellerReview.get(seller_id) 
+    reviews = sellerReview.get(seller_id)  
+    total = len(reviews)
+    if total == 0:
+        average_rating = 0
+    else:
+        print(total)
+        count = 0
+        for review in reviews:
+            count += review.num_stars
+        average_rating = count / total
     return render_template('sellerSummaryReviews.html',
-                           sellerReviewSummary=summary, sellerReviews=reviews)
+                           total=total, average_rating=average_rating, sellerReviews=reviews)
