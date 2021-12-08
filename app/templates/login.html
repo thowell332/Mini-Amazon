@@ -3,7 +3,7 @@
 {% block content %}
 
 <h1>Login</h1>
-
+<!-- form for entering login information -->
 <form action="" method="post" novalidate>
   {{ form.hidden_tag() }}
   <p>
@@ -32,6 +32,7 @@
     {% endwith %}
   </p>
   {{ form.submit(class_="btn btn-black") }}
+  <!-- button to go to registration page -->
   <a class="btn btn-secondary" href="{{ url_for('users.register') }}" role="button">Register</a>
   
 

@@ -67,7 +67,7 @@ role="button">Go Back</a>
     </tr>
   </thead>
   <tbody>
-    {% set statuses = ['ORDERED', 'SHIPPED', 'DELIVERED'] %}  
+    {% set statuses = ['ORDERED', 'SHIPPED', 'FULFILLED'] %}  
     {% for item in itemFulfillment %}
       <tr>
         <th scope="row">{{item.item_id}}</th>
