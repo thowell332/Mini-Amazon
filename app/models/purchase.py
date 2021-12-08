@@ -4,12 +4,14 @@ from flask import current_app as app
 # This maps to either "ordered", "shipped", or "fulfilled"
 status_options = ["ORDERED", "SHIPPED", "FULFILLED"]
 
+# Class used to show each purchase made.
 class PurchaseSummary:
     def __init__(self, purchase_id, date, status):
         self.purchase_id = purchase_id
         self.date = date.strftime("%m/%d/%Y at %H:%M:%S")
         self.status = status_options[status]
 
+# Class used to show each item in a purchase.
 class PurchaseEntry:
     def __init__(self, product_name, product_image, seller_first_name, seller_last_name, seller_id, quantity, status, unit_price):
         self.product_name = product_name
@@ -22,6 +24,7 @@ class PurchaseEntry:
         self.total_price = round(quantity * unit_price, 2)
         self.status = status_options[status]
 
+# Methods used to query the purchase database.
 class Purchase:
 
     # Helper method used to create a unique purchase ID.

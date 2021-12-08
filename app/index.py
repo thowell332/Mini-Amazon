@@ -9,21 +9,20 @@ from .models.purchase import Purchase
 from flask import Blueprint
 bp = Blueprint('index', __name__)
 
+# Home route
 @bp.route('/')
 def index():
 
-    
+    # Set up pagination.
     page = request.args.get(get_page_parameter(), type=int, default=1)
     per_page = 10
     start = (page - 1) * per_page
 
 
-    # get all available products for sale:
+    # Get all available products for sale.
     products = Product.get_all()
 
-    # render the page by adding information to the index.html file
-
+    # Render the page by adding information to the index.html file
     pagination = Pagination(page=page, per_page=per_page, total=len(products), record_name='products')
-
     return render_template('index.html', avail_products=products[start: start + per_page],pagination=pagination)
                            
