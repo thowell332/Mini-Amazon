@@ -27,6 +27,10 @@
           <a href="{{ url_for('cart.cart') }}" type="button" class="btn btn-dark">Cart</a>
           <a href="{{ url_for('cart.saved_for_later') }}" type="button" class="btn btn-dark">Saved For Later</a>
           <a href="{{ url_for('purchases.purchases') }}" type="button" class="btn btn-dark">Purchase History</a>
+          <!-- {% if current_user.is_seller %} -->
+          <a href="{{ url_for('inventories.inventory') }}" type="button" class="btn btn-dark">Inventory</a>
+          <a href="{{ url_for('orderFulfillments.orderFulfillments') }}" type="button" class="btn btn-dark">Order Fulfillment</a>
+          <!-- {% endif %} -->
           <a href="{{ url_for('users.logout') }}" type="button" class="btn btn-light">Log out</a>
 
         {% else %}
