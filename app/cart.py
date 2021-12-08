@@ -18,7 +18,8 @@ def cart():
 
     cart = Cart.get_cart(current_user.id)
     total_cart_cost = Cart.get_total_cart_cost(current_user.id)
-
+    total_cart_cost = ('%.2f'%total_cart_cost)
+    
     # Initialize variables used for error handling.
     
     if 'type' in request.form:

@@ -29,7 +29,7 @@ CREATE TABLE SellsProduct
 (
 seller_id INTEGER NOT NULL REFERENCES Seller(seller_id),
 product_id INTEGER NOT NULL REFERENCES Product(product_id),
-price DECIMAL NOT NULL,
+price DECIMAL NOT NULL CHECK (price > 0),
 PRIMARY KEY (seller_id, product_id)
 );
 
@@ -51,6 +51,7 @@ item_id INTEGER NOT NULL,
 purchase_id INTEGER NOT NULL,
 status INTEGER NOT NULL,
 date TIMESTAMP WITH TIME ZONE NOT NULL,
+price DECIMAL NOT NULL CHECK (price > 0),
 PRIMARY KEY (buyer_id, product_id, item_id)
 );
  

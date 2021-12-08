@@ -48,12 +48,12 @@ product_id = product_id, seller_id = seller_id)
     # Helper method used to delete an item from SellsItem, indicating it has been purchased.
     # Parameter definitions are the same as above.
     @staticmethod
-    def _delete_from_sells_item(item_id):
+    def _delete_from_sells_item(seller_id, product_id, item_id):
         app.db.execute(
 """
 DELETE
 FROM SellsItem
-WHERE item_id = :item_id
+WHERE seller_id = :seller_id AND product_id = :product_id AND item_id = :item_id
 RETURNING 1
 """,
-        item_id = item_id)
+        seller_id = seller_id, product_id = product_id, item_id = item_id)
