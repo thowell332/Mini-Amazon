@@ -158,7 +158,7 @@ def editOrderFulfillment(purchase_id, product_id):
     form.status.choices = [(0, 'ORDERED'), (1, 'SHIPPED'), (2, 'FULFILLED')]
     if form.validate_on_submit():
         ItemFulfillment.update_status(current_user.id, purchase_id, product_id, form.item.data, form.status.data)
-        flash('Item fulfillment(s) has been updated')
+        flash('Item fulfillment(s) have been updated')
         itemFulfillment = ItemFulfillment.get_item_fulfillment(current_user.id, purchase_id, product_id)
     
     # render the page
