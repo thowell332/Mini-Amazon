@@ -4,7 +4,7 @@
 
 <h1>Purchase Order # {{purchase_id}}</h1>
 
-<!-- Table to show purchases. -->
+<!-- Table to show an individual order. -->
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>
@@ -14,6 +14,7 @@
         <th scope="col">Quantity</th>
         <th scope="col">Unit Price</th>
         <th scope="col">Total Price</th>
+        <th scope="col">Status</th>
       </tr>
     </thead>
       <tbody>
@@ -25,7 +26,8 @@
             <td scope="row">{{entry.quantity}}</th>
             <td scope="row">${{entry.unit_price}}</th>
             <td scope="row">${{entry.total_price}}</th>
-          </tr>
+            <td scope="row">{{entry.status}}</th>
+              </tr>
         {% endfor %}
       </tbody>
   </table>

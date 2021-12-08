@@ -4,10 +4,12 @@
 
 <h1>Saved For Later</h1>
 
+<!-- Flashed error messages. -->
 {% for message in get_flashed_messages() %}
         <p>{{ message }}</p>
 {% endfor %}
 
+<!-- Table to show saved for later entries. -->
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>
@@ -49,7 +51,7 @@
     </tbody>
   </table>
 
-
+<!-- Buttons to change items in saved for later. -->
     <input type="submit" name="type" value="Move Items to Cart">
     <input type="submit" name="type" value="Update Quantities">
     <input type="submit" name="type" value="Delete Items">

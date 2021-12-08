@@ -4,23 +4,27 @@ from flask import current_app as app
 # This maps to either "ordered", "shipped", or "fulfilled"
 status_options = ["ORDERED", "SHIPPED", "FULFILLED"]
 
+# Class used to show each purchase made.
 class PurchaseSummary:
     def __init__(self, purchase_id, date, status):
         self.purchase_id = purchase_id
         self.date = date.strftime("%m/%d/%Y at %H:%M:%S")
         self.status = status_options[status]
 
+# Class used to show each item in a purchase.
 class PurchaseEntry:
-    def __init__(self, product_name, product_image, seller_first_name, seller_last_name, quantity, unit_price, status):
+    def __init__(self, product_name, product_image, seller_first_name, seller_last_name, seller_id, quantity, status, unit_price):
         self.product_name = product_name
         self.product_image = product_image
         self.seller_name = seller_first_name + ' ' + seller_last_name
+        self.seller_id = seller_id
         self.quantity = quantity
         self.unit_price = unit_price
         # Round the price to avoid floating point errors.
         self.total_price = round(quantity * unit_price, 2)
-        self.status = status
+        self.status = status_options[status]
 
+# Methods used to query the purchase database.
 class Purchase:
 
     # Helper method used to create a unique purchase ID.
@@ -64,6 +68,7 @@ class Purchase:
             FROM Purchase
             WHERE buyer_id = :buyer_id
             GROUP BY purchase_id, date
+            ORDER BY date DESC
             """,
         buyer_id = buyer_id)
 
@@ -77,21 +82,21 @@ class Purchase:
         rows = app.db.execute(
             """
             WITH
-            BasicPurchase(product_id, seller_id, quantity, price, min_status) AS (
-                SELECT product_id, seller_id, COUNT(item_id), price, MIN(status)
+            BasicPurchase(product_id, seller_id, quantity, min_status, price) AS (
+                SELECT product_id, seller_id, COUNT(item_id), MIN(status), price
                 FROM Purchase
                 WHERE buyer_id = :buyer_id AND purchase_id = :purchase_id
                 GROUP BY product_id, seller_id, date, price
             ),
-            PurchaseAddProduct(product_name, product_image, seller_id, quantity, price, min_status) AS (
+            PurchaseAddProduct(product_name, product_image, seller_id, quantity, min_status, price) AS (
                 SELECT Product.name, Product.image, BasicPurchase.seller_id, BasicPurchase.quantity, BasicPurchase.min_status, BasicPurchase.price
                 FROM BasicPurchase
                 LEFT JOIN
                 Product
                 ON BasicPurchase.product_id = Product.product_id
             ),
-            PurchaseAddSeller(product_name, product_image, seller_name, quantity, price, min_status) AS (
-                SELECT PurchaseAddProduct.product_name, PurchaseAddProduct.product_image, Account.firstname, Account.lastname, PurchaseAddProduct.quantity, PurchaseAddProduct.min_status, PurchaseAddProduct.price
+            PurchaseAddSeller(product_name, product_image, seller_firstname, seller_lastname, seller_id, quantity, min_status, price) AS (
+                SELECT PurchaseAddProduct.product_name, PurchaseAddProduct.product_image, Account.firstname, Account.lastname, PurchaseAddProduct.seller_id, PurchaseAddProduct.quantity, PurchaseAddProduct.min_status, PurchaseAddProduct.price
                 FROM PurchaseAddProduct
                 LEFT JOIN
                 Account

@@ -5,6 +5,7 @@ from .user import User
 from .sellsItem import SellsItem
 from .purchase import Purchase
 
+# Cart class that contains information needed to visualize a cart entry.
 class Cart:
     def __init__(self, product_id, product_name, product_image, seller_id, seller_first_name, seller_last_name, quantity, unit_price):
         self.product_id = product_id

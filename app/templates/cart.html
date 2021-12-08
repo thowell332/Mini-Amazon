@@ -4,6 +4,7 @@
 
 <h1>Cart</h1>
 
+<!-- Flashed error messages. -->
 {% for message in get_flashed_messages() %}
         <p>{{ message }}</p>
 {% endfor %}
@@ -50,6 +51,8 @@
     </table>
 
       <h3>Total Cost: ${{total_cost}}</h3>
+      
+      <!-- Buttons to update the cart. -->
       <input type="submit" name="type" value="Purchase Cart">
       <input type="submit" name="type" value="Move Items to Saved">
       <input type="submit" name="type" value="Update Quantities">
