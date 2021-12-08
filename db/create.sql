@@ -61,16 +61,21 @@ CREATE TABLE SellerReview
  num_stars DECIMAL NOT NULL, -- # stars is float
  date TIMESTAMP NOT NULL,
  description VARCHAR(512), -- Can have stars with no description
+ upvotes INTEGER NOT NULL,
+ images TEXT[],
  PRIMARY KEY(buyer_id, seller_id)
 );
  
 CREATE TABLE ProductReview
 (buyer_id INTEGER NOT NULL REFERENCES Account(account_id),
  product_id INTEGER NOT NULL REFERENCES Product(product_id),
+ seller_id INTEGER NOT NULL REFERENCES Seller(seller_id),
  num_stars REAL NOT NULL,
  date TIMESTAMP NOT NULL,
  description VARCHAR(512),
- PRIMARY KEY(buyer_id, product_id)
+ upvotes INTEGER NOT NULL,
+ images TEXT[],
+ PRIMARY KEY(buyer_id, product_id, seller_id)
 );
  
 CREATE TABLE Cart
@@ -83,10 +88,9 @@ saved_for_later BOOLEAN NOT NULL,
 PRIMARY KEY (buyer_id, seller_id, product_id, saved_for_later)
 );
  
-
 CREATE FUNCTION Product_Reviewer() RETURNS TRIGGER AS $$
 BEGIN 
-	IF NOT (NEW.buyer_id IN (SELECT Purchase.buyer_id FROM Purchase WHERE Purchase.product_id = NEW.product_id)) THEN
+	IF NOT (NEW.buyer_id IN (SELECT Purchase.buyer_id FROM Purchase WHERE Purchase.product_id = NEW.product_id AND Purchase.seller_id = NEW.seller_id)) THEN
        RAISE EXCEPTION 'Buyers cannot write reviews for products they have not  
        purchased';
        END IF;
@@ -101,7 +105,7 @@ CREATE TRIGGER Product_Reviewer
  
 CREATE FUNCTION TF_Seller_Reviewer() RETURNS TRIGGER AS $seller_review$
 BEGIN
-	IF NOT (NEW.buyer_id IN (SELECT Purchase.buyer_id FROM Purchase, SellsItem WHERE SellsItem.seller_id = NEW.seller_id AND Purchase.product_id = SellsItem.product_id AND Purchase.item_id = SellsItem.item_id)) THEN
+	IF NOT (NEW.buyer_id IN (SELECT Purchase.buyer_id FROM Purchase WHERE Purchase.seller_id = NEW.seller_id AND Purchase.buyer_id = NEW.buyer_id)) THEN
 	RAISE EXCEPTION 'Buyers cannot review sellers they have not bought from before';
 	END IF;
 	RETURN NEW;
@@ -129,7 +133,7 @@ CREATE TRIGGER TG_Cart_Product_Exists
 
 CREATE FUNCTION One_Product_Review() RETURNS TRIGGER AS $one_product_review$
 BEGIN 
-	IF EXISTS(SELECT * FROM ProductReview WHERE NEW.buyer_id = ProductReview.buyer_id AND NEW.product_id = ProductReview.product_id) THEN
+	IF EXISTS(SELECT * FROM ProductReview WHERE NEW.buyer_id = ProductReview.buyer_id AND NEW.product_id = ProductReview.product_id AND NEW.seller_id = ProductReview.seller_id) THEN
 	RAISE EXCEPTION 'A user cannot submit more than one rating/review for a single product';
 	END IF;
 	RETURN NEW;
@@ -154,27 +158,3 @@ CREATE TRIGGER One_Seller_Review
 	BEFORE INSERT ON SellerReview
 	FOR EACH ROW
 	EXECUTE PROCEDURE One_Seller_Review();
-
---Allratings/reviews authored by the user in reverse chronological order
---SELECT * FROM ProductReview, SellerReview
---WHERE NEW.account_id = ProductReview.account_id
---ORDER BY date DESC
-
---List of ratings for product
---SELECT * FROM ProductReview 
---WHERE NEW.product_id = ProductReview.product_id
---ORDER BY ProductReview.num_stars DESC
-
---Average, number of ratings for product
---SELECT AVG(num_stars), COUNT(*) FROM ProductReview
---WHERE NEW.product_id = ProductReview.product_id
-
-
---List of ratings for seller
---SELECT * FROM SellerReview 
---WHERE NEW.seller_id = SellerReview.seller_id
---ORDER BY SellerReview.num_stars DESC
-
---Average, number of ratings for seller
---SELECT AVG(num_stars), COUNT(*) FROM SellerReview
---WHERE NEW.seller_id = SellerReview.seller_id

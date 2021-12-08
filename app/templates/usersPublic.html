@@ -7,7 +7,7 @@
 <h2>Users:</h2>
 <p>Here are all the current users of Amazon+!</p>
 <p>You can see each users' name and account number</p>
-<p>For users that also act as sellers, you can also see their email and address</p>
+<p>For users that also act as sellers, you can also see their email, address, and reviews</p>
 <p></p>
 
 {{pagination.info}}
@@ -33,6 +33,7 @@
         {% else %}
         <td>{{user.email}}</td>
         <td>{{user.address}}</td>
+        <td><a class="btn btn-secondary" href="{{ url_for('users.sellerReviews', sel_id=user.id) }}" role="button">Seller Reviews</a></td>
         {% endif %}
       </tr>
     {% endfor %}

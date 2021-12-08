@@ -5,6 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from flask_babel import _, lazy_gettext as _l
+from datetime import datetime
 
 from .models.user import User, UserView
 from .models.userReviews import userProductReview, userSellerReview
@@ -23,6 +24,12 @@ def userPublicView():
     users = UserView.getUsersPublicView()
     pagination = Pagination(page=page, per_page=per_page, total=len(users), record_name='users')
     return render_template('usersPublic.html', users = users[start: start + per_page], pagination=pagination)
+    
+class LoginForm(FlaskForm):
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    password = PasswordField(_l('Password'), validators=[DataRequired()])
+    remember_me = BooleanField(_l('Remember Me'))
+    submit = SubmitField(_l('Sign In'))
 
 @bp.route('/profile', methods=['GET', 'POST'])
 def profile():
@@ -162,66 +169,153 @@ def logout():
     logout_user()
     return redirect(url_for('index.index'))
 
-"""
-class UserReviewForm(FlaskForm):
-    review = StringField(_l('Review'), validators=[DataRequired()])
-"""
 
+global currentProduct
+currentProduct = '37'
+global currentSeller
+currentSeller = '4'
 
-@bp.route('/userReviews')
-def userReviews():
+@bp.route('/userReviews/<int:user_id>')
+def userReviews(user_id):
     seller_status = 0
     if current_user.is_authenticated:
         seller_status = User.sellerStatus(current_user.id)
     # get all product reviews user has made:
-    productReviews = userProductReview.get('5') #CHANGE '5' TO CURRENT USER ID
-    sellerReviews = userSellerReview.get('5') #CHANGE '5' TO CURRENT USER ID
+    productReviews = userProductReview.get(current_user.id) 
+    # get all seller reviews user has made:
+    sellerReviews = userSellerReview.get(current_user.id) 
     # render the page by adding information to the index.html file
     return render_template('userReviews.html',
                            userProductReviews=productReviews, userSellerReviews=sellerReviews, seller_status=seller_status)
 
-
-@bp.route('/sellerReviews')
-def sellerReviews():
+    
+@bp.route('/sellerReviews/<int:sel_id>')
+def sellerReviews(sel_id):
     seller_status = 0
     if current_user.is_authenticated:
         seller_status = User.sellerStatus(current_user.id)
     # get all reviews for given seller:
-    summary = sellerReviewSummary.get('2') #CHANGE '2' TO SELECTED SELLER ID
-    reviews = sellerReview.get('2') #CHANGE '2' TO SELECTED SELLER ID
+    summary = sellerReviewSummary.get(sel_id) 
+    reviews = sellerReview.get(sel_id) 
     # render the page by adding information to the index.html file
     return render_template('sellerSummaryReviews.html',
                            sellerReviewSummary=summary, sellerReviews=reviews, seller_status=seller_status)
   
-   
-@bp.route('/productReviews')
-def productReviews():
+    
+@bp.route('/productReviews/<int:sel_id>/<int:prod_id>')
+def productReviews(sel_id, prod_id):
     seller_status = 0
     if current_user.is_authenticated:
         seller_status = User.sellerStatus(current_user.id)
     # get all reviews for given seller:
-    summary = productReviewSummary.get('2') #CHANGE '2' TO SELECTED PRODUCT ID
-    reviews = productReview.get('2') #CHANGE '2' TO SELECTED PRODUCT ID
+    summary = productReviewSummary.get(prod_id, sel_id) 
+    reviews = productReview.get(prod_id, sel_id) 
     # render the page by adding information to the index.html file
     return render_template('productSummaryReviews.html',
                            productReviewSummary=summary, productReviews=reviews, seller_status=seller_status)
 
-class EditReviewForm(FlaskForm):
+class ReviewForm(FlaskForm):
     numStars= StringField(_l('Number of Stars'), validators=[DataRequired()])
     description = StringField(_l('Review'), validators=[DataRequired()])
+    image1 = StringField(_l('Image 1 URL (optional)'))
+    image2 = StringField(_l('Image 2 URL (optional)'))
+    image3 = StringField(_l('Image 3 URL (optional)'))
     submit = SubmitField(_l('Submit'))
 
-@bp.route('/editReview', methods=['GET', 'POST'])
-def editReview():
+
+"""
+Edit seller review 
+parameters: id is seller_id
+"""
+@bp.route('/editSellerReview/<int:id>', methods=['GET', 'POST'])
+def editSellerReview(id):
     seller_status = User.sellerStatus(current_user.id)
-    form = EditReviewForm()
+    form = ReviewForm()
     if form.validate_on_submit():
-        print("hi")
-        userProductReview.update_product_review('5', '1', form.numStars.data, '10/20/21 0:00', form.description.data)
-        userSellerReview.update_seller_review('5', '2', form.numStars.data, '10/20/21 0:00', form.description.data)
-        flash('Review has been updated')
-        return redirect(url_for('users.userReviews'))
+        date = datetime.now()
+        userSellerReview.update_seller_review(current_user.id, id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
+        return redirect(url_for('users.userReviews', user_id=current_user.id))
     # render the page by adding information to the index.html file
     return render_template('editReview.html', title='Edit Review', form=form, seller_status=seller_status)
-   
-   
+
+"""
+Edit product review 
+"""
+@bp.route('/editProductReview/<int:prod_id>/<int:sel_id>', methods=['GET', 'POST'])
+def editProductReview(prod_id, sel_id):
+    seller_status = User.sellerStatus(current_user.id)
+    form = ReviewForm()
+    if form.validate_on_submit():
+        date = datetime.now()
+        userProductReview.update_product_review(current_user.id, prod_id, sel_id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
+        return redirect(url_for('users.userReviews', user_id=current_user.id))
+    # render the page by adding information to the index.html file
+    return render_template('editReview.html', title='Edit Review', form=form, seller_status=seller_status)
+
+"""
+Delete product review 
+"""
+@bp.route('/deleteProductReview/<int:prod_id>/<int:sel_id>', methods=['GET', 'POST'])
+def deleteProductReview(prod_id, sel_id):
+    userProductReview.delete_product_review(current_user.id, prod_id, sel_id) 
+    return redirect(url_for('users.userReviews', user_id=current_user.id))
+
+"""
+Delete seller review 
+parameters: id is seller_id
+"""
+@bp.route('/deleteSellerReview/<int:id>', methods=['GET', 'POST'])
+def deleteSellerReview(id):
+    userSellerReview.delete_seller_review(current_user.id, id) 
+    return redirect(url_for('users.userReviews', user_id=current_user.id))
+
+#Delete product review with specified id
+@bp.route('/submitProductReview/<int:sel_id>/<int:prod_id>', methods=['GET', 'POST'])
+def submitProductReview(sel_id, prod_id):
+    form = ReviewForm()
+    if form.validate_on_submit():
+        date = datetime.now()
+        userProductReview.submit_product_review(current_user.id, prod_id, sel_id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
+        return redirect(url_for('users.login'))
+    return render_template('submitReview.html', title='Submit Review', form=form)
+
+#Delete seller review with specified id
+@bp.route('/submitSellerReview/<int:sel_id>', methods=['GET', 'POST'])
+def submitSellerReview(sel_id):
+    form = ReviewForm()
+    if form.validate_on_submit():
+        date = datetime.now()
+        userSellerReview.submit_seller_review(current_user.id, sel_id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
+        return redirect(url_for('users.login'))
+    return render_template('submitReview.html', title='Submit Review', form=form)
+
+
+"""
+Upvote product review 
+"""
+@bp.route('/upvoteProductReview/<int:buyer_id>/<int:prod_id>/<int:sel_id>/<int:upvotes>', methods=['GET', 'POST'])
+def upvoteProductReview(buyer_id, prod_id, sel_id, upvotes):
+    user_id = buyer_id 
+    product_id = prod_id
+    seller_id = sel_id
+    upvotes = upvotes
+    userProductReview.upvote_product_review(user_id, product_id, seller_id, upvotes)
+    summary = productReviewSummary.get(product_id, seller_id)
+    reviews = productReview.get(product_id, seller_id) 
+    return render_template('productSummaryReviews.html',
+                           productReviewSummary=summary, productReviews=reviews)
+
+
+"""
+Upvote seller review 
+"""
+@bp.route('/upvoteSellerReview/<int:buyer_id>/<int:sel_id>/<int:upvotes>', methods=['GET', 'POST'])
+def upvoteSellerReview(buyer_id, sel_id, upvotes):
+    user_id = buyer_id
+    seller_id = sel_id
+    upvotes = upvotes
+    userSellerReview.upvote_seller_review(user_id, seller_id, upvotes)
+    summary = sellerReviewSummary.get(seller_id) 
+    reviews = sellerReview.get(seller_id) 
+    return render_template('sellerSummaryReviews.html',
+                           sellerReviewSummary=summary, sellerReviews=reviews)

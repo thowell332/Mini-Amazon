@@ -175,24 +175,28 @@ def gen_Reviews(num_reviews, purchases, items_sold):
                 seller_id = purchase[1]
                 product_id = purchase[2]
                 item_id = purchase[3]
-                for items in items_sold:
-                    if items[1] == product_id and items[2] == item_id:
-                        seller_id = items[0]
+                #for items in items_sold:
+                    #if items[1] == product_id and items[2] == item_id:
+                        #seller_id = items[0]
                 num_stars1 = fake.random_int(min=0, max=5)
                 num_stars2 = fake.random_int(min=0, max=5)
                 date1 = fake.date_time()
                 date2 = fake.date_time()
                 description1 = fake.paragraph(nb_sentences=5)
                 description2 = fake.paragraph(nb_sentences=5)
-                seller_writer.writerow([buyer_id, seller_id, num_stars1, date1, description1])
-                product_writer.writerow([buyer_id, product_id, num_stars2, date2, description2])
+                upvotes1 = fake.random_int(min=0, max=10000)
+                upvotes2 = fake.random_int(min=0, max=10000)
+                images1 = {fake.image_url(), fake.image_url(), fake.image_url()}
+                images2 = {fake.image_url(), fake.image_url(), fake.image_url()}
+                
+                seller_writer.writerow([buyer_id, seller_id, num_stars1, date1, description1, upvotes1, images1])
+                product_writer.writerow([buyer_id, product_id, seller_id, num_stars2, date2, description2, upvotes2, images2])
                 reviews.append(buyer_id)
             print(f'{num_reviews} Reviews generated')
     return
 
 def gen_cart(num_carts, num_accounts, items_sold):
     print('items sold')
-    print(items_sold)
     with open('Cart.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Cart...', end=' ', flush=True)
@@ -213,7 +217,7 @@ def gen_cart(num_carts, num_accounts, items_sold):
         print(f'{num_carts} carts generated')
     return
 
-#gen_accounts(num_accounts)
+gen_accounts(num_accounts)
 sellers = gen_sellers(num_sellers)
 categories = gen_categories(num_categories)
 available_pids = gen_products(num_products, categories)

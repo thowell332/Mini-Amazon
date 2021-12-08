@@ -3,26 +3,51 @@
 {% block content %}
 
 <br><br>
-
+<h1> User Reviews</h1>
 <h2>User Reviews for Products:</h2>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
+      <th scope="col">Upvotes</th>
       <th scope="col">Product ID</th>
+      <th scope="col">Product Name</th>
+      <th scope="col">Seller ID</th>
+      <th scope="col">Seller Name</th>
       <th scope="col">Number of Stars</th>
       <th scope="col">Date</th>
       <th scope="col">Review</th>
+
 
     </tr>
   </thead>
   <tbody>
     {% for product_review in userProductReviews%}
       <tr>
+        <th scope="row">{{product_review.upvotes}}</th>
+        <input type="hidden" name="upvotes" value="{{product_review.upvotes}}" /> 
         <th scope="row">{{product_review.product_id}}</th>
+        <input type="hidden" name="product_id" value="{{product_review.product_id}}" />
+        <th scope="row">{{product_review.product_name}}</th>
+        <input type="hidden" name="product_name" value="{{product_review.product_name}}" />
+        <th scope="row">{{product_review.seller_id}}</th>
+        <input type="hidden" name="seller_id" value="{{product_review.seller_id}}" />
+        <td>{{product_review.seller_name}}</td>
+        <input type="hidden" name="seller_name" value="{{product_review.seller_name}}" />
         <td>{{product_review.num_stars}}</td>
+        <input type="hidden" name="num_stars" value="{{product_review.num_stars}}" />
         <td>{{product_review.date}}</td>
+        <input type="hidden" name="date" value="{{product_review.date}}" />
         <td>{{product_review.description}}</td>
-        <th> <a class="btn btn-secondary" href="{{ url_for('users.editReview')}}" role="button">Edit</a></th>
+        <input type="hidden" name="description" value="{{product_review.description}}" />
+        <th> <a class="btn btn-secondary" href="{{ url_for('users.editProductReview', prod_id = product_review["product_id"], sel_id = product_review["seller_id"])}}" role="button">Edit</a></th>
+        <th> <a class="btn btn-secondary" href="{{ url_for('users.deleteProductReview', prod_id = product_review["product_id"], sel_id = product_review["seller_id"])}}" role="button">Delete</a></th>
+      </tr>
+      <tr>
+        {% for imageURL in product_review.images%}
+        {% if imageURL != "" %}
+        <td><img src="{{imageURL}}" width="200"></td>
+        {% endif %}
+        {% endfor %}
       </tr>
     {% endfor %}
   </tbody>
@@ -32,7 +57,9 @@
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
+      <th scope="col">Upvotes</th>
       <th scope="col">Seller ID</th>
+      <th scope="col">Seller Name</th>
       <th scope="col">Number of Stars</th>
       <th scope="col">Date</th>
       <th scope="col">Review</th>
@@ -42,11 +69,27 @@
   <tbody>
     {% for seller_review in userSellerReviews%}
       <tr>
+        <th scope="row">{{seller_review.upvotes}}</th>
+        <input type="hidden" name="upvotes" value="{{seller_review.upvotes}}" />
         <th scope="row">{{seller_review.seller_id}}</th>
+        <input type="hidden" name="seller_id" value="{{seller_review.seller_id}}" />
+        <td>{{seller_review.name}}</td>
+        <input type="hidden" name="name" value="{{seller_review.name}}" />
         <td>{{seller_review.num_stars}}</td>
+        <input type="hidden" name="num_stars" value="{{seller_review.num_stars}}" />
         <td>{{seller_review.date}}</td>
+        <input type="hidden" name="date" value="{{seller_review.date}}" />
         <td>{{seller_review.description}}</td>
-        <th> <a class="btn btn-secondary" href="{{ url_for('users.editReview')}}" role="button">Edit</a></th>
+        <input type="hidden" name="description" value="{{seller_review.description}}" />
+        <th> <a class="btn btn-secondary" href="{{ url_for('users.editSellerReview', id = seller_review["seller_id"])}}" role="button">Edit</a></th>
+        <th> <a class="btn btn-secondary" href="{{ url_for('users.deleteSellerReview', id = seller_review["seller_id"])}}" role="button">Delete</a></th>
+      </tr>
+      <tr>
+        {% for imageURL in seller_review.images%}
+        {% if imageURL != "" %}
+        <td><img src="{{imageURL}}" width="200"></td>
+        {% endif %}
+        {% endfor %}
       </tr>
     {% endfor %}
   </tbody>
