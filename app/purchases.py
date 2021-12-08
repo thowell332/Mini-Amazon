@@ -41,4 +41,4 @@ def individual_purchase(purchase_id):
     total_price_paid = Purchase._get_total_purchase_cost(current_user.id, purchase_id)
     total_price_paid = ('%.2f'%total_price_paid)
 
-    return render_template('individualPurchase.html', purchase_id=purchase_id, purchase_entries=purchase_entries, total_price_paid = total_price_paid)
+    return render_template('individualPurchase.html', purchase_id=purchase_id, purchase_entries=purchase_entries, total_price_paid=total_price_paid)

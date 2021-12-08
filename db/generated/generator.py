@@ -10,10 +10,12 @@ num_products_per_seller = 100
 num_items_per_seller = 10
 num_purchases = 500
 num_reviews = 500
-num_carts = 100
+num_carts = 80
 
 Faker.seed(0)
 fake = Faker()
+
+fake_image_URLs = ['https://via.placeholder.com/400', 'https://picsum.photos/400', 'http://placekitten.com/400/400', ]
 
 def get_csv_writer(f):
     return csv.writer(f, dialect='unix')
@@ -82,7 +84,7 @@ def gen_products(num_products, cat):
             name = fake.unique.sentence(nb_words=4)[:-1]
             owner_id = fake.random_element(elements=sellers)
             description = fake.text(max_nb_chars=128)
-            image = fake.image_url()
+            image = fake.random_element(elements=fake_image_URLs)
             category = fake.random_element(elements=cat)
             writer.writerow([owner_id, description, name, image, category])
             available_pids.append(pid+1)
