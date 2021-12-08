@@ -61,41 +61,16 @@ WHERE category LIKE :category
     # @return- a list of products with all of the necessary details to display on the product page.
     @staticmethod
     def get_product_display_page(product_id, sort):
-        rows = app.db.execute('''WITH
-    ProductTable(product_id, seller_id, description, name, image, category, price, quantity) AS (SELECT p.product_id, sp.seller_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id)
-    FROM Product p, SellsProduct sp, SellsItem si
-    WHERE p.product_id = :product_id
-    AND sp.product_id = :product_id
-    AND si.product_id = :product_id
-    AND sp.seller_id = si.seller_id
-    GROUP BY p.product_id, sp.seller_id, sp.price
-    ORDER BY {0} DESC),
-    
-    ReviewTable(review_product_id, review_seller_id, review_averagerating) AS 
-    (SELECT product_id, seller_id, AVG(num_stars)
-    FROM ProductReview
-    GROUP BY product_id, seller_id),
-    
-    FullTable(product_id, seller_id, description, name, image, category, price, quantity, averagerating) AS 
-    (SELECT * FROM ProductTable
-    LEFT JOIN ReviewTable
-    ON ReviewTable.review_product_id = ProductTable.product_id AND ReviewTable.review_seller_id = ProductTable.seller_id)
-    SELECT product_id, seller_id, description, name, image, category, price, quantity, averagerating FROM FullTable   
-    '''.format(sort), product_id=product_id)
+        rows = app.db.execute('''
+        SELECT p.product_id, sp.seller_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id)
+        FROM Product p, SellsProduct sp, SellsItem si
+        WHERE p.product_id = :product_id
+        AND sp.product_id = :product_id
+        AND si.product_id = :product_id
+        AND sp.seller_id = si.seller_id
+        GROUP BY p.product_id, sp.seller_id, sp.price
+        ORDER BY {0} DESC'''.format(sort), product_id=product_id)
         return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
-
-    # Old not working query for above method:
-    # '''
-    # SELECT p.product_id, p.seller_id, p.description, p.name, p.image, p.category, sp.price, COUNT(si.item_id), AVG(num_stars)
-    # FROM Product p, SellsProduct sp, SellsItem si, ProductReview pr
-    # WHERE p.product_id = :product_id
-    # AND sp.product_id = :product_id
-    # AND si.product_id = :product_id
-    # AND sp.seller_id = si.seller_id
-    # AND pr.seller_id = si.seller_id
-    # AND pr.product_id = :product_id
-    # GROUP BY p.product_id, sp.seller_id, sp.price
-    # ORDER BY {0} DESC)''''.format(sort)
 
     # Method to insert a new product into the database.
     # @param product_id- the product id of the new product.
@@ -162,7 +137,7 @@ RETURNING product_id
 
 # A class to containing all of the information to display a specific product.
 class ProductDisplayPage:
-    def __init__(self, product_id, seller_id, description, name, image, category, price, quantity, num_stars):
+    def __init__(self, product_id, seller_id, description, name, image, category, price, quantity):
         self.product_id = product_id
         self.seller_id = seller_id
         self.description = description
@@ -171,5 +146,4 @@ class ProductDisplayPage:
         self.category = category
         self.price = price
         self.quantity = quantity
-        self.num_stars = num_stars
 

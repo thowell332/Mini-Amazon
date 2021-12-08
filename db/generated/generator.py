@@ -150,7 +150,7 @@ def gen_purchases(num_purchases, pids, sellers, num_users, itemssold):
                 if item[1]==pid:
                     available_items += 1
             item_id = fake.random_int(max=available_items)
-            status = fake.random_int(min=0, max=3)
+            status = fake.random_int(min=0, max=2)
             purchase_id = fake.random_int(min=1, max=num_purchases)
             time_purchased = fake.date_time()
             if pid not in p and item_id != 0:

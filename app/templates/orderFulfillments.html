@@ -32,7 +32,7 @@
     </tr>
   </thead>
   <tbody>
-    {% set statuses = ['ORDERED', 'SHIPPED', 'DELIVERED'] %}  
+    {% set statuses = ['ORDERED', 'SHIPPED', 'FULFILLED'] %}  
     {% for order in orderHistory %}
       <tr>
         <th scope="row">{{order.purchase_id}}</th>

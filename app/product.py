@@ -58,11 +58,11 @@ def product(input, sort):
     
     ## determine how to sort product
     if sort == "quantity-ordered":
-        product = Product.get_product_display_page(input, 'COUNT(si.item_id)')
+        product = Product.get_product_display_page(input, "COUNT(si.item_id)")
     elif sort == "price-ordered":
         product = Product.get_product_display_page(input, "sp.price")
     else:
-        product = Product.get_product_display_page(input, 'sp.seller_id')
+        product = Product.get_product_display_page(input, "sp.seller_id")
     ## if no products being sold, tell user
     if (len(product) == 0):
         return render_template('noProductsBeingSold.html', seller_status=seller_status)

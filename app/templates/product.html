@@ -60,8 +60,6 @@
                         <input type="hidden" name="product_id" value="{{item.product_id}}" /> 
                         <td>{{item.description}}</td>
                         <td>
-                            <h> Number of Stars: </h>{{item.num_stars}}
-                            <input type="hidden" name="num_stars" value="{{item.num_stars}}" />
                             <a class="btn btn-secondary" href="{{ url_for('users.productReviews', sel_id = item["seller_id"], prod_id = item["product_id"])}}" role="button">See Reviews</a>
                             <a class="btn btn-secondary" href="{{ url_for('users.submitProductReview', sel_id = item["seller_id"], prod_id = item["product_id"])}}" role="button">Submit Product Review</a>
                         </td>

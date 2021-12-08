@@ -2,7 +2,7 @@ from flask import current_app as app
 
 # Status is either 0, 1, or 2 in the database.
 # This maps to either "ordered", "shipped", or "fulfilled"
-status_options = ["ORDERED", "SHIPPED", "FULFILLED"]
+status_options = ["ORDERED", "SHIPPED", "DELIVERED"]
 
 # Class used to show each purchase made.
 class PurchaseSummary:
