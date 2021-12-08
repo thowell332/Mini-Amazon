@@ -151,7 +151,7 @@ def editOrderFulfillment(purchase_id, product_id):
     # create edit fulfillment form
     form = EditOrderForm()
     form.item.choices = [(-1, 'All Items')] + [(id, id) for id in itemList]
-    form.status.choices = [(0, 'ORDERED'), (1, 'SHIPPED'), (2, 'DELIVERED')]
+    form.status.choices = [(0, 'ORDERED'), (1, 'SHIPPED'), (2, 'FULFILLED')]
     if form.validate_on_submit():
         ItemFulfillment.update_status(purchase_id, product_id, form.item.data, form.status.data)
         flash('Item fulfillment(s) has been updated')
