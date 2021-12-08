@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Update Your Account Information Here!</h1>
+<p>
+  The form below has been prepopulated with your current account information.
+</p>
+<p>
+  Change whichever field you desire, the rest will remain the same
+</p>
+
+<form action="" method="post">
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.firstname.label }}<br/>
+    {{ form.firstname(size=32) }}<br/>
+    {% for error in form.firstname.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.lastname.label }}<br/>
+    {{ form.lastname(size=32) }}<br/>
+    {% for error in form.lastname.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.email.label }} (Can be a made-up email)<br/>
+    {{ form.email(size=64) }}<br/>
+    {% for error in form.email.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.address.label }} (Can be a made-up address)<br/>
+    {{ form.address(size=64) }}<br/>
+    {% for error in form.address.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+
+  <p>{{ form.submit() }}</p>
+</form>
+
+{% endblock %}

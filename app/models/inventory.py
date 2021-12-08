@@ -98,8 +98,12 @@ class InventoryListing:
             ''',
             name=form.name.data
         )
-        product_id = row[0][0] if row is not None else None
+        product_id = row[0][0] if row else None
         
+        # throw error if product name is not in db
+        if product_id is None:
+            return 1
+
         # update SellsProduct with new listing
         try: app.db.execute(
             '''

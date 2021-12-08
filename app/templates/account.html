@@ -5,7 +5,7 @@
 <h1>Welcome to Your Amazon+ Profile!</h1>
     <h2>User ID:</h3>
         <p>
-            {{ user_info.id }}
+            #{{ user_info.id }}
         </p>
     <h2>First Name:</h3>
         <p>
@@ -21,9 +21,17 @@
         </p>
     <h2>Balance:</h3>
         <p>
-            {{ user_info.balance }}
+            ${{ user_info.balance }}
         </p>
     <a class="btn btn-secondary" href="{{ url_for('users.updateProfile') }}" role="button">Update Profile</a>
+    <a class="btn btn-secondary" href="{{ url_for('users.updatePassword') }}" role="button">Update Password</a>
 
+    <h2>Seller Status:</h2>
+    {% if seller_status == 0 %}
+    <p>You are not a Seller</p>
+    <a class="btn btn-secondary" href="{{ url_for('users.becomeSeller') }}" role="button">Become a Seller</a>
+    {% else %}
+    <p>You are a Seller!</p>
+    {% endif %}
 
 {% endblock %}

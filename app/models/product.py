@@ -110,7 +110,20 @@ DELETE FROM Product WHERE product_id = :product_id
         ''', product_id=product_id)
         except Exception as e:
             print(e)
-
+    
+    # Method to retrieve all of the products owned by a seller
+    # @param seller_id- the id of the seller
+    @staticmethod
+    def get_seller_products(seller_id):
+        rows = app.db.execute(
+            '''
+            SELECT product_id, owner_id, description, name, image, category
+            FROM Product
+            WHERE owner_id = :seller_id
+            ''',
+            seller_id=seller_id
+        )
+        return [Product(*row) for row in rows] if rows is not None else None
 
 # A class to containing all of the information to display a specific product.
 class ProductDisplayPage:
