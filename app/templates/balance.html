@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Update Your Balance</h1>
+<h2>Enter the number of dollars you want to withdraw or deposit into your account.</h2>
+<h2>Your Current Balance Is:</h2>
+<p>
+  {{ curr_balance }}
+</p>
+
+<form action="" method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.withdraw.label }}<br/>
+    {{ form.withdraw(size=32) }}<br/>
+    {% for error in form.withdraw.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.deposit.label }}<br/>
+    {{ form.deposit(size=32) }}<br/>
+    {% for error in form.deposit.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+  </p>
+  {{ form.submit(class_="btn btn-black") }}
+</form>
+
+{% endblock %}
