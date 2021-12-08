@@ -2,6 +2,7 @@
 
 {% block content %}
 
+<!-- Show your profile information including user_id, name, address, and balance -->
 <h1>Welcome to Your Amazon+ Profile!</h1>
     <h2>User ID:</h3>
         <p>
@@ -23,17 +24,25 @@
         <p>
             ${{ user_info.balance }}
         </p>
+        <!-- button to take user's to their reviews' page -->
         <p>
             <th> <a class="btn btn-secondary" href="{{ url_for('users.userReviews', user_id = user_info.id)}}" role="button">Your Reviews</a></th>
         </p>
+    <!-- button for users to update their profile -->
     <a class="btn btn-secondary" href="{{ url_for('users.updateProfile') }}" role="button">Update Profile</a>
+    <!-- button for users to update their password -->
     <a class="btn btn-secondary" href="{{ url_for('users.updatePassword') }}" role="button">Update Password</a>
+    <!-- button for users to update their balance -->
     <a class="btn btn-secondary" href="{{ url_for('users.updateBalance') }}" role="button">Update Balance</a>
 
+    <!-- show a user's seller status -->
     <h2>Seller Status:</h2>
+    <!-- if the user is not a seller -->
     {% if seller_status == 0 %}
     <p>You are not a Seller</p>
+    <!-- button for user to become a seller -->
     <a class="btn btn-secondary" href="{{ url_for('users.becomeSeller') }}" role="button">Become a Seller</a>
+    <!-- if a user is a seller, display "You are a seller" -->
     {% else %}
     <p>You are a Seller!</p>
     {% endif %}
