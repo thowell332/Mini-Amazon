@@ -15,25 +15,60 @@ from flask import Blueprint
 bp = Blueprint('users', __name__)
 
 
-class LoginForm(FlaskForm):
-    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
-    password = PasswordField(_l('Password'), validators=[DataRequired()])
-    remember_me = BooleanField(_l('Remember Me'))
-    submit = SubmitField(_l('Sign In'))
-
 @bp.route('/profile', methods=['GET', 'POST'])
 def profile():
     user_info = User.get(current_user.id)
-    return render_template('account.html', title = 'Profile', user_info = user_info)
+    seller_status = User.sellerStatus(current_user.id)
+    return render_template('account.html', title = 'Profile', user_info = user_info, seller_status = seller_status)
+
+class UpdateProfile(FlaskForm):
+    firstname = StringField(_l('First Name'), validators=[DataRequired()])
+    lastname = StringField(_l('Last Name'), validators=[DataRequired()])
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    address = StringField(_l('Address (Street, Apt #, City, State, Zip)'), validators=[DataRequired()])        
+    submit = SubmitField(_l('Register'))
 
 @bp.route('/updateprofile', methods=['GET', 'POST'])
 def updateProfile():
     user_info = User.get(current_user.id)
-    form = RegistrationForm()
+    form = UpdateProfile(obj = user_info)
+    if form.validate_on_submit():
+        if User.updateProfile(user_info.id, 
+                                form.email.data, 
+                                form.firstname.data, 
+                                form.lastname.data, 
+                                form.address.data):
+            flash('Congratulations, you have updated your account information!')
+            return redirect(url_for('users.profile'))
+    return render_template('updateProfile.html', title='Update Profile', form=form)
+
+class UpdatePassword(FlaskForm):
+    password = PasswordField(_l('New Password'), validators=[DataRequired()])
+    password2 = PasswordField(_l('Confirm New Password'), validators=[DataRequired(), EqualTo('password')])           
+    submit = SubmitField(_l('Update'))
+
+@bp.route('/updatepassword', methods=['GET', 'POST'])
+def updatePassword():
+    form = UpdatePassword()
+    if form.validate_on_submit():
+        if User.updatePassword(current_user.id, form.password.data):
+            flash('Congratulations, you have successfully updated your password!')
+            return redirect(url_for('users.profile'))
+    return render_template('updatePassword.html', title='Update Password', form=form)
+
+@bp.route('/becomeseller', methods=['GET','POST'])
+def becomeSeller():
+    if User.becomeSeller(current_user.id):
+        flash('Congratuations, you have successfully become a seller!')
+        return redirect(url_for('users.profile'))
+    else:
+        flash('Something went wrong, please try again!')
+        return redirect(url_for('users.profile'))
+
 
 class BalanceForm(FlaskForm):
-    withdraw = FloatField(_l('How much do you want to withdraw'))
-    deposit = FloatField(_l('How much do you want to deposit'))
+    withdraw = FloatField(_l('How much do you want to withdraw'), default = 0)
+    deposit = FloatField(_l('How much do you want to deposit'), default = 0)
     submit = SubmitField(_l('Update'))
 
 @bp.route('/updatebalance', methods=['GET', 'POST'])
@@ -51,6 +86,11 @@ def updateBalance():
             return redirect(url_for('users.profile'))
     return render_template('balance.html', title='Balance', form=form, curr_balance=curr_balance)
         
+class LoginForm(FlaskForm):
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    password = PasswordField(_l('Password'), validators=[DataRequired()])
+    remember_me = BooleanField(_l('Remember Me'))
+    submit = SubmitField(_l('Sign In'))
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
