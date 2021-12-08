@@ -17,10 +17,7 @@ per_page = 10
 # @return- the page displaying the product(s) with product_id = @param input.
 @bp.route('/product<input>/<sort>', methods=['GET', 'POST'])
 def product(input, sort):
-    search = False
-    q = request.args.get('q')
-    if q:
-        search = True
+    
     page = request.args.get(get_page_parameter(), type=int, default=1)
     start = (page - 1) * per_page
     
@@ -67,5 +64,5 @@ def product(input, sort):
     ## display products being sold
     else:
         productid = product[0].product_id
-        pagination = Pagination(page=page, per_page=per_page, total=len(product), search=search, record_name='products')
+        pagination = Pagination(page=page, per_page=per_page, total=len(product), record_name='products')
         return render_template('product.html', product=product[start: start + per_page], productid=productid, pagination=pagination)

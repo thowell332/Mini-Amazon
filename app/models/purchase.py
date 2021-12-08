@@ -11,7 +11,7 @@ class PurchaseSummary:
         self.status = status_options[status]
 
 class PurchaseEntry:
-    def __init__(self, product_name, product_image, seller_first_name, seller_last_name, seller_id, quantity, unit_price, status):
+    def __init__(self, product_name, product_image, seller_first_name, seller_last_name, seller_id, quantity, status, unit_price):
         self.product_name = product_name
         self.product_image = product_image
         self.seller_name = seller_first_name + ' ' + seller_last_name
@@ -20,7 +20,7 @@ class PurchaseEntry:
         self.unit_price = unit_price
         # Round the price to avoid floating point errors.
         self.total_price = round(quantity * unit_price, 2)
-        self.status = status
+        self.status = status_options[status]
 
 class Purchase:
 

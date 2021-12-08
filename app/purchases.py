@@ -13,11 +13,7 @@ bp = Blueprint('purchases', __name__)
 
 @bp.route('/purchases', methods=['GET', 'POST'])
 def purchases():
-
-    search = False
-    q = request.args.get('q')
-    if q:
-        search = True
+ 
     page = request.args.get(get_page_parameter(), type=int, default=1)
     per_page = 10
     start = (page - 1) * per_page
@@ -26,9 +22,8 @@ def purchases():
         return redirect(url_for('users.login'))
 
     past_purchases = Purchase._get_purchases(current_user.id)
-    print(past_purchases)
         
-    pagination = Pagination(page=page, per_page=per_page, total=len(past_purchases), search=search, record_name='products')
+    pagination = Pagination(page=page, per_page=per_page, total=len(past_purchases), record_name='products')
     return render_template('purchases.html', purchases=past_purchases[start: start + per_page], pagination=pagination)
 
 @bp.route('/individual-purchase<purchase_id>', methods=['GET', 'POST'])
