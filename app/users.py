@@ -35,7 +35,7 @@ class UpdateProfile(FlaskForm):
     lastname = StringField(_l('Last Name'), validators=[DataRequired()])
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
     address = StringField(_l('Address (Street, Apt #, City, State, Zip)'), validators=[DataRequired()])        
-    submit = SubmitField(_l('Register'))
+    submit = SubmitField(_l('Update'))
 
 @bp.route('/updateprofile', methods=['GET', 'POST'])
 def updateProfile():

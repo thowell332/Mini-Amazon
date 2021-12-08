@@ -18,7 +18,6 @@ class User(UserMixin):
     @staticmethod
     def get_by_auth(email, password):
         rows = app.db.execute("""SELECT * FROM Account WHERE email = :email""", email=email)
-        print(rows[0])
         if not rows:  # email not found
             return None
         elif not check_password_hash(rows[0][-1], password):
