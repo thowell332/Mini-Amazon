@@ -30,7 +30,7 @@ class OrderHistory:
     def get_search_results(seller_id, search_field, search_criteria):
         search_criteria = "'%" + search_criteria + "%'"
         if search_field == 'buyer_name':
-            search = 'a.firstname ILIKE ' + search_criteria + ' OR a.lastname ILIKE ' + search_criteria
+            search = '(a.firstname ILIKE ' + search_criteria.replace(" ", "'%'") + ' OR a.lastname ILIKE ' + search_criteria + ')'
         else:
             search = search_field + ' ILIKE ' + search_criteria
         rows = app.db.execute(
@@ -39,15 +39,16 @@ class OrderHistory:
             a.address, pu.date, COUNT(pu.item_id) as quantity, MIN(pu.status) as status
             FROM Purchase pu, Account a, Product pr
             WHERE pu.seller_id = :seller_id AND a.account_id = pu.buyer_id
-            AND pr.product_id = pu.product_id AND 
+            AND pr.product_id = pu.product_id AND
             ''' + search +
             '''
             GROUP BY pu.purchase_id, a.firstname, a.lastname, a.address, pu.date
-            ORDER BY p.date DESC;
+            ORDER BY pu.date DESC;
             ''',
             seller_id=seller_id,
             search=search
         )
+        print(rows)
         return [OrderHistory(*row) for row in rows] if rows is not None else None
     
     @staticmethod
