@@ -132,8 +132,11 @@ class ItemFulfillment:
             try: app.db.execute(
                 '''
                 UPDATE Purchase SET status = :status
-                WHERE item_id = :item_id;
+                WHERE purchase_id = :purchase_id AND product_id = :product_id
+                AND item_id = :item_id;
                 ''',
+                purchase_id=purchase_id,
+                product_id=product_id,
                 item_id=item_id,
                 status=status
             )
