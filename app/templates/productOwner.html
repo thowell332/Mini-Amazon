@@ -6,6 +6,7 @@
 <h2>My Products</h2>
 {{pagination.info}}
 {{pagination.links}}
+{#    Table to show all of an owner's products. #}
 <table id="product-table" class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
@@ -19,8 +20,12 @@
       <tr>
         <th scope="row">{{product.name}}</th>
         <td>{{product.description}}</td>
-        <th> 
-            <a class="btn btn-secondary" href="" role="button">Edit</a>
+        <th>
+{#            Button to edit an owner's product.#}
+            <a href="{{ url_for("newProduct.editProduct", input=product.product_id) }}"><input type="submit" name="edit_product_button" value="Edit Product"rel="tooltip" class="btn btn-info">
+                <i class="material-icons"></i>
+                </input>
+            </a>
         </th>
       </tr>
     {% endfor %}
@@ -28,6 +33,7 @@
 </table>
 {{pagination.links}}
 <br/>
+{#    Button to add a new product.#}
 <a class="btn btn-secondary mb-5" href="{{ url_for('newProduct.addNewProduct') }}" role="button">Add New Product</a>
 
 

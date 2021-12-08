@@ -68,12 +68,15 @@ WHERE category LIKE :category
     AND sp.product_id = :product_id
     AND si.product_id = :product_id
     AND sp.seller_id = si.seller_id
-    AND pr.product_id = :product_id 
-    AND pr.seller_id = si.seller_id
+
     GROUP BY p.product_id, sp.seller_id, sp.price
     ORDER BY {0} DESC
     '''.format(sort), product_id=product_id)
         return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
+
+    # the below two lines are supposed to go in the empty line of the query above, but break it currently.
+    # AND pr.product_id = :product_id
+    # AND pr.seller_id = si.seller_id
 
     # Method to insert a new product into the database.
     # @param product_id- the product id of the new product.
@@ -82,37 +85,48 @@ WHERE category LIKE :category
     # @param name- the name of the product.
     # @param image- the image string of the product.
     # @param category- the category the product belongs to.
-    # @return- the product id that has been inserted.
+    # @return- 1 should the product be inserted.
     @staticmethod
-    def insert_new_product(product_id, owner_id, description, name, image, category):
-        try:
-            app.db.execute("""
-INSERT INTO Product(product_id, owner_id, description, name, image, category)
-VALUES(:product_id, :owner_id, :description, :name, :image, :category)
-RETURNING product_id
+    def insert_new_product(owner_id, description, name, image, category):
+        app.db.execute("""
+INSERT INTO Product(owner_id, description, name, image, category)
+VALUES(:owner_id, :description, :name, :image, :category)
+RETURNING name
 """,
-                                  product_id=product_id,
                                   owner_id=owner_id,
                                   description=description,
                                   name=name,
                                   image=image,
                                   category=category)
-            return product_id
-        except Exception as e:
-            print(e)
-            return None
+        return 1
 
     # Method to delete a product from a database.
     # @param product_id- the product id of the product to be deleted.
+    # @return- 1 should the product be deleted.
     @staticmethod
     def delete_product(product_id):
-        try:
-            app.db.execute('''
+        app.db.execute('''
 DELETE FROM Product WHERE product_id = :product_id
+RETURNING product_id
         ''', product_id=product_id)
-        except Exception as e:
-            print(e)
-    
+        return 1
+
+    # Method to update a product record in the database.
+    # @param product_id- the new product id of the product being updated.
+    # @param description- the new description of the product being updated.
+    # @param name- the new name of the product being updated.
+    # @param category- the new category of the product being updated.
+    # @return- 1 should the product be updated.
+    @staticmethod
+    def update_product(product_id, description, name, image, category):
+        app.db.execute('''
+            UPDATE Product
+            SET description = :description, name = :name, image = :image, category = :category
+            WHERE product_id = :product_id
+            RETURNING :product_id
+            ''', product_id=product_id, description=description, name=name, image=image, category=category)
+        return 1
+
     # Method to retrieve all of the products owned by a seller
     # @param seller_id- the id of the seller
     @staticmethod
