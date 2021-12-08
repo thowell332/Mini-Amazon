@@ -2,13 +2,16 @@
 
 {% block content %}
 
+
 <h1>Update Your Balance</h1>
 <h2>Enter the number of dollars you want to withdraw or deposit into your account.</h2>
 <h2>Your Current Balance Is:</h2>
+<!-- show current balance -->
 <p>
   ${{ curr_balance }}
 </p>
 
+<!-- form for updating current balance -->
 <form action="" method="post" novalidate>
   {{ form.hidden_tag() }}
   <p>

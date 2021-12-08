@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<!-- mini amazon header -->
 <head>
   <title>Mini Amazon</title>
   <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
@@ -22,9 +22,9 @@
             </input>
         </a>
       <div style="color: aliceblue; text-align: right; margin-bottom: 25px">
-        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('index.index') }}" type="button" class="btn btn-dark">Home</a>
+          {% if current_user.is_authenticated %}
           Hello {{current_user.firstname}}!
-            <a href="{{ url_for('index.index') }}" type="button" class="btn btn-dark">Home</a>
             <a href="{{ url_for('users.profile') }}" type="button" class="btn btn-dark">Your Profile</a>
           <a href="{{ url_for('users.userPublicView') }}" type="button" class="btn btn-dark">Users</a>
           <a href="{{ url_for('cart.cart') }}" type="button" class="btn btn-dark">Cart</a>
