@@ -7,12 +7,12 @@
 <form action="{{ url_for('orderFulfillments.orderFulfillments') }}" method="post">
   <select name="search_field">
     <option value="buyer_name">Buyer Name</option>
-    <option value="a.address">Buyer Address</option>
-    <option value="pr.name">Product Name</option>
-    <option value="pr.description">Product Description</option>
+    <option value="buyer_address">Buyer Address</option>
+    <option value="product_name">Product Name</option>
+    <option value="product_description">Product Description</option>
   </select>
   contains: 
-  <input type="text" name="search_criteria" value="{{search_criteria}}">
+  <input type="text" name="search_criteria" value=" ">
   <input type="submit" value="Search Fulfillment History">
 </form>
 
