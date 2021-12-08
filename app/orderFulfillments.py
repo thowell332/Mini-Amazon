@@ -33,7 +33,7 @@ def orderFulfillments():
     page = request.args.get(get_page_parameter(), type=int, default=1)
     start = (page - 1) * per_page
     orderHistory = OrderHistory.get(current_user.id)
-    pagination = Pagination(page=page, per_page=per_page, total=len(orderHistory), search=search, record_name='orderHistory')
+    pagination = Pagination(page=page, per_page=per_page, total=len(orderHistory), search=search, record_name='orders')
     # render the page by adding information to the index.html file
     return render_template('orderFulfillments.html', orderHistory=orderHistory[start: start + per_page], pagination=pagination)
 
@@ -46,7 +46,7 @@ def orderFulfillmentSearch(search_field, search_criteria):
     page = request.args.get(get_page_parameter(), type=int, default=1)
     start = (page - 1) * per_page
     orderHistory = OrderHistory.get_search_results(current_user.id, search_field, search_criteria)
-    pagination = Pagination(page=page, per_page=per_page, total=len(orderHistory), search=search, record_name='orderHistory')
+    pagination = Pagination(page=page, per_page=per_page, total=len(orderHistory), search=search, record_name='orders')
     return render_template(
         'orderFulfillments.html',
         orderHistory=orderHistory[start: start + per_page], 
@@ -65,7 +65,7 @@ def orderFulfillmentDetails(purchase_id):
     start = (page - 1) * per_page
     purchase = OrderHistory.get_purchase(purchase_id)
     fulfillment = OrderFulfillment.get_order_fulfillment(purchase_id)
-    pagination = Pagination(page=page, per_page=per_page, total=len(fulfillment), search=search, record_name='fulfillment')
+    pagination = Pagination(page=page, per_page=per_page, total=len(fulfillment), search=search, record_name='products')
     # render the page by adding information to the index.html file
     return render_template(
         'orderFulfillmentDetails.html', 
@@ -92,7 +92,7 @@ def editOrderFulfillment(purchase_id, product_id):
     # get item fulfillment statuses
     itemFulfillment = ItemFulfillment.get_item_fulfillment(purchase_id, product_id)
     itemList = [item.item_id for item in itemFulfillment]
-    pagination = Pagination(page=page, per_page=per_page, total=len(itemFulfillment), search=search, record_name='itemFulfillment')
+    pagination = Pagination(page=page, per_page=per_page, total=len(itemFulfillment), search=search, record_name='items')
     # create edit fulfillment form
     form = EditOrderForm()
     form.item.choices = [(-1, 'All Items')] + [(id, id) for id in itemList]
