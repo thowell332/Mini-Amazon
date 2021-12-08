@@ -107,8 +107,7 @@ def logout():
     logout_user()
     return redirect(url_for('index.index'))
 
-global currentUser 
-currentUser = current_user.id
+
 global currentProduct
 currentProduct = '37'
 global currentSeller
@@ -117,9 +116,9 @@ currentSeller = '4'
 @bp.route('/userReviews/<int:user_id>')
 def userReviews(user_id):
     # get all product reviews user has made:
-    productReviews = userProductReview.get(currentUser) 
+    productReviews = userProductReview.get(current_user.id) 
     # get all seller reviews user has made:
-    sellerReviews = userSellerReview.get(currentUser) 
+    sellerReviews = userSellerReview.get(currentuser.id) 
     # render the page by adding information to the index.html file
     return render_template('userReviews.html',
                            userProductReviews=productReviews, userSellerReviews=sellerReviews)
@@ -162,8 +161,8 @@ def editSellerReview(id):
     form = ReviewForm()
     if form.validate_on_submit():
         date = datetime.now()
-        userSellerReview.update_seller_review(currentUser, id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
-        return redirect(url_for('users.userReviews', user_id=currentUser))
+        userSellerReview.update_seller_review(current_user.id, id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
+        return redirect(url_for('users.userReviews', user_id=current_user.id))
     # render the page by adding information to the index.html file
     return render_template('editReview.html', title='Edit Review', form=form)
 
@@ -175,8 +174,8 @@ def editProductReview(prod_id, sel_id):
     form = ReviewForm()
     if form.validate_on_submit():
         date = datetime.now()
-        userProductReview.update_product_review(currentUser, prod_id, sel_id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
-        return redirect(url_for('users.userReviews', user_id=currentUser))
+        userProductReview.update_product_review(current_user.id, prod_id, sel_id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
+        return redirect(url_for('users.userReviews', user_id=current_user.id))
     # render the page by adding information to the index.html file
     return render_template('editReview.html', title='Edit Review', form=form)
 
@@ -185,8 +184,8 @@ Delete product review
 """
 @bp.route('/deleteProductReview/<int:prod_id>/<int:sel_id>', methods=['GET', 'POST'])
 def deleteProductReview(prod_id, sel_id):
-    userProductReview.delete_product_review(currentUser, prod_id, sel_id) 
-    return redirect(url_for('users.userReviews', user_id=currentUser))
+    userProductReview.delete_product_review(current_user.id, prod_id, sel_id) 
+    return redirect(url_for('users.userReviews', user_id=current_user.id))
 
 """
 Delete seller review 
@@ -194,8 +193,8 @@ parameters: id is seller_id
 """
 @bp.route('/deleteSellerReview/<int:id>', methods=['GET', 'POST'])
 def deleteSellerReview(id):
-    userSellerReview.delete_seller_review(currentUser, id) #REMOVE HARD CODE
-    return redirect(url_for('users.userReviews', user_id=currentUser))
+    userSellerReview.delete_seller_review(current_user.id, id) #REMOVE HARD CODE
+    return redirect(url_for('users.userReviews', user_id=current_user.id))
 
 #Delete product review with specified id
 @bp.route('/submitProductReview/<int:sel_id>/<int:prod_id>', methods=['GET', 'POST'])
@@ -203,7 +202,7 @@ def submitProductReview(sel_id, prod_id):
     form = ReviewForm()
     if form.validate_on_submit():
         date = datetime.now()
-        userProductReview.submit_product_review(currentUser, prod_id, sel_id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
+        userProductReview.submit_product_review(current_user.id, prod_id, sel_id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
         return redirect(url_for('users.login'))
     return render_template('submitReview.html', title='Submit Review', form=form)
 
@@ -213,7 +212,7 @@ def submitSellerReview(sel_id):
     form = ReviewForm()
     if form.validate_on_submit():
         date = datetime.now()
-        userSellerReview.submit_seller_review(currentUser, sel_id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
+        userSellerReview.submit_seller_review(current_user.id, sel_id, form.numStars.data, str(date), form.description.data, '0', form.image1.data, form.image2.data, form.image3.data) 
         return redirect(url_for('users.login'))
     return render_template('submitReview.html', title='Submit Review', form=form)
 

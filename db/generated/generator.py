@@ -175,9 +175,9 @@ def gen_Reviews(num_reviews, purchases, items_sold):
                 seller_id = purchase[1]
                 product_id = purchase[2]
                 item_id = purchase[3]
-                for items in items_sold:
-                    if items[1] == product_id and items[2] == item_id:
-                        seller_id = items[0]
+                #for items in items_sold:
+                    #if items[1] == product_id and items[2] == item_id:
+                        #seller_id = items[0]
                 num_stars1 = fake.random_int(min=0, max=5)
                 num_stars2 = fake.random_int(min=0, max=5)
                 date1 = fake.date_time()
