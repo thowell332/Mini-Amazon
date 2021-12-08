@@ -3,7 +3,7 @@
 {% block content %}
 
 <br><br>
-<h2>Summary of Reviews for Product:</h2>
+<h2>Summary of Reviews for Product with ID 1</h2>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
@@ -23,6 +23,7 @@
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
+      <th scope="col">Upvotes</th>
       <th scope="col">Buyer ID</th>
       <th scope="col">Number of Stars</th>
       <th scope="col">Date</th>
@@ -33,10 +34,26 @@
   <tbody>
     {% for product_review in productReviews%}
       <tr>
-        <th scope="row">{{product_review.buyer_id}}</th>
+        <td>
+          {{product_review.upvotes}}
+          <a class="btn btn-secondary" href="{{ url_for('users.upvoteProductReview', id = product_review["buyer_id"], upvotes = product_review["upvotes"])}}" role="button">Upvote</a>
+  
+        </td>
+        <input type="hidden" name="upvotes" value="{{product_review.upvotes}}" /> 
+        <td>{{product_review.buyer_id}}</td>
+        <input type="hidden" name="buyer_id" value="{{product_review.buyer_id}}" /> 
         <td>{{product_review.num_stars}}</td>
         <td>{{product_review.date}}</td>
         <td>{{product_review.description}}</td>
+      </tr>
+      <tr>
+        {% for imageURL in product_review.images%}
+        {% if imageURL != "" %}
+        <td><img src="{{imageURL}}" width = 200></td>
+        {% endif %}
+        {% endfor %}
+        
+         
       </tr>
     {% endfor %}
   </tbody>
