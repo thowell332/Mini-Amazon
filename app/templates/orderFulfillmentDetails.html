@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<a class="btn btn-secondary mt-3 mb-3"
+href="{{ url_for('orderFulfillments.orderFulfillments') }}" 
+role="button">Go Back</a>
+
+<br/>
+<h2>Order Information</h2>
+<table class='table table-borderless'>
+  <tbody>
+    <tr>
+        <th scope="row">Order ID</th>
+        <td>{{purchase.purchase_id}}</td>
+    </tr>
+    <tr>
+        <th scope="row">Buyer Name</th>
+        <td>{{purchase.buyer_name}}</td>
+    </tr>
+    <tr>
+        <th scope="row">Buyer Address</th>
+        <td>{{purchase.buyer_address}}</td>
+    </tr>
+    <tr>
+        <th scope="row">Total Quantity</th>
+        <td>{{purchase.quantity}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<br/>
+<h2>Order Fulfillment Details</h2>
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Product Name</th>
+      <th scope="col">Product Description</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% set statuses = ['ORDERED', 'SHIPPED', 'DELIVERED'] %}  
+    {% for product in fulfillment %}
+      <tr>
+        <th scope="row">{{product.product_name}}</th>
+        <td>{{product.product_description}}</td>
+        <td>{{product.quantity}}</td>
+        <td>{{statuses[product.status]}}</td>
+        <th> 
+            <a class="btn btn-secondary" 
+            href="{{ url_for('orderFulfillments.editOrderFulfillment', purchase_id=purchase.purchase_id, product_id=product.product_id) }}" 
+            role="button">View / Update</a>
+        </th>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+{% endblock %}

@@ -34,7 +34,7 @@
     {% for seller_review in sellerReviews%}
       <tr>
         <td>{{seller_review.upvotes}}
-          <a class="btn btn-secondary" href="{{ url_for('users.upvoteSellerReview', id = seller_review["buyer_id"], upvotes = seller_review["upvotes"])}}" role="button" onClick='this.disabled=true'>Upvote</a>
+          <a class="btn btn-secondary" href="{{ url_for('users.upvoteSellerReview', buyer_id = seller_review["buyer_id"], sel_id = seller_review.seller_id, upvotes = seller_review["upvotes"])}}" role="button" onClick='this.disabled=true'>Upvote</a>
         </td>
         <input type="hidden" name="upvotes" value="{{seller_review.upvotes}}" /> 
     

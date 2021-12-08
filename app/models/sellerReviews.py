@@ -18,8 +18,9 @@ WHERE seller_id = :seller_id
 
         
 class sellerReview:
-    def __init__(self, buyer_id, num_stars, date, description, upvotes, images):
+    def __init__(self, buyer_id, seller_id, num_stars, date, description, upvotes, images):
         self.buyer_id = buyer_id
+        self.seller_id = seller_id
         self.num_stars = num_stars
         self.date = date
         self.description = description
@@ -31,17 +32,17 @@ class sellerReview:
     def get(seller_id):
         rows = app.db.execute(
 '''
-SELECT buyer_id, num_stars, date, description, upvotes, images FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
-    FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
+SELECT buyer_id, seller_id, num_stars, date, description, upvotes, images FROM (SELECT buyer_id, seller_id, num_stars, date, description, upvotes, images
+    FROM (SELECT buyer_id, seller_id, num_stars, date, description, upvotes, images
     FROM SellerReview
     WHERE seller_id = :seller_id
     ORDER BY upvotes DESC) AS sortedReviews
     LIMIT 3) AS topThree
 UNION ALL
-(SELECT buyer_id, num_stars, date, description, upvotes, images FROM SellerReview
+(SELECT buyer_id, seller_id, num_stars, date, description, upvotes, images FROM SellerReview
 WHERE seller_id = :seller_id AND NOT EXISTS (
-    SELECT buyer_id, num_stars, date, description, upvotes, images FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
-    FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
+    SELECT buyer_id, seller_id, num_stars, date, description, upvotes, images FROM (SELECT buyer_id, seller_id, num_stars, date, description, upvotes, images
+    FROM (SELECT buyer_id, seller_id, num_stars, date, description, upvotes, images
     FROM SellerReview
     WHERE seller_id = :seller_id
     ORDER BY upvotes DESC) AS sortedReviews

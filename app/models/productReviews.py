@@ -18,8 +18,10 @@ WHERE product_id = :product_id AND seller_id = :seller_id
 
         
 class productReview:
-    def __init__(self, buyer_id, num_stars, date, description, upvotes, images):
+    def __init__(self, buyer_id, product_id, seller_id, num_stars, date, description, upvotes, images):
         self.buyer_id = buyer_id
+        self.product_id = product_id
+        self.seller_id = seller_id
         self.num_stars = num_stars
         self.date = date
         self.description = description
@@ -31,17 +33,17 @@ class productReview:
     def get(product_id, seller_id):
         rows = app.db.execute('''
 
-SELECT buyer_id, num_stars, date, description, upvotes, images FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
-    FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
+SELECT buyer_id, product_id, seller_id, num_stars, date, description, upvotes, images FROM (SELECT buyer_id, product_id, seller_id, num_stars, date, description, upvotes, images
+    FROM (SELECT buyer_id, product_id, seller_id, num_stars, date, description, upvotes, images
     FROM ProductReview
     WHERE product_id = :product_id AND seller_id = :seller_id
     ORDER BY upvotes DESC) AS sortedReviews
     LIMIT 3) AS topThree
 UNION ALL
-(SELECT buyer_id, num_stars, date, description, upvotes, images FROM ProductReview
+(SELECT buyer_id, product_id, seller_id, num_stars, date, description, upvotes, images FROM ProductReview
 WHERE product_id = :product_id AND NOT EXISTS (
-    SELECT buyer_id, num_stars, date, description, upvotes, images FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
-    FROM (SELECT buyer_id, num_stars, date, description, upvotes, images
+    SELECT buyer_id, product_id, seller_id, num_stars, date, description, upvotes, images FROM (SELECT buyer_id, product_id, seller_id, num_stars, date, description, upvotes, images
+    FROM (SELECT buyer_id, product_id, seller_id, num_stars, date, description, upvotes, images
     FROM ProductReview
     WHERE product_id = :product_id AND seller_id = :seller_id
     ORDER BY upvotes DESC) AS sortedReviews

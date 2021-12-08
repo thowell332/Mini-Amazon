@@ -10,7 +10,9 @@
     <tr>
       <th scope="col">Upvotes</th>
       <th scope="col">Product ID</th>
+      <th scope="col">Product Name</th>
       <th scope="col">Seller ID</th>
+      <th scope="col">Seller Name</th>
       <th scope="col">Number of Stars</th>
       <th scope="col">Date</th>
       <th scope="col">Review</th>
@@ -25,8 +27,12 @@
         <input type="hidden" name="upvotes" value="{{product_review.upvotes}}" /> 
         <th scope="row">{{product_review.product_id}}</th>
         <input type="hidden" name="product_id" value="{{product_review.product_id}}" />
+        <th scope="row">{{product_review.product_name}}</th>
+        <input type="hidden" name="product_name" value="{{product_review.product_name}}" />
         <th scope="row">{{product_review.seller_id}}</th>
         <input type="hidden" name="seller_id" value="{{product_review.seller_id}}" />
+        <td>{{product_review.seller_name}}</td>
+        <input type="hidden" name="seller_name" value="{{product_review.seller_name}}" />
         <td>{{product_review.num_stars}}</td>
         <input type="hidden" name="num_stars" value="{{product_review.num_stars}}" />
         <td>{{product_review.date}}</td>
@@ -53,6 +59,7 @@
     <tr>
       <th scope="col">Upvotes</th>
       <th scope="col">Seller ID</th>
+      <th scope="col">Seller Name</th>
       <th scope="col">Number of Stars</th>
       <th scope="col">Date</th>
       <th scope="col">Review</th>
@@ -66,6 +73,8 @@
         <input type="hidden" name="upvotes" value="{{seller_review.upvotes}}" />
         <th scope="row">{{seller_review.seller_id}}</th>
         <input type="hidden" name="seller_id" value="{{seller_review.seller_id}}" />
+        <td>{{seller_review.name}}</td>
+        <input type="hidden" name="name" value="{{seller_review.name}}" />
         <td>{{seller_review.num_stars}}</td>
         <input type="hidden" name="num_stars" value="{{seller_review.num_stars}}" />
         <td>{{seller_review.date}}</td>

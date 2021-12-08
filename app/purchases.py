@@ -26,8 +26,7 @@ def purchases():
         return redirect(url_for('users.login'))
 
     past_purchases = Purchase._get_purchases(current_user.id)
-    for i in range(100):
-        past_purchases.append(PurchaseSummary(i, i, i))
+    print(past_purchases)
         
     pagination = Pagination(page=page, per_page=per_page, total=len(past_purchases), search=search, record_name='products')
     return render_template('purchases.html', purchases=past_purchases[start: start + per_page], pagination=pagination)
@@ -38,11 +37,8 @@ def individual_purchase(purchase_id):
     if not current_user.is_authenticated:
         return redirect(url_for('users.login'))
 
-    purchase_entries = []
-    for i in range(10):
-        purchase_entries.append(PurchaseEntry("Name" + str(i), "https://picsum.photos/400/400", "Eric Doppelt", i, i))
-    price_paid = 69
-    # # If an order is clicked, show it.
-    # for key in request.form.keys():
-        
-    return render_template('individualPurchase.html', purchase_id=purchase_id, purchase_entries=purchase_entries, price_paid = price_paid)
+    purchase_entries = Purchase._get_individual_purchase(current_user.id, purchase_id)
+    total_price_paid = Purchase._get_total_purchase_cost(current_user.id, purchase_id)
+    total_price_paid = ('%.2f'%total_price_paid)
+
+    return render_template('individualPurchase.html', purchase_id=purchase_id, purchase_entries=purchase_entries, total_price_paid=total_price_paid)

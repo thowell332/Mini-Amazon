@@ -5,6 +5,7 @@ from .user import User
 from .sellsItem import SellsItem
 from .purchase import Purchase
 
+# Cart class that contains information needed to visualize a cart entry.
 class Cart:
     def __init__(self, product_id, product_name, product_image, seller_id, seller_first_name, seller_last_name, quantity, unit_price):
         self.product_id = product_id
@@ -14,7 +15,8 @@ class Cart:
         self.seller_name = seller_first_name + ' ' + seller_last_name
         self.quantity = quantity
         self.unit_price = unit_price
-        self.total_price = self.unit_price * self.quantity
+        # Round the price to avoid floating point errors.
+        self.total_price = round(self.unit_price * self.quantity, 2)
 
 # METHODS USED TO QUERY DATA FROM THE CART DATABASE.
 
@@ -309,8 +311,7 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
         date_of_purchase = datetime.now()
 
         # Set the status for purchases 0, meaning the items have been ordered.
-        # TODO: CHANGE TO 0
-        initial_status = "ordered"
+        initial_status = 0
 
         # Purchase all the in stock items.
 
@@ -330,8 +331,8 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
             # Buy one item from inventory for each incremental quantity selected.
             for i in range(entry.quantity):
                 purchased_item = inventory[i]
-                SellsItem._delete_from_sells_item(purchased_item.item_id)
-                Purchase._add_to_purchase(buyer_id, entry.product_id, purchased_item.item_id, purchase_id, initial_status, date_of_purchase)
+                SellsItem._delete_from_sells_item(entry.seller_id, entry.product_id, purchased_item.item_id)
+                Purchase._add_to_purchase(buyer_id, entry.seller_id, entry.product_id, purchased_item.item_id, purchase_id, initial_status, date_of_purchase, entry.unit_price)
 
             # Pay the seller for the items purchased.
             User.update_balance(entry.seller_id, entry.total_price)
@@ -348,6 +349,6 @@ buyer_id = buyer_id, product_id = product_id, seller_id = seller_id, new_quantit
         for entry in cart_entries:
             total_cart_cost += float(entry.total_price)
 
-        return total_cart_cost
+        return round(total_cart_cost, 2)
 
  

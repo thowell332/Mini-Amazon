@@ -1,9 +1,11 @@
 from flask import current_app as app
 
 class userProductReview:
-    def __init__(self, product_id, seller_id, num_stars, date, description, upvotes, images):
+    def __init__(self, product_id, product_name, seller_id, seller_fname, seller_lname, num_stars, date, description, upvotes, images):
         self.product_id = product_id
+        self.product_name = product_name
         self.seller_id = seller_id
+        self.seller_name = seller_fname + ' ' + seller_lname
         self.num_stars = num_stars
         self.date = date
         self.description = description
@@ -14,9 +16,11 @@ class userProductReview:
     ##method to get all product reviews written by user with user_id in reverse chronological order
     def get(user_id):
         rows = app.db.execute('''
-SELECT product_id, seller_id, num_stars, date, description, upvotes, images
-FROM ProductReview
-WHERE buyer_id = :user_id
+SELECT pr.product_id, p.name, pr.seller_id, a.firstname, a.lastname, num_stars, date, pr.description, upvotes, pr.images
+FROM ProductReview pr, Product p, Account a
+WHERE pr.buyer_id = :user_id
+AND pr.product_id = p.product_id
+AND pr.seller_id = a.account_id
 ORDER BY date DESC
 ''',
                               user_id=user_id)
@@ -64,8 +68,9 @@ WHERE buyer_id = :user_id AND product_id = :product_id AND seller_id = :seller_i
 
 
 class userSellerReview:
-    def __init__(self, seller_id, num_stars, date, description, upvotes, images):
+    def __init__(self, seller_id, fname, lname, num_stars, date, description, upvotes, images):
         self.seller_id = seller_id
+        self.name = fname + ' ' + lname
         self.num_stars = num_stars
         self.date = date
         self.description = description
@@ -76,9 +81,10 @@ class userSellerReview:
     ##method to get all seller reviews written by user with user_id in reverse chronological order
     def get(user_id):
         rows = app.db.execute('''
-SELECT seller_id, num_stars, date, description, upvotes, images
-FROM SellerReview
-WHERE buyer_id = :user_id
+SELECT seller_id, firstname, lastname, num_stars, date, sr.description, upvotes, images
+FROM SellerReview sr, Account a
+WHERE sr.buyer_id = :user_id
+AND a.account_id = sr.seller_id
 ORDER BY date DESC
 ''',
                               user_id=user_id)
