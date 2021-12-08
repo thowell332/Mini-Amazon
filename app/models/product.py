@@ -68,8 +68,7 @@ WHERE category LIKE :category
     AND sp.product_id = :product_id
     AND si.product_id = :product_id
     AND sp.seller_id = si.seller_id
-    GROUP BY p.product_id, sp.seller_id, sp.price
-    ORDER BY {0} DESC),
+    GROUP BY p.product_id, sp.seller_id, sp.price),
     
     ReviewTable(review_product_id, review_seller_id, review_averagerating) AS 
     (SELECT product_id, seller_id, AVG(num_stars)
@@ -80,7 +79,8 @@ WHERE category LIKE :category
     (SELECT * FROM ProductTable
     LEFT JOIN ReviewTable
     ON ReviewTable.review_product_id = ProductTable.product_id AND ReviewTable.review_seller_id = ProductTable.seller_id)
-    SELECT product_id, seller_id, description, name, image, category, price, quantity, averagerating FROM FullTable   
+    SELECT product_id, seller_id, description, name, image, category, price, quantity, averagerating FROM FullTable
+    ORDER BY {0} DESC   
     '''.format(sort), product_id=product_id)
         return [ProductDisplayPage(*row) for row in rows] if rows is not None else None
 
