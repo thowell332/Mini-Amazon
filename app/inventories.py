@@ -7,20 +7,27 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.fields.core import DecimalField, IntegerField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional
 from flask_babel import _, lazy_gettext as _l
+from flask_paginate import Pagination, get_page_parameter
 
-from .models.userReviews import userProductReview, userSellerReview
-
+from .models.product import Product
 from .models.inventory import Inventory, InventoryListing
 
 from flask import Blueprint
 bp = Blueprint('inventories', __name__)
+per_page = 10
 
 @bp.route('/inventory')
 def inventory():
-    # get product inventory for given seller
-    inventoryList = Inventory.get('2') #CHANGE '5' TO USER ID
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    start = (page - 1) * per_page
+    inventoryList = Inventory.get(current_user.id)
+    pagination = Pagination(page=page, per_page=per_page, total=len(inventoryList), search=search, record_name='listings')
     # render the page by adding information to the index.html file
-    return render_template('inventory.html', inventory=inventoryList)
+    return render_template('inventory.html', inventory=inventoryList[start: start + per_page], pagination=pagination)
 
 class EditInventoryForm(FlaskForm):
     name = StringField(_l('Product Name'), validators=[Optional()])
@@ -31,10 +38,10 @@ class EditInventoryForm(FlaskForm):
 
 @bp.route('/editInventory/<int:product_id>', methods=['GET', 'POST'])
 def editInventory(product_id):
-    product = InventoryListing.get_product_listing('2', product_id) #CHANGE '5' TO USER ID
+    product = InventoryListing.get_product_listing(current_user.id, product_id)
     form = EditInventoryForm()
     if form.validate_on_submit():
-        InventoryListing.edit_product_listing('2', product_id, form.price.data, form.quantity.data - product.quantity) #CHANGE '5' TO USER ID
+        InventoryListing.edit_product_listing(current_user.id, product_id, form.price.data, form.quantity.data - product.quantity)
         flash('Product listing has been updated')
         return redirect(url_for('inventories.inventory'))
     # render the page by adding information to the index.html file
@@ -50,16 +57,19 @@ class AddInventoryForm(FlaskForm):
 def addInventory():
     form = AddInventoryForm()
     if form.validate_on_submit():
-        InventoryListing.add_product_listing('2', form) #CHANGE '5' TO USER ID
-        flash('Product listing has been updated')
-        return redirect(url_for('inventories.inventory'))
+        result = InventoryListing.add_product_listing(current_user.id, form)
+        if result == 1:
+            form.name.errors = ['Please create this product or enter the name of an existing product.']
+        else:
+            flash('Product listing has been updated')
+            return redirect(url_for('inventories.inventory'))
     # render the page by adding information to the index.html file
     return render_template('addInventory.html', title='Add Product Listing', form=form)
 
 @bp.route('/deleteInventory/<int:product_id>', methods=['GET', 'POST'])
 def deleteInventory(product_id):
     # execute deletion of inventory
-    InventoryListing.delete_product_listing('2', product_id) #CHANGE '5' TO USER ID
+    InventoryListing.delete_product_listing(current_user.id, product_id)
     # render inventory page
     return redirect(url_for('inventories.inventory'))
 

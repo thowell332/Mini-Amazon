@@ -4,7 +4,6 @@ import datetime
 from flask_paginate import Pagination, get_page_parameter
 
 from .models.product import Product
-from .models.purchase import Purchase
 
 from flask import Blueprint
 bp = Blueprint('index', __name__)

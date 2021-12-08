@@ -17,7 +17,7 @@
             <input type="text" name="search_criteria">
             <input type="submit">
         </form>
-        <a href="{{ url_for("productSearchCategory.productViewCategories") }}"><input type="submit" name="go_to_product_button" value="Search By Category"rel="tooltip" class="btn btn-info">
+        <a href="{{ url_for('productSearchCategory.productViewCategories') }}"><input type="submit" name="go_to_product_button" value="Search By Category"rel="tooltip" class="btn btn-info">
             <i class="material-icons"></i>
             </input>
         </a>
@@ -27,6 +27,9 @@
           <a href="{{ url_for('cart.cart') }}" type="button" class="btn btn-dark">Cart</a>
           <a href="{{ url_for('cart.saved_for_later') }}" type="button" class="btn btn-dark">Saved For Later</a>
           <a href="{{ url_for('purchases.purchases') }}" type="button" class="btn btn-dark">Purchase History</a>
+          <a href="{{ url_for('inventories.inventory') }}" type="button" class="btn btn-dark">My Inventory</a>
+          <a href="{{ url_for('product.productOwner') }}" type="button" class="btn btn-dark">My Products</a>
+          <a href="{{ url_for('orderFulfillments.orderFulfillments') }}" type="button" class="btn btn-dark">Order Fulfillment</a>
           <a href="{{ url_for('users.logout') }}" type="button" class="btn btn-light">Log out</a>
 
         {% else %}

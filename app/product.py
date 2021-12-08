@@ -66,3 +66,17 @@ def product(input, sort):
         productid = product[0].product_id
         pagination = Pagination(page=page, per_page=per_page, total=len(product), record_name='products')
         return render_template('product.html', product=product[start: start + per_page], productid=productid, pagination=pagination)
+
+@bp.route('/productOwner')
+def productOwner():
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    start = (page - 1) * per_page
+    productList = Product.get_seller_products(current_user.id)
+    pagination = Pagination(page=page, per_page=per_page, total=len(productList), search=search, record_name='products')
+    # render the page by adding information to the index.html file
+    return render_template('productOwner.html', productList=productList[start: start + per_page], pagination=pagination)
+
