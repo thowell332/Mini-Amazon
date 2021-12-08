@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Product</h1>
+{#    Buttons to sort the products#}
+    <td class="td-actions text-right">
+        <a href="{{ url_for("product.product", input=productid, sort="price-ordered") }}"><input type="submit" name="Sort by Price" value="Sort By Price"rel="tooltip" class="btn btn-info">
+            <i class="material-icons"></i>
+            </input>
+        </a>
+    </td>
+    <td class="td-actions text-right">
+        <a href="{{ url_for("product.product", input=productid, sort="quantity-ordered") }}"><input type="submit" name="Sort by Quantity" value="Sort By Quantity"rel="tooltip" class="btn btn-info">
+            <i class="material-icons"></i>
+            </input>
+        </a>
+    </td>
+    <td class="td-actions text-right">
+        <a href="{{ url_for("product.product", input=productid, sort="standard") }}"><input type="submit" name="Standard Sort" value="Undo Sorting"rel="tooltip" class="btn btn-info">
+            <i class="material-icons"></i>
+            </input>
+        </a>
+    </td>
+    {{pagination.info}}
+    {{pagination.links}}
+
+    {% for message in get_flashed_messages() %}
+        <p>{{ message }}</p>
+    {% endfor %}
+
+
+{#    A table containing all of the necessary information to display the product.#}
+    <table class='table table-hover table-bordered container'>
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Product Name</th>
+            <th scope="col">Image</th>
+            <th scope="col">Seller ID</th>
+            <th scope="col">Product ID</th>
+            <th scope="col">Description</th>
+            <th scope="col">Category</th>
+            <th scope="col">Price</th>
+            <th scope="col">Quantity Available</th>
+            <th scope="col">Add to Cart?</th>
+            <th scope="col">Save for Later?</th>
+            <th scope="col">Quantity</th>
+
+        </tr>
+        </thead>
+        <tbody>
+                {% for item in product%}
+                    <tr>
+                        <th scope="row">{{item.name}}</th>
+                        <td><img src="{{item.image}}" alt="User Image Not Found" width="120" height="90"></td>
+                        <td>{{item.seller_id}}</td>
+                        <td>{{item.product_id}}</td>
+                        <td>{{item.description}}</td>
+                        <td>{{item.category}}</td>
+                        <td>{{item.price}}</td>
+                        <td>{{item.quantity}}</td>
+
+                        <form method="post" action="">
+                            <td><input type="submit" name="add,{{item.product_id}},{{item.seller_id}}" value="Add"></td>
+                            <td><input type="submit" name="save,{{item.product_id}},{{item.seller_id}}" value="Save"></td>
+                            <td><input style="width:100px" type="number" min="1" max="{{item.quantity}}" name="quantity,{{item.product_id}},{{item.seller_id}}"></td>
+                        </form>
+                    </tr>
+                {% endfor %}
+        </tbody>
+    </table>
+    {{pagination.links}}
+
+
+
+
+
+{% endblock %}
