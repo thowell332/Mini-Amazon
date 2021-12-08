@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Welcome to Your Amazon+ Profile!</h1>
+    <h2>User ID:</h3>
+        <p>
+            {{ user_info.id }}
+        </p>
+    <h2>First Name:</h3>
+        <p>
+            {{ user_info.firstname }}
+        </p>
+    <h2>Last Name:</h3>
+        <p>
+            {{ user_info.lastname }}
+        </p>
+    <h2>Address:</h3>
+        <p>
+            {{ user_info.address }}
+        </p>
+    <h2>Balance:</h3>
+        <p>
+            {{ user_info.balance }}
+        </p>
+    <a class="btn btn-secondary" href="{{ url_for('users.updateProfile') }}" role="button">Update Profile</a>
+
+
+{% endblock %}

@@ -29,7 +29,7 @@ CREATE TABLE SellsProduct
 (
 seller_id INTEGER NOT NULL REFERENCES Seller(seller_id),
 product_id INTEGER NOT NULL REFERENCES Product(product_id),
-price DECIMAL NOT NULL,
+price DECIMAL NOT NULL CHECK (price > 0),
 PRIMARY KEY (seller_id, product_id)
 );
 
@@ -51,6 +51,7 @@ item_id INTEGER NOT NULL,
 purchase_id INTEGER NOT NULL,
 status INTEGER NOT NULL,
 date TIMESTAMP WITH TIME ZONE NOT NULL,
+price DECIMAL NOT NULL CHECK (price > 0),
 PRIMARY KEY (buyer_id, product_id, item_id)
 );
  
@@ -77,8 +78,9 @@ CREATE TABLE Cart
 buyer_id INTEGER NOT NULL REFERENCES Account(account_id),
 seller_id INTEGER NOT NULL REFERENCES Seller(seller_id),
 product_id INTEGER NOT NULL REFERENCES Product(product_id),
-quantity INTEGER NOT NULL,
-PRIMARY KEY (buyer_id, seller_id, product_id)
+quantity INTEGER NOT NULL CHECK (quantity > 0),
+saved_for_later BOOLEAN NOT NULL,
+PRIMARY KEY (buyer_id, seller_id, product_id, saved_for_later)
 );
  
 
@@ -124,20 +126,6 @@ CREATE TRIGGER TG_Cart_Product_Exists
 	BEFORE INSERT ON Cart
 	FOR EACH ROW
 	EXECUTE PROCEDURE TF_Cart_Product_Exists();
- 
-CREATE FUNCTION TF_Cart_Quantity_Available() RETURNS TRIGGER AS $cart_quantity_available$
-BEGIN
-	IF ((SELECT COUNT(*) FROM SellsItem WHERE NEW.product_id = SellsItem.item_id AND NEW.seller_id = SellsItem.seller_id) > NEW.quantity) THEN
-	RAISE EXCEPTION 'The quantity you selected is not available';
-	END IF;
-	RETURN NEW;
-END;
-$cart_quantity_available$ LANGUAGE plpgsql;
- 
-CREATE TRIGGER TG_Cart_Quantity_Available
-	BEFORE INSERT ON Cart
-	FOR EACH ROW
-	EXECUTE PROCEDURE TF_Cart_Quantity_Available();
 
 CREATE FUNCTION One_Product_Review() RETURNS TRIGGER AS $one_product_review$
 BEGIN 

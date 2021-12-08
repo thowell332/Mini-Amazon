@@ -7,8 +7,6 @@ from flask_babel import Babel
 from .config import Config
 from .db import DB
 
-from .models.cart import Cart
-
 login = LoginManager()
 login.login_view = 'users.login'
 babel = Babel()
@@ -46,6 +44,9 @@ def create_app():
     from .newProduct import bp as newProduct_bp
     app.register_blueprint(newProduct_bp)
 
+    from .purchases import bp as purchases_bp
+    app.register_blueprint(purchases_bp)
+    
     from .orderFulfillments import bp as order_bp
     app.register_blueprint(order_bp)
 

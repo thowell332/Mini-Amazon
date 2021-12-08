@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Purchase Order # {{purchase_id}}</h1>
+
+<!-- Table to show purchases. -->
+<table class='table table-hover table-bordered container'>
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Product Name</th>
+        <th scope="col">Image</th>
+        <th scope="col">Seller Name</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Unit Price</th>
+        <th scope="col">Total Price</th>
+      </tr>
+    </thead>
+      <tbody>
+        {% for entry in purchase_entries%}
+          <tr>
+            <th scope="row">{{entry.product_name}}</th>
+            <td><img src="{{entry.product_image}}" alt="Image Not Found" height="100"></td>
+            <td scope="row">{{entry.seller_name}}</th>
+            <td scope="row">{{entry.quantity}}</th>
+            <td scope="row">${{entry.unit_price}}</th>
+            <td scope="row">${{entry.total_price}}</th>
+          </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+
+  <h3>Total Price Paid: ${{total_price_paid}}</h3>
+
+{% endblock %}

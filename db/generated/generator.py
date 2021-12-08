@@ -5,8 +5,8 @@ from faker import Faker
 num_accounts = 100
 num_sellers = 20
 num_categories = 20
-num_products = 2000
-num_products_per_seller = 50
+num_products = 500
+num_products_per_seller = 100
 num_items_per_seller = 10
 num_purchases = 500
 num_reviews = 500
@@ -142,6 +142,7 @@ def gen_purchases(num_purchases, pids, sellers, num_users, itemssold):
             uid = fake.random_int(min=1, max=num_users)
             pid = fake.random_element(elements=pids)
             sid = fake.random_element(elements=sellers)
+            price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
             available_items = 0
             for item in itemssold:
                 if item[1]==pid:
@@ -151,7 +152,7 @@ def gen_purchases(num_purchases, pids, sellers, num_users, itemssold):
             purchase_id = fake.random_int(min=1, max=num_purchases)
             time_purchased = fake.date_time()
             if pid not in p and item_id != 0:
-                writer.writerow([uid, sid, pid, item_id, purchase_id, status, time_purchased])
+                writer.writerow([uid, sid, pid, item_id, purchase_id, status, time_purchased, price])
                 purchases.append([uid, sid, pid, item_id])
             p.append(pid)
         print(f'{num_purchases} generated')
@@ -188,6 +189,8 @@ def gen_Reviews(num_reviews, purchases, items_sold):
     return
 
 def gen_cart(num_carts, num_accounts, items_sold):
+    print('items sold')
+    print(items_sold)
     with open('Cart.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Cart...', end=' ', flush=True)
@@ -202,8 +205,9 @@ def gen_cart(num_carts, num_accounts, items_sold):
             for i in items_sold:
                 if seller_id == i[0] and product_id == i[1]:
                     available_items += 1
-            quantity = fake.random_int(max=available_items)
-            writer.writerow([buyer_id, seller_id, product_id, quantity])
+            quantity = fake.random_int(max=available_items - 1) + 1
+            saved_for_later = fake.boolean()
+            writer.writerow([buyer_id, seller_id, product_id, quantity, saved_for_later])
         print(f'{num_carts} carts generated')
     return
 

@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, request
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from flask_babel import _, lazy_gettext as _l
 
@@ -21,11 +21,41 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField(_l('Remember Me'))
     submit = SubmitField(_l('Sign In'))
 
+@bp.route('/profile', methods=['GET', 'POST'])
+def profile():
+    user_info = User.get(current_user.id)
+    return render_template('account.html', title = 'Profile', user_info = user_info)
+
+@bp.route('/updateprofile', methods=['GET', 'POST'])
+def updateProfile():
+    user_info = User.get(current_user.id)
+    form = RegistrationForm()
+
+class BalanceForm(FlaskForm):
+    withdraw = FloatField(_l('How much do you want to withdraw'))
+    deposit = FloatField(_l('How much do you want to deposit'))
+    submit = SubmitField(_l('Update'))
+
+@bp.route('/updatebalance', methods=['GET', 'POST'])
+def updateBalance():
+    curr_balance = User.get_balance(current_user.id)
+    form = BalanceForm()
+    if form.validate_on_submit():
+        if form.withdraw.data > float(curr_balance):
+            flash('You cannot withdraw more than your current balance')
+            return redirect(url_for('users.updateBalance'))
+        else:
+            new_balance = float(curr_balance) - form.withdraw.data
+            new_balance = float(new_balance) + form.deposit.data
+            User.update_balance(current_user.id, new_balance)
+            return redirect(url_for('users.profile'))
+    return render_template('balance.html', title='Balance', form=form, curr_balance=curr_balance)
+        
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index.index'))
+        return redirect(url_for('users.profile'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.get_by_auth(form.email.data, form.password.data)
@@ -36,7 +66,6 @@ def login():
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index.index')
-
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
@@ -45,6 +74,7 @@ class RegistrationForm(FlaskForm):
     firstname = StringField(_l('First Name'), validators=[DataRequired()])
     lastname = StringField(_l('Last Name'), validators=[DataRequired()])
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    address = StringField(_l('Address (Street, Apt #, City, State, Zip)'), validators=[DataRequired()])
     password = PasswordField(_l('Password'), validators=[DataRequired()])
     password2 = PasswordField(
         _l('Repeat Password'), validators=[DataRequired(),
@@ -65,7 +95,8 @@ def register():
         if User.register(form.email.data,
                          form.password.data,
                          form.firstname.data,
-                         form.lastname.data):
+                         form.lastname.data,
+                         form.address.data):
             flash('Congratulations, you are now a registered user!')
             return redirect(url_for('users.login'))
     return render_template('register.html', title='Register', form=form)
