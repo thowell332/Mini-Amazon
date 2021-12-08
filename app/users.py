@@ -27,6 +27,7 @@ def userPublicView():
 @bp.route('/profile', methods=['GET', 'POST'])
 def profile():
     user_info = User.get(current_user.id)
+    user_info.balance = round(user_info.balance, 2)
     seller_status = User.sellerStatus(current_user.id)
     return render_template('account.html', title = 'Profile', user_info = user_info, seller_status = seller_status)
 
@@ -83,6 +84,7 @@ class BalanceForm(FlaskForm):
 @bp.route('/updatebalance', methods=['GET', 'POST'])
 def updateBalance():
     curr_balance = User.get_balance(current_user.id)
+    curr_balance = round(curr_balance, 2)
     form = BalanceForm()
     if form.validate_on_submit():
         if form.withdraw.data > float(curr_balance):
@@ -91,6 +93,7 @@ def updateBalance():
         else:
             new_balance = float(curr_balance) - form.withdraw.data
             new_balance = float(new_balance) + form.deposit.data
+            new_balance = round(new_balance, 2)
             User.update_balance(current_user.id, new_balance)
             return redirect(url_for('users.profile'))
     return render_template('balance.html', title='Balance', form=form, curr_balance=curr_balance)
