@@ -6,6 +6,7 @@ from flask_babel import _, lazy_gettext as _l
 from flask_login import current_user
 
 from .models.cart import Cart
+from .models.user import User
 
 from flask import Blueprint
 bp = Blueprint('cart', __name__)
@@ -18,6 +19,7 @@ def cart():
     if not current_user.is_authenticated:
         return redirect(url_for('users.login'))
 
+    seller_status = User.sellerStatus(current_user.id)
     # Get cart and cost.
     cart = Cart.get_cart(current_user.id)
     total_cart_cost = Cart.get_total_cart_cost(current_user.id)
@@ -99,7 +101,7 @@ def cart():
         if redirect_page:
             return redirect(url_for('cart.cart'))
 
-    return render_template('cart.html', cart=cart, total_cost=total_cart_cost)
+    return render_template('cart.html', cart=cart, total_cost=total_cart_cost, seller_status=seller_status)
 
 # Route to show a user's saved for later section.
 @bp.route('/saved-for-later', methods=['GET', 'POST'])
@@ -109,8 +111,9 @@ def saved_for_later():
     if not current_user.is_authenticated:
         return redirect(url_for('users.login'))
 
-    # Get items saved for later.
+    seller_status = User.sellerStatus(current_user.id)
 
+    # Get items saved for later.
     saved_for_later = Cart.get_saved(current_user.id)
 
     # Respond to user feedback via buttons.
@@ -165,4 +168,4 @@ def saved_for_later():
         if redirect_page:
             return redirect(url_for('cart.saved_for_later')) 
         
-    return render_template('savedForLater.html', saved_for_later=saved_for_later)
+    return render_template('savedForLater.html', saved_for_later=saved_for_later, seller_status=seller_status)
