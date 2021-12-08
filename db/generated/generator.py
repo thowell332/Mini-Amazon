@@ -217,7 +217,7 @@ def gen_cart(num_carts, num_accounts, items_sold):
         print(f'{num_carts} carts generated')
     return
 
-#gen_accounts(num_accounts)
+gen_accounts(num_accounts)
 sellers = gen_sellers(num_sellers)
 categories = gen_categories(num_categories)
 available_pids = gen_products(num_products, categories)

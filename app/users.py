@@ -118,7 +118,7 @@ def userReviews(user_id):
     # get all product reviews user has made:
     productReviews = userProductReview.get(current_user.id) 
     # get all seller reviews user has made:
-    sellerReviews = userSellerReview.get(currentuser.id) 
+    sellerReviews = userSellerReview.get(current_user.id) 
     # render the page by adding information to the index.html file
     return render_template('userReviews.html',
                            userProductReviews=productReviews, userSellerReviews=sellerReviews)
