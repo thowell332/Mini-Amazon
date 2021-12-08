@@ -30,7 +30,7 @@ This simple process allows validation to occur at checkout, ensuring that users 
 
 A buyer can always view the orders they have purchased. This is seen in the Purchase History, showing all of the carts that have been ordered. By clicking on one, a user can see the specific products, selllers, and quantities in the order. 
 
-A status is given to each order, which shows whether it has been ordered, shipped, or fulfilled. The status for the order defaults to the lowerst possible status—meaning if any item in the order is still not shipped, then the entire order is listed as not shipped. The rankings are ordered is lowest, and fulfilled is highest. The same logic applies to items of a certain product and seller in an order page. This means that if two items of a certain product are purchased from a seller in an order, the status on those items will default to the lowest status as specified in the rankings above.
+A status is given to each order, which shows whether it has been ordered, shipped, or delivered. The status for the order defaults to the lowerst possible status—meaning if any item in the order is still not shipped, then the entire order is listed as not shipped. The rankings are ordered is lowest, and delivered is highest. The same logic applies to items of a certain product and seller in an order page. This means that if two items of a certain product are purchased from a seller in an order, the status on those items will default to the lowest status as specified in the rankings above.
 
 Of course, in the database, a status is kept for each item. This is shown to the seller where they can update their inventory. However, for the consumer, they do not see entires on an item-by-item basis, so this generalization is made.
 
