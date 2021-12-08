@@ -5,7 +5,7 @@ from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.fields.core import DecimalField, IntegerField
-from wtforms.validators import DataRequired, NumberRange, Optional
+from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional
 from flask_babel import _, lazy_gettext as _l
 
 from .models.userReviews import userProductReview, userSellerReview
@@ -25,8 +25,8 @@ def inventory():
 class EditInventoryForm(FlaskForm):
     name = StringField(_l('Product Name'), validators=[Optional()])
     description = StringField(_l('Description'), validators=[Optional()])
-    price = DecimalField(_l('Price'), validators=[DataRequired(), NumberRange(min=0, message='Price cannot be negative.')])
-    quantity = IntegerField(_l('Quantity'), validators=[DataRequired(), NumberRange(min=0, message='Quantity cannot be negative.')])
+    price = DecimalField(_l('Price'), validators=[InputRequired(), NumberRange(min=0, message='Price cannot be negative.')])
+    quantity = IntegerField(_l('Quantity'), validators=[InputRequired(), NumberRange(min=0, message='Quantity cannot be negative.')])
     submit = SubmitField(_l('Submit'))
 
 @bp.route('/editInventory/<int:product_id>', methods=['GET', 'POST'])
@@ -42,8 +42,8 @@ def editInventory(product_id):
 
 class AddInventoryForm(FlaskForm):
     name = StringField(_l('Product Name'), validators=[DataRequired()])
-    price = DecimalField(_l('Price'), validators=[DataRequired(), NumberRange(min=0, message='Price cannot be negative.')])
-    quantity = IntegerField(_l('Quantity'), validators=[DataRequired(), NumberRange(min=0, message='Quantity cannot be negative.')])
+    price = DecimalField(_l('Price'), validators=[InputRequired(), NumberRange(min=0, message='Price cannot be negative.')])
+    quantity = IntegerField(_l('Quantity'), validators=[InputRequired(), NumberRange(min=0, message='Quantity cannot be negative.')])
     submit = SubmitField(_l('Submit'))
 
 @bp.route('/addInventory', methods=['GET', 'POST'])

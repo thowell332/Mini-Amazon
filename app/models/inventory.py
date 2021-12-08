@@ -15,11 +15,20 @@ class Inventory:
     def get(seller_id):
         rows = app.db.execute(
             '''
-            SELECT p.product_id, p.name, p.description, p.image, sp.price, COUNT(si.item_id) as quantity
-            FROM Product p, SellsItem si, SellsProduct sp
-            WHERE si.seller_id = :seller_id AND p.product_id = si.product_id
-            AND sp.seller_id = :seller_id AND p.product_id = sp.product_id
-            GROUP BY p.product_id, p.name, p.description, p.image, sp.price;
+            SELECT t1.product_id, t1.name, t1.description, t1.image, t1.price, COALESCE(t2.quantity, 0) as quantity
+            FROM
+            (
+                SELECT p.product_id, p.name, p.description, p.image, sp.price
+                FROM Product p, SellsProduct sp
+                WHERE sp.seller_id = :seller_id AND p.product_id = sp.product_id
+            ) AS t1 LEFT OUTER JOIN
+            (
+                SELECT p.product_id, p.name, p.description, p.image, sp.price, COUNT(si.item_id) as quantity
+                FROM Product p, SellsItem si, SellsProduct sp
+                WHERE si.seller_id = :seller_id AND p.product_id = si.product_id
+                AND sp.seller_id = :seller_id AND p.product_id = sp.product_id
+                GROUP BY p.product_id, p.name, p.description, p.image, sp.price
+            ) AS t2 ON t1.product_id = t2.product_id;
             ''',
             seller_id=seller_id
         )
@@ -38,12 +47,22 @@ class InventoryListing:
     def get_product_listing(seller_id, product_id):
         row = app.db.execute(
             '''
-            SELECT p.name, p.description, sp.price, COUNT(si.item_id) as quantity
-            FROM Product p, SellsItem si, SellsProduct sp
-            WHERE si.seller_id = :seller_id AND p.product_id = si.product_id
-            AND sp.seller_id = :seller_id AND p.product_id = sp.product_id
-            AND p.product_id = :product_id
-            GROUP BY p.name, p.description, sp.price;
+            SELECT t1.name, t1.description, t1.price, COALESCE(t2.quantity, 0) as quantity
+            FROM
+            (
+                SELECT p.product_id, p.name, p.description, sp.price
+                FROM Product p, SellsProduct sp
+                WHERE sp.seller_id = :seller_id AND sp.product_id = :product_id
+                AND p.product_id = :product_id 
+            ) AS t1 LEFT OUTER JOIN
+            (
+                SELECT p.product_id, p.name, p.description, sp.price, COUNT(si.item_id) as quantity
+                FROM Product p, SellsItem si, SellsProduct sp
+                WHERE si.seller_id = :seller_id AND si.product_id = :product_id
+                AND sp.seller_id = :seller_id AND sp.product_id = :product_id
+                AND p.product_id = :product_id
+                GROUP BY p.product_id, p.name, p.description, sp.price
+            ) AS t2 ON t1.product_id = t2.product_id;
             ''',
             product_id=product_id,
             seller_id=seller_id)
@@ -158,7 +177,7 @@ class InventoryListing:
                 seller_id=seller_id,
                 product_id=product_id
             )
-            current_items = [row[0] for row in rows] if rows is not None else None
+            current_items = [row[0] for row in rows] if rows else [0]
             # assign item_id values to the new rows
             new_items = [max(current_items) + i + 1 for i in range(delta_quantity)]
             # generate row values to be inserted

@@ -5,7 +5,7 @@ from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.fields.core import DateField, DecimalField, IntegerField, SelectField
-from wtforms.validators import DataRequired, NumberRange, Optional
+from wtforms.validators import DataRequired, NumberRange, Optional, InputRequired
 from flask_babel import _, lazy_gettext as _l
 
 from .models.orderFulfillment import ItemFulfillment, OrderFulfillment, OrderHistory
@@ -30,7 +30,7 @@ def orderFulfillmentDetails(purchase_id):
 
 class EditOrderForm(FlaskForm):
     item = SelectField(_l('Item ID'), coerce=int, validators=[DataRequired()])
-    status = SelectField('Status', coerce=int, validators=[DataRequired()])
+    status = SelectField('Status', coerce=int, validators=[InputRequired()])
     submit = SubmitField(_l('Submit'))
 
 @bp.route('/orderFulfillmentDetails/<int:purchase_id>/<int:product_id>', methods=['GET', 'POST'])
@@ -43,9 +43,9 @@ def editOrderFulfillment(purchase_id, product_id):
     # create edit fulfillment form
     form = EditOrderForm()
     form.item.choices = [(-1, 'All Items')] + [(id, id) for id in itemList]
-    form.status.choices = [(1, 'ORDERED'), (2, 'SHIPPED'), (3, 'DELIVERED')]
+    form.status.choices = [(0, 'ORDERED'), (1, 'SHIPPED'), (2, 'DELIVERED')]
     if form.validate_on_submit():
-        ItemFulfillment.update_status(purchase_id, product_id, form.item.data, form.status.data - 1)
+        ItemFulfillment.update_status(purchase_id, product_id, form.item.data, form.status.data)
         flash('Item fulfillment(s) has been updated')
         itemFulfillment = ItemFulfillment.get_item_fulfillment(purchase_id, product_id)
     # render the page by adding information to the index.html file
