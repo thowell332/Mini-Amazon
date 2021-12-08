@@ -90,7 +90,7 @@ PRIMARY KEY (buyer_id, seller_id, product_id, saved_for_later)
  
 CREATE FUNCTION Product_Reviewer() RETURNS TRIGGER AS $$
 BEGIN 
-	IF NOT (NEW.buyer_id IN (SELECT Purchase.buyer_id FROM Purchase WHERE Purchase.product_id = NEW.product_id)) THEN
+	IF NOT (NEW.buyer_id IN (SELECT Purchase.buyer_id FROM Purchase WHERE Purchase.product_id = NEW.product_id AND Purchase.seller_id = NEW.seller_id)) THEN
        RAISE EXCEPTION 'Buyers cannot write reviews for products they have not  
        purchased';
        END IF;
@@ -105,7 +105,7 @@ CREATE TRIGGER Product_Reviewer
  
 CREATE FUNCTION TF_Seller_Reviewer() RETURNS TRIGGER AS $seller_review$
 BEGIN
-	IF NOT (NEW.buyer_id IN (SELECT Purchase.buyer_id FROM Purchase, SellsItem WHERE SellsItem.seller_id = NEW.seller_id AND Purchase.product_id = SellsItem.product_id AND Purchase.item_id = SellsItem.item_id)) THEN
+	IF NOT (NEW.buyer_id IN (SELECT Purchase.buyer_id FROM Purchase WHERE Purchase.seller_id = NEW.seller_id AND Purchase.buyer_id = NEW.buyer_id)) THEN
 	RAISE EXCEPTION 'Buyers cannot review sellers they have not bought from before';
 	END IF;
 	RETURN NEW;
@@ -133,7 +133,7 @@ CREATE TRIGGER TG_Cart_Product_Exists
 
 CREATE FUNCTION One_Product_Review() RETURNS TRIGGER AS $one_product_review$
 BEGIN 
-	IF EXISTS(SELECT * FROM ProductReview WHERE NEW.buyer_id = ProductReview.buyer_id AND NEW.product_id = ProductReview.product_id) THEN
+	IF EXISTS(SELECT * FROM ProductReview WHERE NEW.buyer_id = ProductReview.buyer_id AND NEW.product_id = ProductReview.product_id AND NEW.seller_id = ProductReview.seller_id) THEN
 	RAISE EXCEPTION 'A user cannot submit more than one rating/review for a single product';
 	END IF;
 	RETURN NEW;
@@ -158,5 +158,3 @@ CREATE TRIGGER One_Seller_Review
 	BEFORE INSERT ON SellerReview
 	FOR EACH ROW
 	EXECUTE PROCEDURE One_Seller_Review();
-
-
