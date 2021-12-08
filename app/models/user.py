@@ -1,3 +1,4 @@
+from ctypes import addressof
 from flask_login import UserMixin
 from flask import current_app as app
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -131,3 +132,25 @@ RETURNING account_id
         except Exception:
             #already a seller
             return
+
+class UserView:
+    def __init__(self, id, firstname, lastname, email, address):
+        self.id = id
+        self.firstname = firstname
+        self.lastname = lastname
+        self.email = email
+        self.address = address
+
+    @staticmethod
+    def getUsersPublicView():
+        rows = app.db.execute("""
+        WITH q1 AS (SELECT account_id, firstname, lastname FROM Account),
+        q2 AS (SELECT account_id, email, address FROM Account
+        WHERE account_id IN (SELECT seller_id FROM Seller))
+        SELECT q1.account_id, q1.firstname, q1.lastname, q2.email, q2.address FROM q1 LEFT OUTER JOIN q2 ON q1.account_id = q2.account_id""")
+        # for row in rows[:10]:
+        #     print(len(row))
+        #     print(row[-1])
+        #     print(row[-2])
+        # print(rows[:10])
+        return [UserView(*row) for row in rows]

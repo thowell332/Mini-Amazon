@@ -6,14 +6,23 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Float
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from flask_babel import _, lazy_gettext as _l
 
-from .models.user import User
+from .models.user import User, UserView
 from .models.userReviews import userProductReview, userSellerReview
 from .models.sellerReviews import sellerReviewSummary, sellerReview
 from .models.productReviews import productReviewSummary, productReview
+from flask_paginate import Pagination, get_page_parameter
 
 from flask import Blueprint
 bp = Blueprint('users', __name__)
 
+@bp.route('/users', methods=['GET','POST'])
+def userPublicView():
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    per_page = 10
+    start = (page - 1) * per_page
+    users = UserView.getUsersPublicView()
+    pagination = Pagination(page=page, per_page=per_page, total=len(users), record_name='users')
+    return render_template('usersPublic.html', users = users[start: start + per_page], pagination=pagination)
 
 @bp.route('/profile', methods=['GET', 'POST'])
 def profile():
