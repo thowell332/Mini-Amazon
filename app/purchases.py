@@ -26,8 +26,7 @@ def purchases():
         return redirect(url_for('users.login'))
 
     past_purchases = Purchase._get_purchases(current_user.id)
-    for i in range(100):
-        past_purchases.append(PurchaseSummary(i, i, i))
+    print(past_purchases)
         
     pagination = Pagination(page=page, per_page=per_page, total=len(past_purchases), search=search, record_name='products')
     return render_template('purchases.html', purchases=past_purchases[start: start + per_page], pagination=pagination)

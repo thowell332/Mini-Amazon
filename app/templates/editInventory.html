@@ -8,17 +8,11 @@
   {{ form.hidden_tag() }}
   <p>
     {{ form.name.label }}<br/>
-    {{ form.name(size=32, disabled=true, value=product.name) }}<br/>
-    {% for error in form.price.errors %}
-    <span style="color: red;">{{ error }}</span>
-    {% endfor %}
+    {{ form.name(size=32, disabled=true, value=product.name) }}
   </p>
   <p>
     {{ form.description.label }}<br/>
-    {{ form.description(size=32, disabled=true, value=product.description) }}<br/>
-    {% for error in form.price.errors %}
-    <span style="color: red;">{{ error }}</span>
-    {% endfor %}
+    {{ form.description(size=32, disabled=true, value=product.description) }}
   </p>
   <p>
     {{ form.price.label }}<br/>

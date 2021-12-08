@@ -45,10 +45,11 @@ FOREIGN KEY(seller_id, product_id) REFERENCES SellsProduct(seller_id, product_id
 CREATE TABLE Purchase
 (
 buyer_id INTEGER NOT NULL REFERENCES Account(account_id),
+seller_id INTEGER NOT NULL REFERENCES Seller(seller_id),
 product_id INTEGER NOT NULL,
 item_id INTEGER NOT NULL,
 purchase_id INTEGER NOT NULL,
-status VARCHAR(32) NOT NULL,
+status INTEGER NOT NULL,
 date TIMESTAMP WITH TIME ZONE NOT NULL,
 PRIMARY KEY (buyer_id, product_id, item_id)
 );

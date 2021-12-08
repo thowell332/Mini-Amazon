@@ -23,10 +23,10 @@ class Purchase:
     @staticmethod
     def _create_purchase_id():
         rows = app.db.execute(
-"""
-SELECT MAX(purchase_id)
-FROM Purchase
-""")
+            """
+            SELECT MAX(purchase_id)
+            FROM Purchase
+            """)
         # If there are no purchases, start with an ID of 1.
         count = rows[0][0]
         if count is None:
@@ -41,24 +41,44 @@ FROM Purchase
     @staticmethod
     def _add_to_purchase(buyer_id, product_id, item_id, purchase_id, status, date):
         app.db.execute(
-"""
-INSERT INTO Purchase (buyer_id, product_id, item_id, purchase_id, status, date)
-VALUES (:buyer_id, :product_id, :item_id, :purchase_id, :status, :date)
-RETURNING 1
-""",
+            """
+            INSERT INTO Purchase (buyer_id, product_id, item_id, purchase_id, status, date)
+            VALUES (:buyer_id, :product_id, :item_id, :purchase_id, :status, :date)
+            RETURNING 1
+            """,
         buyer_id = buyer_id, product_id = product_id, item_id = item_id, purchase_id = purchase_id, status = status, date = date)
 
-    # Method used to get all purchase IDs and dates for those purchases.
+    # Method used to get all purchase IDs, dates, and statuses for those purchases.
+    # Status is the minimum for all items with the purchase_ID.
     # Same parameter definitions as the methods above.
     @staticmethod
     def _get_purchases(buyer_id):
         rows = app.db.execute(
-"""
-SELECT MIN(status)
-FROM Purchase
-WHERE buyer_id = :buyer_id
-GROUP BY purchase_id, date
-""",
+            """
+            SELECT purchase_id, date, MIN(status)
+            FROM Purchase
+            WHERE buyer_id = :buyer_id
+            GROUP BY purchase_id, date
+            """,
         buyer_id = buyer_id)
+
+        return [PurchaseSummary(*row) for row in rows]
+
+    # Method used to get all products and  for those purchases.
+    # Status is the minimum for all items with the purchase_ID.
+    # Same parameter definitions as the methods above.
+    @staticmethod
+    def _get_purchases(buyer_id, purchase_id):
+        rows = app.db.execute(
+            """
+            WITH
+            BasicOrder(buyer_id, seller_id, date, min_status) AS (
+                SELECT buyer_id, seller_id, date, MIN(status)
+                FROM Purchase
+                WHERE buyer_id = :buyer_id AND purchase_id = :purchase_id
+                GROUP BY buyer_id, seller_id, date
+            ),
+            """,
+        buyer_id = buyer_id, purchase_id = purchase_id)
 
         return [PurchaseSummary(*row) for row in rows]
