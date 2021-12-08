@@ -21,13 +21,13 @@
         {% for item in purchases%}
           <tr>
             <th scope="row">{{item.purchase_id}}</th>
-            <th scope="row">{{item.date}}</th>
-            <th scope="row">{{item.status}}</th>
-            <th>
+            <td scope="row">{{item.date}}</th>
+            <td scope="row">{{item.status}}</th>
+            <td>
               <a href="{{ url_for("purchases.individual_purchase", purchase_id=item.purchase_id) }}">
                 <input type="submit" value="More Info" class="btn btn-dark"/>
               </a> 
-            </th>
+            </td>
         {% endfor %}
       </tbody>
   </table>

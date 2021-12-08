@@ -6,7 +6,7 @@ from wtforms import SubmitField
 from flask_babel import _, lazy_gettext as _l
 from flask_login import current_user
 
-from .models.purchase import Purchase, PurchaseSummary
+from .models.purchase import Purchase, PurchaseSummary, PurchaseEntry
 
 from flask import Blueprint
 bp = Blueprint('purchases', __name__)
@@ -38,11 +38,11 @@ def individual_purchase(purchase_id):
     if not current_user.is_authenticated:
         return redirect(url_for('users.login'))
 
-    past_purchases = Purchase._get_purchases(current_user.id)
-    for i in range(100):
-        past_purchases.append(PurchaseSummary(i, i, i))
-    
+    purchase_entries = []
+    for i in range(10):
+        purchase_entries.append(PurchaseEntry("Name" + str(i), "https://picsum.photos/400/400", "Eric Doppelt", i, i))
+    price_paid = 69
     # # If an order is clicked, show it.
     # for key in request.form.keys():
         
-    return render_template('individualPurchase.html', purchase_id=purchase_id)
+    return render_template('individualPurchase.html', purchase_id=purchase_id, purchase_entries=purchase_entries, price_paid = price_paid)

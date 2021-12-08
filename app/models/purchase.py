@@ -7,6 +7,15 @@ class PurchaseSummary:
         self.date = date
         self.status = status
 
+class PurchaseEntry:
+    def __init__(self, product_name, product_image, seller_name, quantity, unit_price):
+        self.product_name = product_name
+        self.product_image = product_image
+        self.seller_name = seller_name
+        self.quantity = quantity
+        self.unit_price = unit_price
+        self.total_price = quantity * unit_price
+
 class Purchase:
 
     # Helper method used to create a unique purchase ID.
