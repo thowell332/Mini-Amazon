@@ -58,7 +58,6 @@ class OrderHistory:
                 search_criteria=search_criteria
             )
         elif search_field == "product_name":
-            print(search_criteria)
             rows = app.db.execute(
                 '''
                 SELECT pu.purchase_id, CONCAT(a.firstname,' ',a.lastname) as buyer_name,
