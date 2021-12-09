@@ -13,7 +13,6 @@ from .models.user import User
 bp = Blueprint('newProduct', __name__)
 
 class NewProductForm(FlaskForm):
-    owner_id = StringField(_l('Owner ID'), validators=[DataRequired()])
     product_name = StringField(_l('Product Name'), validators=[DataRequired()])
     product_description = StringField(_l('Product Description'), validators=[DataRequired()])
     product_image = StringField(_l('Product Image'), validators=[DataRequired()])
@@ -35,7 +34,6 @@ def addNewProduct():
     # redirect to login if not authenticated
     if not current_user.is_authenticated:
         return redirect(url_for('users.login'))
-    
     # redirect to homepage if not seller
     seller_status = User.sellerStatus(current_user.id)
     if seller_status != 1:
@@ -44,7 +42,7 @@ def addNewProduct():
     # build new product form
     form = NewProductForm()
     if form.validate_on_submit():
-        if Product.insert_new_product(form.owner_id.data,
+        if Product.insert_new_product(current_user.id,
                                       form.product_description.data,
                                       form.product_name.data,
                                       form.product_image.data,
