@@ -50,7 +50,7 @@ def product(input, sort):
                 saved_for_later = "TRUE" if 'save' in key else "FALSE"
                 
                 Cart.add_values_into_cart(current_user.id, product_id, seller_id, quantity_to_move, saved_for_later)
-                if saved_for_later:
+                if saved_for_later=="TRUE":
                     flash('Successfully added items to saved for later!')
                 else:
                     flash('Successfully added items to cart!')

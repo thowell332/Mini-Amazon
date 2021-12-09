@@ -189,7 +189,7 @@ class InventoryListing:
                 try: app.db.execute(
                     '''
                     INSERT INTO SellsItem
-                    VALUES (:seller_id, :product_id, item_id)
+                    VALUES (:seller_id, :product_id, :item_id)
                     ''',
                     seller_id=seller_id,
                     product_id=product_id,
