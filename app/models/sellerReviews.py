@@ -1,21 +1,5 @@
 from flask import current_app as app
 
-class sellerReviewSummary:
-    def __init__(self, count, average):
-        self.count = count
-        self.average = average
-
-    @staticmethod
-    ##method to get number of and average of reviews for a given seller
-    def get(seller_id):
-        row = app.db.execute('''
-SELECT COUNT(*), AVG(num_stars)
-FROM SellerReview
-WHERE seller_id = :seller_id
-''',
-                              seller_id=seller_id)
-        return sellerReviewSummary(*(row[0])) if row is not None else None
-
         
 class sellerReview:
     def __init__(self, buyer_id, seller_id, num_stars, date, description, upvotes, images):

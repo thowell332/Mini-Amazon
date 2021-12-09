@@ -57,6 +57,10 @@ def orderFulfillments():
 
 @bp.route('/orderFulfillments;<search_field>;<search_criteria>', methods=['GET', 'POST'])
 def orderFulfillmentSearch(search_field, search_criteria):
+    # check if search is provided
+    if search_criteria == " ":
+        return redirect(url_for('orderFulfillments.orderFulfillments'))
+    
     # redirect to login if not authenticated
     if not current_user.is_authenticated:
         return redirect(url_for('users.login'))
@@ -104,8 +108,8 @@ def orderFulfillmentDetails(purchase_id):
         search = True
     page = request.args.get(get_page_parameter(), type=int, default=1)
     start = (page - 1) * per_page
-    purchase = OrderHistory.get_purchase(purchase_id)
-    fulfillment = OrderFulfillment.get_order_fulfillment(purchase_id)
+    purchase = OrderHistory.get_purchase(current_user.id, purchase_id)
+    fulfillment = OrderFulfillment.get_order_fulfillment(current_user.id, purchase_id)
     pagination = Pagination(page=page, per_page=per_page, total=len(fulfillment), search=search, record_name='products')
     
     # render the page
@@ -140,11 +144,11 @@ def editOrderFulfillment(purchase_id, product_id):
         search = True
     page = request.args.get(get_page_parameter(), type=int, default=1)
     start = (page - 1) * per_page
-    purchase = OrderHistory.get_purchase(purchase_id)
+    purchase = OrderHistory.get_purchase(current_user.id, purchase_id)
     product = Product.get(product_id)
     
     # get item fulfillment statuses
-    itemFulfillment = ItemFulfillment.get_item_fulfillment(purchase_id, product_id)
+    itemFulfillment = ItemFulfillment.get_item_fulfillment(current_user.id, purchase_id, product_id)
     itemList = [item.item_id for item in itemFulfillment]
     pagination = Pagination(page=page, per_page=per_page, total=len(itemFulfillment), search=search, record_name='items')
     
@@ -153,9 +157,9 @@ def editOrderFulfillment(purchase_id, product_id):
     form.item.choices = [(-1, 'All Items')] + [(id, id) for id in itemList]
     form.status.choices = [(0, 'ORDERED'), (1, 'SHIPPED'), (2, 'FULFILLED')]
     if form.validate_on_submit():
-        ItemFulfillment.update_status(purchase_id, product_id, form.item.data, form.status.data)
-        flash('Item fulfillment(s) has been updated')
-        itemFulfillment = ItemFulfillment.get_item_fulfillment(purchase_id, product_id)
+        ItemFulfillment.update_status(current_user.id, purchase_id, product_id, form.item.data, form.status.data)
+        flash('Item fulfillment(s) have been updated')
+        itemFulfillment = ItemFulfillment.get_item_fulfillment(current_user.id, purchase_id, product_id)
     
     # render the page
     return render_template(
