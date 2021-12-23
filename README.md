@@ -14,3 +14,9 @@ You can then deactivate the environment using
 ```
 deactiviate
 ```
+
+## Database E/R Diagram
+
+The E/R diagram for the Mini Amazon database is shown below.
+
+![cs316_final_er drawio](https://user-images.githubusercontent.com/65472983/147299702-108c965e-c6ee-4115-bfbe-1bdfb2b82bf3.png)
